@@ -143,11 +143,21 @@ try {
     $nm = [regex]::Match($guideFull, "(?ms)^v$([regex]::Escape($Version))（.*?(?=^v\d|\z)")
     if ($nm.Success) { $notes = $nm.Value.Trim() }
     $notesFile = Join-Path $Dist 'notes.txt'; [IO.File]::WriteAllText($notesFile, $notes, $utf8)
+    # GitHub 會把檔名裡的中文去掉，所以上傳用英文檔名，另外加上中文顯示名稱
+    $up = Join-Path $Dist 'upload'; New-Item -ItemType Directory -Force $up | Out-Null
+    Copy-Item $Zip (Join-Path $up 'ws-sim-zh.zip') -Force
+    Copy-Item $Manual (Join-Path $up 'ws-sim-zh-manual.zip') -Force
+    Copy-Item $Installer (Join-Path $up 'ws-sim-zh-setup.exe') -Force
+    $assets = @(
+        "$(Join-Path $up 'ws-sim-zh.zip')#WS模擬器中文化套件（安裝程式＋使用說明）.zip",
+        "$(Join-Path $up 'ws-sim-zh-manual.zip')#WS模擬器中文化套件_手動安裝包.zip",
+        "$(Join-Path $up 'ws-sim-zh-setup.exe')#WS模擬器中文化套件安裝程式（單檔）.exe"
+    )
     gh release view "v$Version" *> $null
     if ($LASTEXITCODE -ne 0) {
-        gh release create "v$Version" $Zip $Manual $Installer --title "v$Version" --notes-file $notesFile | Out-Host
+        gh release create "v$Version" @assets --title "v$Version" --notes-file $notesFile | Out-Host
     } else {
-        gh release upload "v$Version" $Zip $Manual $Installer --clobber | Out-Host
+        gh release upload "v$Version" @assets --clobber | Out-Host
         gh release edit "v$Version" --notes-file $notesFile | Out-Host
     }
     if ($LASTEXITCODE -ne 0) { throw "建立 GitHub Release 失敗" }

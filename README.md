@@ -11,12 +11,12 @@ Blake Thoennes 的 Weiss Schwarz 模擬器（Weiss Schwarz Simulator）非官方
 
 ## 下載
 
-到 [Releases](../../releases/latest) 下載：
+到 [Releases](../../releases/latest) 下載（或直接用固定連結：[ws-sim-zh.zip](https://github.com/DDGaryC/ws-sim-zh/releases/latest/download/ws-sim-zh.zip)）：
 
 | 檔案 | 說明 |
 |---|---|
-| `WS模擬器中文化套件.zip` | 一般使用者：安裝程式＋使用說明。安裝時會從網路下載最新的中文化檔案 |
-| `WS模擬器中文化套件_手動安裝包.zip` | 電腦開著 Windows「智慧型應用程式控制」、或安裝程式被防毒擋住時使用 |
+| `ws-sim-zh.zip` | 一般使用者：安裝程式＋使用說明。安裝時會從網路下載最新的中文化檔案 |
+| `ws-sim-zh-manual.zip` | 手動安裝包：電腦開著 Windows「智慧型應用程式控制」、或安裝程式被防毒擋住時使用 |
 
 安裝程式沒有數位簽章，第一次執行時 Windows 可能會出現警告，按「其他資訊」→「仍要執行」即可。
 
