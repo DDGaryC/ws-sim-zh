@@ -18,8 +18,8 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("WS 模擬器（Weiss Schwarz Simulator）中文化套件的安裝與更新程式。原始碼：https://github.com/DDGaryC/ws-sim-zh")]
 [assembly: AssemblyCompany("ws-sim-zh")]
 [assembly: AssemblyCopyright("ws-sim-zh")]
-[assembly: AssemblyVersion("1.1.0.0")]
-[assembly: AssemblyFileVersion("1.1.0.0")]
+[assembly: AssemblyVersion("1.2.0.0")]
+[assembly: AssemblyFileVersion("1.2.0.0")]
 
 class Installer : Form
 {
@@ -29,6 +29,14 @@ class Installer : Form
     static void Main(string[] args)
     {
         // 無介面模式（測試／進階用）：Installer.exe /silent "模擬器資料夾" [tw|hk|cn]、/update-silent "模擬器資料夾"
+        if (args.Length >= 2 && args[0] == "/rollback-silent")
+        {
+            var f = new Installer();
+            try { f.Rollback(args[1]); Environment.ExitCode = 0; }
+            catch (Exception ex) { f.log.AppendText("✘ " + ex.Message); Environment.ExitCode = 1; }
+            File.WriteAllText(Path.Combine(args[1], "中文化安裝紀錄.txt"), f.log.Text, Encoding.UTF8);
+            return;
+        }
         if (args.Length >= 2 && (args[0] == "/silent" || args[0] == "/update-silent"))
         {
             var f = new Installer();
@@ -51,7 +59,7 @@ class Installer : Form
 
     TextBox txtDir, log;
     Label lblDirState;
-    Button btnBrowse, btnInstall, btnLaunch;
+    Button btnBrowse, btnInstall, btnLaunch, btnRollback;
     RadioButton rbTw, rbHk, rbCn;
     CheckBox chkDesktop, chkMusic, chkDecks;
     string installedDir;
@@ -128,7 +136,9 @@ class Installer : Form
         btnInstall.Click += delegate { StartInstall(); };
         btnLaunch = new Button { Text = "▶ 啟動遊戲", Location = new Point(212, 390), Size = new Size(150, 44), Enabled = false };
         btnLaunch.Click += delegate { LaunchGame(); };
-        Controls.AddRange(new Control[] { btnInstall, btnLaunch });
+        btnRollback = new Button { Text = "↶ 還原上一版", Location = new Point(374, 390), Size = new Size(150, 44), Enabled = false };
+        btnRollback.Click += delegate { StartRollback(); };
+        Controls.AddRange(new Control[] { btnInstall, btnLaunch, btnRollback });
 
         log = new TextBox { Multiline = true, ReadOnly = true, ScrollBars = ScrollBars.Vertical, Location = new Point(30, 448), Size = new Size(600, 162), BackColor = Color.FromArgb(247, 248, 252), BorderStyle = BorderStyle.FixedSingle };
         Controls.Add(log);
@@ -167,6 +177,7 @@ class Installer : Form
         else if (DirOk) { lblDirState.Text = "✔ 找到模擬器"; lblDirState.ForeColor = Color.SeaGreen; }
         else { lblDirState.Text = "✘ 這個資料夾裡沒有 Weiss Schwarz.exe"; lblDirState.ForeColor = Color.Firebrick; }
         btnInstall.Enabled = DirOk;
+        if (btnRollback != null) btnRollback.Enabled = DirOk && Directory.Exists(Path.Combine(txtDir.Text.Trim(), BackupDirName, "files"));
     }
 
     void Browse()
@@ -252,6 +263,8 @@ class Installer : Form
         try { version = Online.RemoteVersion(); manifest = Online.Manifest(); }
         catch (Exception ex) { throw new Exception("無法連線到 GitHub 取得中文化檔案，請確認網路連線（" + ex.Message + "）"); }
         Log("  中文化套件 v" + version + "，共 " + manifest.Count + " 個檔案");
+        string prevVersion = ReadText(Path.Combine(dir, "wszh_version.txt"));
+        var backup = new Backup(dir, prevVersion);
         int n = 0, skipped = 0;
         string root = Path.GetFullPath(dir).TrimEnd('\\') + "\\";
         foreach (var e in manifest)
@@ -263,10 +276,14 @@ class Installer : Form
             if (!isIni && Online.UpToDate(dest, e.Size, e.Sha)) { skipped++; continue; }
             if (isIni && File.Exists(dest) && update) { skipped++; continue; }   // 更新時保留使用者自己的設定檔
             Log("  下載 " + e.Path);
-            if (Online.WriteFile(dest, Online.DownloadEntry(e))) Log("    （正在使用中，已改名為 .old 後更新，重新開啟該程式即可）");
+            var data = Online.DownloadEntry(e);
+            backup.Save(dest, e.Path);   // 先備份舊檔，之後可以「還原上一版」
+            if (Online.WriteFile(dest, data)) Log("    （正在使用中，已改名為 .old 後更新，重新開啟該程式即可）");
             n++;
         }
         Log("  已更新 " + n + " 個檔案" + (skipped > 0 ? "（" + skipped + " 個已是最新，略過）" : ""));
+        backup.Finish();
+        if (backup.Started) Log("  被換掉的舊檔已備份到 " + BackupDirName + "（可以用「還原上一版」退回 v" + (prevVersion ?? "舊版") + "）");
 
         // 1b. 中文字型、翻譯插件安裝程式：直接從 XUnity 官方下載
         string fontPath = Path.Combine(dir, Online.FontName);
@@ -320,6 +337,7 @@ class Installer : Form
 
         // 版本紀錄與更新程式（啟動腳本會用它們檢查與套用更新）
         File.WriteAllText(Path.Combine(dir, "wszh_version.txt"), version, new UTF8Encoding(false));
+        try { File.Delete(Path.Combine(dir, "wszh_skip.txt")); } catch { }
         try
         {
             string self = Path.GetFullPath(Application.ExecutablePath), updater = Path.Combine(dir, "wszh_updater.exe");
@@ -344,6 +362,7 @@ class Installer : Form
         MakeShortcut(Path.Combine(dir, "Weiss Schwarz (Patch and Run).lnk"), wscript, gameArgs, dir, gameIcon, "以中文介面啟動 Weiss Schwarz 模擬器");
         MakeShortcut(Path.Combine(dir, "Weiss Schwarz 中文版.lnk"), wscript, gameArgs, dir, gameIcon, "以中文介面啟動 Weiss Schwarz 模擬器");
         if (music) MakeShortcut(Path.Combine(dir, "音樂設定工具.lnk"), musicExe, "", Path.Combine(dir, "MusicTool"), musicIcon, "WS 模擬器 音樂設定工具");
+        MakeShortcut(Path.Combine(dir, "中文化套件（更新與還原）.lnk"), Path.Combine(dir, "wszh_updater.exe"), "", dir, Path.Combine(dir, "wszh_updater.exe") + ",0", "重新安裝、更新或還原 WS 模擬器中文化套件");
         if (desktop)
         {
             string desk = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -371,6 +390,76 @@ class Installer : Form
         Log("✔ 安裝完成！以後請用「Weiss Schwarz 中文版」捷徑啟動遊戲。");
         Log("  請不要使用遊戲裡的「匯入舊版牌組」，中文名稱會變亂碼；需要時請用「舊牌組修復工具.exe」。");
         Log("  模擬器更新後，捷徑會自動重新安裝翻譯插件；中文化有新版本時，開遊戲會詢問是否更新。");
+    }
+
+    const string BackupDirName = "wszh_backup";
+
+    static string ReadText(string p) { try { return File.Exists(p) ? File.ReadAllText(p).Trim() : null; } catch { return null; } }
+
+    // 更新前備份：把即將被換掉的檔案存到 wszh_backup\files，並記錄新增了哪些檔案
+    class Backup
+    {
+        readonly string root, prevVersion; readonly List<string> added = new List<string>();
+        public bool Started;
+        public Backup(string dir, string prev) { root = Path.Combine(dir, BackupDirName); prevVersion = prev; }
+        void Begin()
+        {
+            if (Started) return;
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+            Directory.CreateDirectory(Path.Combine(root, "files"));
+            File.WriteAllText(Path.Combine(root, "version.txt"), prevVersion ?? "1.0", new UTF8Encoding(false));
+            Started = true;
+        }
+        public void Save(string dest, string rel)
+        {
+            Begin();
+            if (!File.Exists(dest)) { added.Add(rel); return; }
+            string b = Path.Combine(root, "files", rel.Replace('/', '\\'));
+            Directory.CreateDirectory(Path.GetDirectoryName(b));
+            File.Copy(dest, b, true);
+        }
+        public void Finish()
+        {
+            if (Started) File.WriteAllLines(Path.Combine(root, "added.txt"), added.ToArray(), new UTF8Encoding(false));
+        }
+    }
+
+    // 還原上一版：把備份的檔案放回去，刪掉那次更新新增的檔案，並記住「不要再提示更新到剛剛那個版本」
+    void Rollback(string dir)
+    {
+        string root = Path.Combine(dir, BackupDirName), files = Path.Combine(root, "files");
+        if (!Directory.Exists(files)) throw new Exception("沒有可以還原的備份（還沒有更新過，或已經還原過了）");
+        string backVer = ReadText(Path.Combine(root, "version.txt")) ?? "舊版";
+        string curVer = ReadText(Path.Combine(dir, "wszh_version.txt"));
+        Log("正在還原到 v" + backVer + "…");
+        int n = 0;
+        foreach (var f in Directory.GetFiles(files, "*", SearchOption.AllDirectories))
+        {
+            string rel = f.Substring(files.Length + 1);
+            Online.WriteFile(Path.Combine(dir, rel), File.ReadAllBytes(f));
+            n++;
+        }
+        string addedList = Path.Combine(root, "added.txt");
+        if (File.Exists(addedList))
+            foreach (var rel in File.ReadAllLines(addedList))
+                if (rel.Trim().Length > 0) try { File.Delete(Path.Combine(dir, rel.Replace('/', '\\'))); } catch { }
+        File.WriteAllText(Path.Combine(dir, "wszh_version.txt"), backVer, new UTF8Encoding(false));
+        if (curVer != null) File.WriteAllText(Path.Combine(dir, "wszh_skip.txt"), curVer, new UTF8Encoding(false));
+        Directory.Delete(root, true);
+        Log("  已還原 " + n + " 個檔案");
+        Log("✔ 已還原到 v" + backVer + (curVer != null ? "。之後不會再提示更新到 v" + curVer + "，有更新的版本時才會再詢問。" : ""));
+    }
+
+    void StartRollback()
+    {
+        string dir = txtDir.Text.Trim();
+        string backVer = ReadText(Path.Combine(dir, BackupDirName, "version.txt")) ?? "舊版";
+        string curVer = ReadText(Path.Combine(dir, "wszh_version.txt")) ?? "目前版本";
+        if (MessageBox.Show(this, "要把中文化套件從 v" + curVer + " 還原到 v" + backVer + " 嗎？", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+        log.Clear();
+        try { Rollback(dir); MessageBox.Show(this, "已還原到 v" + backVer + "。", Text, MessageBoxButtons.OK, MessageBoxIcon.Information); }
+        catch (Exception ex) { Log("✘ " + ex.Message); }
+        ValidateDir();
     }
 
     static bool SameAsExisting(ZipArchiveEntry e, string dest)
