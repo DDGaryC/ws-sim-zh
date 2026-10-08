@@ -52,7 +52,27 @@ if (-not $m.Success) { throw "在使用說明.txt 的更新紀錄裡找不到版
 $Version = $m.Groups[1].Value
 "version: $Version"
 
-$items = @('WSLaunch.vbs', 'README_中文.txt', 'MusicTool\MusicTool.exe', '舊牌組修復工具.exe')
+# ---- 安裝程式（原始碼有變動才重新編譯）；它同時也是更新程式 wszh_updater.exe，一起放進更新清單讓它能自我更新 ----
+$Installer = Join-Path $Dist 'WS模擬器中文化套件安裝程式.exe'
+if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
+    $tmpExe = Join-Path $Dist 'installer.new.exe'
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /nowarn:0414 "/out:$tmpExe" `
+        /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll `
+        (Join-Path $Here 'Installer.cs') (Join-Path $Here 'Online.cs') (Join-Path $Here 'LegacyDecks.cs')
+    if ($LASTEXITCODE -ne 0) { throw "安裝程式編譯失敗" }
+    # 防毒軟體常在掃描剛產生的 exe 時鎖住檔案，等它掃完再換上
+    for ($try = 1; ; $try++) {
+        try { Move-Item -LiteralPath $tmpExe $Installer -Force -ErrorAction Stop; break }
+        catch { if ($try -ge 30) { throw "安裝程式被其他程式（通常是防毒軟體）鎖住，請稍後再試" }; Start-Sleep -Seconds 2 }
+    }
+    "installer rebuilt"
+} else { "installer unchanged" }
+
+# 自己這台模擬器也記錄版本並放一份更新程式
+[IO.File]::WriteAllText((Join-Path $Sim 'wszh_version.txt'), $Version, $utf8)
+Copy-Item $Installer (Join-Path $Sim 'wszh_updater.exe') -Force   # 要放進更新清單，複製失敗就停止
+
+$items = @('WSLaunch.vbs', 'README_中文.txt', 'MusicTool\MusicTool.exe', '舊牌組修復工具.exe', 'wszh_updater.exe')
 $items += Get-ChildItem (Join-Path $Sim 'AutoTranslator') -Recurse -File |
     Where-Object { $_.Name -notmatch '\.(bak\d*|orig|old)$' } |
     ForEach-Object { $_.FullName.Substring($Sim.TrimEnd('\').Length + 1) }
@@ -76,26 +96,6 @@ foreach ($rel in ($items | Sort-Object)) {
 [IO.File]::WriteAllText((Join-Path $Here 'manifest.txt'), ($manifest -join "`n") + "`n", $utf8)
 [IO.File]::WriteAllText((Join-Path $Here 'version.txt'), $Version + "`n", $utf8)
 "files: $($items.Count)"
-
-# ---- 3. 安裝程式（原始碼有變動才重新編譯） ----
-$Installer = Join-Path $Dist 'WS模擬器中文化套件安裝程式.exe'
-if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
-    $tmpExe = Join-Path $Dist 'installer.new.exe'
-    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /nowarn:0414 "/out:$tmpExe" `
-        /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll `
-        (Join-Path $Here 'Installer.cs') (Join-Path $Here 'Online.cs') (Join-Path $Here 'LegacyDecks.cs')
-    if ($LASTEXITCODE -ne 0) { throw "安裝程式編譯失敗" }
-    # 防毒軟體常在掃描剛產生的 exe 時鎖住檔案，等它掃完再換上
-    for ($try = 1; ; $try++) {
-        try { Move-Item -LiteralPath $tmpExe $Installer -Force -ErrorAction Stop; break }
-        catch { if ($try -ge 30) { throw "安裝程式被其他程式（通常是防毒軟體）鎖住，請稍後再試" }; Start-Sleep -Seconds 2 }
-    }
-    "installer rebuilt"
-} else { "installer unchanged" }
-
-# 自己這台模擬器也記錄版本並放一份更新程式
-[IO.File]::WriteAllText((Join-Path $Sim 'wszh_version.txt'), $Version, $utf8)
-try { Copy-Item $Installer (Join-Path $Sim 'wszh_updater.exe') -Force } catch { "（wszh_updater.exe 使用中，略過）" }
 
 # ---- 4. 壓縮檔 ----
 function New-Zip($path, [scriptblock]$fill) {
