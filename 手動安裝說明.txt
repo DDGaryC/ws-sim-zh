@@ -1,0 +1,132 @@
+﻿WS 模擬器 中文化套件 手動安裝說明
+==================================================
+
+這是「不使用安裝程式」的版本，給電腦開著 Windows 11「智慧型應用程式控制」、
+或安裝程式被防毒軟體擋住的人使用。
+
+※ 卡片名稱與卡片效果文字不會翻譯。
+
+
+--------------------------------------------------
+一、安裝步驟
+--------------------------------------------------
+1. 完全關閉模擬器。
+
+2. 打開這個資料夾裡的「放進模擬器資料夾」，
+   把裡面「所有東西」複製到模擬器資料夾（跟 Weiss Schwarz.exe 同一層）。
+   遇到同名檔案或資料夾，選「取代」。
+
+3. 下載兩個官方檔案（翻譯插件與中文字型，來自 XUnity.AutoTranslator 官方）：
+
+   (1) 翻譯插件安裝程式：
+       https://github.com/bbepis/XUnity.AutoTranslator/releases/download/v5.2.0/XUnity.AutoTranslator-ReiPatcher-5.2.0.zip
+       解壓縮後，把裡面的「SetupReiPatcherAndAutoTranslator.exe」放進模擬器資料夾。
+
+   (2) 中文字型（約 57 MB）：
+       https://github.com/bbepis/XUnity.AutoTranslator/releases/download/v5.4.4/TMP_Font_AssetBundles.zip
+       解壓縮後，只要把裡面的「arialuni_sdf_u2019」（沒有副檔名）放進模擬器資料夾，其他檔案不需要。
+
+   完成後，模擬器資料夾應該會多出：
+     AutoTranslator（資料夾）
+     arialuni_sdf_u2019
+     SetupReiPatcherAndAutoTranslator.exe
+     WSLaunch.vbs
+     README_中文.txt
+     MusicTool（資料夾）、舊牌組修復工具.exe（選用工具，見第四節）
+
+4. 在模擬器資料夾執行「SetupReiPatcherAndAutoTranslator.exe」。
+   會跳出一個黑色視窗，跑完顯示「Setup completed. Press any key to exit.」，
+   按任意鍵關閉即可。
+   完成後，模擬器資料夾會出現「Weiss Schwarz (Patch and Run)」捷徑。
+
+5. 以後都用「Weiss Schwarz (Patch and Run)」捷徑開遊戲。
+   可以把這個捷徑複製到桌面。
+   ※ 直接開 Weiss Schwarz.exe 會是英文。
+
+
+--------------------------------------------------
+二、選擇語言
+--------------------------------------------------
+預設是繁體中文（台灣）。要換語言：
+用記事本打開模擬器資料夾裡的「AutoTranslator\Config.ini」，
+找到「Language=tw」這一行，改成：
+  tw ＝ 繁體中文（台灣）
+  hk ＝ 繁體中文（香港）
+  cn ＝ 简体中文
+存檔後重新開遊戲。
+
+
+--------------------------------------------------
+三、模擬器更新之後
+--------------------------------------------------
+模擬器更新會把翻譯插件刪掉（翻譯檔和字型會保留），中文會消失。
+※ 中文化套件本身的新版本，請到 https://github.com/DDGaryC/ws-sim-zh/releases 下載手動安裝包，
+  照第一節步驟 2 覆蓋即可（字型與 Setup 不用重新下載）。
+這時只要：
+  再執行一次「SetupReiPatcherAndAutoTranslator.exe」，
+  然後用「Weiss Schwarz (Patch and Run)」捷徑開遊戲即可。
+
+【進階・可省略】自動修復啟動方式
+  雙擊模擬器資料夾裡的「WSLaunch.vbs」也可以開遊戲，它會：
+    ・模擬器更新後自動重新安裝翻譯插件（不用再手動執行 Setup）
+    ・自動修正禁限卡表中會讓遊戲出錯的空白行（見第五節）
+  如果雙擊後沒反應或被 Windows 擋下，就繼續用上面的捷徑方式。
+  可以用的話，對 WSLaunch.vbs 按右鍵 →「顯示其他選項」→「傳送到」→「桌面（建立捷徑）」。
+
+
+--------------------------------------------------
+四、選用工具
+--------------------------------------------------
+以下兩個是中文化套件自製的程式。電腦開著「智慧型應用程式控制」時會被封鎖，
+被擋的話就不能使用，但不影響中文化。
+
+■ 音樂設定工具（MusicTool\MusicTool.exe）
+  換對戰音樂、牌組編輯器音樂、音效，設定循環點。
+
+■ 舊牌組修復工具（舊牌組修復工具.exe）
+  用正確的中文名稱還原舊版模擬器的牌組。
+
+※ 不論能不能用修復工具，都請不要使用遊戲裡的「匯入舊版牌組」，
+  中文名稱會變成亂碼。
+
+
+--------------------------------------------------
+五、常見問題
+--------------------------------------------------
+Q：開遊戲還是英文？
+A：確認是用「Weiss Schwarz (Patch and Run)」捷徑開的。
+   還是英文的話，再執行一次 SetupReiPatcherAndAutoTranslator.exe。
+
+Q：中文出現「□」方塊？
+A：確認 arialuni_sdf_u2019 有放在模擬器資料夾（跟 Weiss Schwarz.exe 同一層）。
+
+Q：SetupReiPatcherAndAutoTranslator.exe 也被擋？
+A：這個是翻譯插件 XUnity.AutoTranslator 的官方安裝程式，沒有它就無法中文化。
+   被擋的話，只能請對方暫時關閉「智慧型應用程式控制」或防毒軟體的攔截。
+
+Q：開遊戲時的更新提示，按「是／否」都沒反應？
+A：這是模擬器本身的問題：遊戲開啟時讀到有問題的資料就會中途出錯，按鈕就沒反應。
+   ・最常見的原因是禁限卡表有空白行：用記事本打開
+     「Weiss Schwarz_Data\StreamingAssets\Banlist.txt」，把所有空白行刪掉後存檔
+     （用 WSLaunch.vbs 開遊戲會自動處理）。
+   ・還是沒反應的話，請改用手動更新：
+     1. 從模擬器作者的 Google Drive 下載最新版的模擬器壓縮檔。
+     2. 關閉遊戲，在模擬器資料夾刪掉：
+          MonoBleedingEdge、Weiss Schwarz_Data、Weiss Schwarz.exe、
+          UnityPlayer.dll、UnityCrashHandler64.exe、steam_appid.txt、README.txt
+        （Decks、CardContent、Audio、GameLogs 不要刪）
+     3. 把新版壓縮檔解壓縮到同一個資料夾。
+     4. 執行一次 SetupReiPatcherAndAutoTranslator.exe，
+        再用「Weiss Schwarz (Patch and Run)」捷徑開遊戲。
+
+Q：開遊戲時出現「Failed to load mono」？
+A：這是模擬器本身的檔案不完整，與中文化無關。
+   請確認模擬器資料夾裡有「MonoBleedingEdge」資料夾；
+   沒有的話，從模擬器壓縮檔重新解壓縮該資料夾（或整個模擬器，保留 Decks、CardContent、Audio）。
+   有防毒軟體的話，也請檢查隔離區是否有被抓走的檔案。
+
+
+--------------------------------------------------
+回報問題
+--------------------------------------------------
+遇到問題或發現沒翻到的英文，請截圖回報。

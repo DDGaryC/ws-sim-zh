@@ -1,0 +1,5 @@
+payload.zip
+dist/
+*.bak
+*.bak2
+*.old
