@@ -846,7 +846,7 @@ class MainForm : Form
     FlowLayoutPanel content;
     Panel editor, editorEmpty, detail, loopRow;
     Label lblWhat, lblFile, lblTime, lblVol, lblTip, lblLoopState, toast;
-    FlatButton btnPlay, btnSeam, btnStop, btnLsNow, btnLeNow, btnClear, btnLsM, btnLsP, btnLeM, btnLeP;
+    FlatButton btnPlay, btnSeam, btnCut, btnStop, btnLsNow, btnLeNow, btnClear, btnLsM, btnLsP, btnLeM, btnLeP;
     TextBox txtLs, txtLe;
     CheckBox chkCf; NumericUpDown numCf;
     Slider volSlider;
@@ -933,7 +933,23 @@ class MainForm : Form
     }
     static List<object> Files(Dictionary<string, object> ev) { return (List<object>)ev["files"]; }
     List<object> Sets() { return (List<object>)Ev("duel_stepped")["fileSets"]; }
-    string EvKey(Sel s) { return s.Type == "set" ? "duel_stepped" : s.Type == "deck" ? "deck_editor" : s.Key; }
+    string EvKey(Sel s) { return s.Type == "set" ? "duel_stepped" : s.Type == "deck" ? (s.Key ?? "deck_editor") : s.Key; }
+    // 「牌組編輯器音樂」與「主畫面音樂」兩個分頁共用同一套畫面，用這個決定目前是哪一個
+    string ListKey { get { return tab == "menu" ? "main_menu" : "deck_editor"; } }
+    // 主畫面音樂是中文化套件新增的項目（遊戲原本沒有）；還沒有的話先用牌組編輯器的曲目當預設
+    Dictionary<string, object> EnsureBgm(string key)
+    {
+        var ev = Ev(key);
+        if (ev != null) return ev;
+        ev = new Dictionary<string, object>();
+        ev["key"] = key; ev["file"] = "";
+        var files = new List<object>();
+        var deck = Ev("deck_editor");
+        if (deck != null) files.AddRange(Files(deck));
+        ev["files"] = files; ev["fileSets"] = new List<object>(); ev["volume"] = 1.0;
+        L("bgm").Add(ev);
+        return ev;
+    }
     double Vol(Sel s) { try { return Convert.ToDouble(Ev(EvKey(s))["volume"], Inv); } catch { return 1; } }
 
     string PathOf(Sel s)
@@ -999,7 +1015,7 @@ class MainForm : Form
             WriteJson(sb, cat, 0);
             File.WriteAllText(catalogPath, sb.ToString(), new UTF8Encoding(false));
             dirty = false; SetTitle(); btnSave.Text = "儲存";
-            Toast("已儲存！重新進入遊戲的對戰／牌組編輯器就會套用");
+            Toast("已儲存！重新進入遊戲的對戰／牌組編輯器／主畫面就會套用");
         }
         catch (Exception ex) { Toast("儲存失敗：" + ex.Message, true); }
     }
@@ -1187,7 +1203,7 @@ class MainForm : Form
                 if ((string)b.Tag == tab) using (var br = new SolidBrush(UI.Accent)) g.FillRectangle(br, b.Left + 6, tabs.Height - 4, b.Width - 12, 3);
         };
         int x = 18;
-        foreach (var t in new[] { new[] { "battle", "對戰音樂" }, new[] { "deck", "牌組編輯器音樂" }, new[] { "sfx", "音效" } })
+        foreach (var t in new[] { new[] { "battle", "對戰音樂" }, new[] { "deck", "牌組編輯器音樂" }, new[] { "menu", "主畫面音樂" }, new[] { "sfx", "音效" } })
         {
             var b = new FlatButton(t[1]) { Ghost = true, Tag = t[0], Font = UI.F(10.5f, FontStyle.Bold), Location = new Point(x, 7) };
             b.Height = 36;
@@ -1216,6 +1232,7 @@ class MainForm : Form
         int avail = content.ClientSize.Width - content.Padding.Horizontal - SystemInformation.VerticalScrollBarWidth - 2;
         string hint = tab == "battle" ? "每場對戰開始時，遊戲會從下面「隨機選一組」。等級 0 播第 1 首，等級 1–2 播第 2 首，等級 3 以上播第 3 首。點一首歌就能在下方試聽與設定循環點；雙擊可以直接換歌。"
             : tab == "deck" ? "牌組編輯器畫面的背景音樂。放多首的話，每次進入會「隨機播放其中一首」。"
+            : tab == "menu" ? "主畫面（主選單）的背景音樂。放多首的話，每次回到主畫面會「隨機播放其中一首」。需要用「Weiss Schwarz 中文版」捷徑開遊戲才會播放。"
             : "遊戲中的各種音效。一個項目放多個檔案時，遊戲會「隨機挑一個」播放。點檔名可以試聽並調整音量。";
         var lbl = new Label { Text = hint, ForeColor = UI.Muted, AutoSize = false, Width = avail - 14, Height = 30, Margin = new Padding(0, 0, 0, 6), AutoEllipsis = true };
         content.Controls.Add(lbl);
@@ -1260,9 +1277,10 @@ class MainForm : Form
             }
             else
             {
-                var files = Files(Ev("deck_editor"));
-                var c = new CardView { Title = "牌組編輯器", FooterText = "＋ 加入一首", FooterAct = "adddeck", Margin = new Padding(0, 0, 14, 14) };
-                for (int i = 0; i < files.Count; i++) c.Slots.Add(MakeSlot(new Sel { Type = "deck", Idx = i }, "第 " + (i + 1) + " 首", files.Count > 1));
+                string key = ListKey;
+                var files = Files(EnsureBgm(key));
+                var c = new CardView { Title = key == "main_menu" ? "主畫面" : "牌組編輯器", FooterText = "＋ 加入一首", FooterAct = "adddeck", Margin = new Padding(0, 0, 14, 14) };
+                for (int i = 0; i < files.Count; i++) c.Slots.Add(MakeSlot(new Sel { Type = "deck", Key = key, Idx = i }, "第 " + (i + 1) + " 首", files.Count > 1));
                 c.Fit(Math.Min(avail - 14, 640)); c.Act += OnAct; c.DoubleAct += OnDouble;
                 content.Controls.Add(c);
             }
@@ -1308,7 +1326,7 @@ class MainForm : Form
             }
             case "delete":
             {
-                var files = Files(Ev("deck_editor"));
+                var files = Files(Ev(EvKey(s)));
                 if (files.Count <= 1) { Toast("至少要保留一首", true); return; }
                 files.RemoveAt(s.Idx); MarkDirty(); player.Stop(); sel = null; RenderList(); RenderEditor();
                 break;
@@ -1343,8 +1361,8 @@ class MainForm : Form
             case "adddeck":
             {
                 string rel = PickAndImport("BGM"); if (rel == null) return;
-                var files = Files(Ev("deck_editor")); files.Add(rel); MarkDirty();
-                SelectItem(new Sel { Type = "deck", Idx = files.Count - 1 }, false);
+                var files = Files(EnsureBgm(ListKey)); files.Add(rel); MarkDirty();
+                SelectItem(new Sel { Type = "deck", Key = ListKey, Idx = files.Count - 1 }, false);
                 break;
             }
             case "chip":
@@ -1395,6 +1413,7 @@ class MainForm : Form
         lblFile = new Label { AutoSize = false, AutoEllipsis = true, Font = UI.F(12f, FontStyle.Bold), ForeColor = UI.Text, Location = new Point(20, 32), Size = new Size(420, 28) };
         btnPlay = new FlatButton("▶") { Primary = true, Round = true, Font = UI.F(13f), Size = new Size(46, 46) };
         btnSeam = new FlatButton("↻ 試聽接縫");
+        btnCut = new FlatButton("✂ 只用這一段");
         btnStop = new FlatButton("■") { Ghost = true, Size = new Size(40, 34) };
         lblTime = new Label { AutoSize = false, Size = new Size(210, 24), Font = new Font("Consolas", 11f), ForeColor = UI.Text, TextAlign = ContentAlignment.MiddleCenter };
         lblVol = new Label { AutoSize = false, Size = new Size(110, 24), ForeColor = UI.Muted, TextAlign = ContentAlignment.MiddleLeft };
@@ -1427,13 +1446,14 @@ class MainForm : Form
             }
         };
 
-        detail.Controls.AddRange(new Control[] { lblWhat, lblFile, btnPlay, btnSeam, btnStop, lblTime, lblVol, volSlider, wave, lblTip, loopRow });
+        detail.Controls.AddRange(new Control[] { lblWhat, lblFile, btnPlay, btnSeam, btnCut, btnStop, lblTime, lblVol, volSlider, wave, lblTip, loopRow });
         editor.Controls.Add(detail); editor.Controls.Add(editorEmpty);
         detail.Resize += delegate { LayoutEditor(); };
         Controls.Add(editor);
 
         btnPlay.Click += delegate { TogglePlay(); };
         btnStop.Click += delegate { StopPlayback(true); };
+        btnCut.Click += delegate { CutSegment(); };
         btnSeam.Click += delegate
         {
             var L2 = LoopOf(PathOf(sel));
@@ -1475,6 +1495,60 @@ class MainForm : Form
         RenderEditor();
     }
 
+    // 把目前選取的範圍（循環點）另存成 wav，套用到這個項目。
+    // 用途：同一首歌在不同等級播放不同段落——遊戲的循環點是跟著檔案走的，
+    // 而且同一個檔案在升級時不會切換，所以每個段落要是獨立的檔案。
+    void CutSegment() { CutSegment(true); }
+    void CutSegment(bool confirm)
+    {
+        string rel = PathOf(sel);
+        var L2 = LoopOf(rel);
+        if (rel == null || wave.Data == null) return;
+        if (L2 == null) { Toast("請先在波形上拖曳，選出要使用的段落", true); return; }
+        var d = wave.Data;
+        long f0 = (long)(L2[0] * d.Rate), f1 = Math.Min(d.Frames, (long)(L2[1] * d.Rate));
+        if (f1 - f0 < d.Rate / 2) { Toast("選取的段落太短（至少要 0.5 秒）", true); return; }
+        string suffix = sel.Type == "set"
+            ? "_第" + (sel.Set + 1) + "組_" + Array.Find(Levels, l => l[0] == sel.Track)[1].Replace(" ", "").Replace("–", "-")
+            : (sel.Key == "main_menu" ? "_主畫面" : "_牌組編輯器");
+        string baseName = Path.GetFileNameWithoutExtension(rel) + suffix;
+        foreach (char c in Path.GetInvalidFileNameChars()) baseName = baseName.Replace(c, '_');
+        string dir = Path.Combine(audioRoot, "BGM");
+        Directory.CreateDirectory(dir);
+        string dest = Path.Combine(dir, baseName + ".wav"); int n = 2;
+        while (File.Exists(dest)) dest = Path.Combine(dir, baseName + "_" + n++ + ".wav");
+        double secs = (f1 - f0) / (double)d.Rate;
+        string msg = "要把 " + FmtTime(L2[0]) + " ～ " + FmtTime(L2[1]) + "（" + secs.ToString("0.0", Inv) + " 秒）另存成\n「" + Path.GetFileName(dest) + "」\n並套用到這個項目嗎？\n\n套用後會整段循環播放；原本的音樂檔不會被修改。";
+        if (confirm && MessageBox.Show(this, msg, "只用這一段", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+        try
+        {
+            WriteWav(dest, d.Pcm, d.Channels, d.Rate, f0, f1);
+            string newRel = "BGM/" + Path.GetFileName(dest);
+            var s = sel;
+            SetPath(s, newRel);
+            sel = null; SelectItem(s, false);
+            Toast("已另存成「" + Path.GetFileName(dest) + "」並套用，記得按儲存");
+        }
+        catch (Exception ex) { Toast("另存失敗：" + ex.Message, true); }
+    }
+
+    static void WriteWav(string path, short[] pcm, int ch, int rate, long f0, long f1)
+    {
+        long frames = f1 - f0;
+        int bytes = checked((int)(frames * ch * 2));
+        using (var fs = new FileStream(path, FileMode.CreateNew))
+        using (var w = new BinaryWriter(fs))
+        {
+            w.Write(Encoding.ASCII.GetBytes("RIFF")); w.Write(36 + bytes); w.Write(Encoding.ASCII.GetBytes("WAVE"));
+            w.Write(Encoding.ASCII.GetBytes("fmt ")); w.Write(16); w.Write((short)1); w.Write((short)ch);
+            w.Write(rate); w.Write(rate * ch * 2); w.Write((short)(ch * 2)); w.Write((short)16);
+            w.Write(Encoding.ASCII.GetBytes("data")); w.Write(bytes);
+            var buf = new byte[bytes];
+            Buffer.BlockCopy(pcm, checked((int)(f0 * ch * 2)), buf, 0, bytes);
+            w.Write(buf);
+        }
+    }
+
     void LayoutEditor()
     {
         int W = detail.ClientSize.Width, pad = 22;
@@ -1484,7 +1558,8 @@ class MainForm : Form
         lblTime.Location = new Point(lblVol.Left - lblTime.Width - 10, 26);
         btnStop.Location = new Point(lblTime.Left - btnStop.Width - 8, 24);
         btnSeam.Location = new Point(btnStop.Left - btnSeam.Width - 6, 24);
-        btnPlay.Location = new Point(btnSeam.Left - btnPlay.Width - 10, 18);
+        btnCut.Location = new Point(btnSeam.Left - btnCut.Width - 6, 24);
+        btnPlay.Location = new Point((btnCut.Visible ? btnCut.Left : btnSeam.Left) - btnPlay.Width - 10, 18);
         lblFile.Width = Math.Max(120, btnPlay.Left - 40);
         wave.Location = new Point(pad, 74); wave.Width = W - pad * 2;
         lblTip.Location = new Point(pad, wave.Bottom + 2); lblTip.Width = W - pad * 2;
@@ -1501,11 +1576,11 @@ class MainForm : Form
         bool music = sel.Type != "sfx";
         editor.Height = music ? 290 : 240;
         lblWhat.Text = sel.Type == "set" ? "對戰音樂・第 " + (sel.Set + 1) + " 組・" + Array.Find(Levels, l => l[0] == sel.Track)[1]
-            : sel.Type == "deck" ? "牌組編輯器音樂・第 " + (sel.Idx + 1) + " 首" : "音效・" + (SfxNames.ContainsKey(sel.Key) ? SfxNames[sel.Key] : sel.Key);
+            : sel.Type == "deck" ? (sel.Key == "main_menu" ? "主畫面音樂・第 " : "牌組編輯器音樂・第 ") + (sel.Idx + 1) + " 首" : "音效・" + (SfxNames.ContainsKey(sel.Key) ? SfxNames[sel.Key] : sel.Key);
         lblFile.Text = Path.GetFileName(rel);
-        btnSeam.Visible = music; loopRow.Visible = music;
+        btnSeam.Visible = music; btnCut.Visible = music; loopRow.Visible = music;
         wave.LoopEditable = music;
-        lblTip.Text = music ? "在波形上「拖曳」即可選取循環範圍；拖動藍色邊線可微調；點一下跳到該位置。滾輪縮放，雙擊顯示全部。" : "點一下跳到該位置。滾輪縮放，雙擊顯示全部。";
+        lblTip.Text = music ? "在波形上「拖曳」選取範圍（循環點）；拖動藍色邊線可微調；按「✂ 只用這一段」可把選取範圍另存成這個項目專用的段落。滾輪縮放，雙擊顯示全部。" : "點一下跳到該位置。滾輪縮放，雙擊顯示全部。";
         syncing = true;
         double v = Vol(sel); volSlider.Value = v; lblVol.Text = "音量 " + (int)Math.Round(v * 100) + "%";
         syncing = false;
@@ -1589,6 +1664,12 @@ class MainForm : Form
     public void TestSelect(Sel s) { SelectItem(s, false); }
     public void TestTab(string t) { tab = t; RenderAll(); }
     public void ForceClose() { dirty = false; Close(); }
+    public string TestCut(double a, double b)
+    {
+        EnsureLoop(PathOf(sel), a, b);
+        CutSegment(false);
+        return PathOf(sel);
+    }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
@@ -1659,6 +1740,19 @@ static class Program
         Snap(f, Path.Combine(outDir, "ui_3_sfx.png"));
         f.TestTab("deck");
         Snap(f, Path.Combine(outDir, "ui_4_deck.png"));
+        f.TestTab("menu");
+        f.TestSelect(new Sel { Type = "deck", Key = "main_menu", Idx = 0 });
+        for (int i = 0; i < 40; i++) { Application.DoEvents(); Thread.Sleep(50); }
+        Snap(f, Path.Combine(outDir, "ui_5_menu.png"));
+        f.TestTab("battle");
+        f.TestSelect(new Sel { Type = "set", Set = 0, Track = "track3" });
+        for (int i = 0; i < 60; i++) { Application.DoEvents(); Thread.Sleep(50); }
+        string cut = f.TestCut(20.0, 35.5);
+        log.AppendLine("cut -> " + cut);
+        try { var cd = MF.Decode(Path.Combine(root, "Audio", cut.Replace('/', '\\'))); log.AppendLine("cut wav duration: " + cd.Duration.ToString("0.000") + "s (expect 15.500)"); }
+        catch (Exception ex) { log.AppendLine("cut decode ERROR " + ex.Message); }
+        for (int i = 0; i < 40; i++) { Application.DoEvents(); Thread.Sleep(50); }
+        Snap(f, Path.Combine(outDir, "ui_6_cut.png"));
         log.AppendLine("ui ok");
         f.ForceClose();
         File.WriteAllText(Path.Combine(outDir, "selftest.txt"), log.ToString());

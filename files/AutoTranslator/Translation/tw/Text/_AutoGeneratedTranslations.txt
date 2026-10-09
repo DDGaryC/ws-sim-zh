@@ -874,3 +874,4 @@ r:"^You cannot use on stage ACT until end of your turn$"=到你的回合結束�
 Extra counter step=額外的反擊步驟
 Emotes=表情
 Show=顯示
+main_menu=主畫面

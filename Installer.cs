@@ -335,6 +335,9 @@ class Installer : Form
         Log("  翻譯插件安裝完成");
         }
 
+        try { if (EnsureMainMenuMusic(dir)) Log("已加入「主畫面音樂」設定（預設使用牌組編輯器的音樂，可以用音樂設定工具更換）"); }
+        catch (Exception ex) { Log("  （設定主畫面音樂失敗：" + ex.Message + "）"); }
+
         // 版本紀錄與更新程式（啟動腳本會用它們檢查與套用更新）
         File.WriteAllText(Path.Combine(dir, "wszh_version.txt"), version, new UTF8Encoding(false));
         try { File.Delete(Path.Combine(dir, "wszh_skip.txt")); } catch { }
@@ -485,6 +488,39 @@ class Installer : Form
             }
         }
         catch { return false; }
+    }
+
+    // 主畫面音樂（中文化套件的補丁會在主畫面播放 "main_menu"）：音樂設定裡還沒有的話，先用牌組編輯器的曲目
+    static bool EnsureMainMenuMusic(string dir)
+    {
+        string p = Path.Combine(dir, @"Audio\audio_catalog.json");
+        if (!File.Exists(p)) return false;
+        string json = File.ReadAllText(p, Encoding.UTF8).TrimStart('\uFEFF');
+        if (Regex.IsMatch(json, "\"key\"\\s*:\\s*\"main_menu\"")) return false;
+        var ser = new System.Web.Script.Serialization.JavaScriptSerializer { MaxJsonLength = int.MaxValue };
+        var files = new List<string>();
+        var root = ser.DeserializeObject(json) as Dictionary<string, object>;
+        object bgmObj;
+        if (root == null || !root.TryGetValue("bgm", out bgmObj) || !(bgmObj is object[])) return false;
+        foreach (var o in (object[])bgmObj)
+        {
+            var d = o as Dictionary<string, object>; object k, f;
+            if (d != null && d.TryGetValue("key", out k) && (k as string) == "deck_editor" && d.TryGetValue("files", out f) && f is object[])
+                foreach (var x in (object[])f) if (x is string) files.Add((string)x);
+        }
+        var sb = new StringBuilder();
+        sb.Append("\n        {\n            \"key\": \"main_menu\",\n            \"file\": \"\",\n            \"files\": [");
+        for (int i = 0; i < files.Count; i++) sb.Append(i == 0 ? "\n" : ",\n").Append("                ").Append(ser.Serialize(files[i]));
+        sb.Append(files.Count > 0 ? "\n            ],\n" : "],\n");
+        sb.Append("            \"fileSets\": [],\n            \"volume\": 1.0\n        }");
+        int bgm = json.IndexOf("\"bgm\"");
+        int bracket = json.IndexOf('[', bgm);
+        if (bgm < 0 || bracket < 0) return false;
+        string rest = json.Substring(bracket + 1).TrimStart();
+        string insert = sb.ToString() + (rest.StartsWith("]") ? "\n    " : ",");
+        File.Copy(p, p + ".wszh.bak", true);
+        File.WriteAllText(p, json.Insert(bracket + 1, insert), new UTF8Encoding(false));
+        return true;
     }
 
     static bool FixBanlist(string p)

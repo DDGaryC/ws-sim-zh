@@ -30,19 +30,39 @@ function Newer($target, [string[]]$sources) {
     return $false
 }
 
+# 編譯到暫存檔再換上：防毒軟體常在掃描剛產生的檔案時鎖住它
+function Install-Built($tmp, $target) {
+    for ($try = 1; ; $try++) {
+        try { Move-Item -LiteralPath $tmp $target -Force -ErrorAction Stop; return }
+        catch { if ($try -ge 30) { throw "$(Split-Path $target -Leaf) 被其他程式鎖住（工具還開著，或防毒軟體正在掃描），請稍後再試" }; Start-Sleep -Seconds 2 }
+    }
+}
+
 # ---- 1. 工具 ----
 New-Item -ItemType Directory -Force (Join-Path $Sim 'MusicTool') | Out-Null
 $mtExe = Join-Path $Sim 'MusicTool\MusicTool.exe'
 if (Newer $mtExe 'MusicTool.cs') {
-    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /nowarn:0649 "/out:$mtExe" `
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 /nowarn:0649 "/out:$mtExe.new" `
         /r:System.Web.Extensions.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll (Join-Path $Here 'MusicTool.cs')
-    if ($LASTEXITCODE -ne 0) { throw "音樂設定工具編譯失敗（如果工具正開著，請先關閉）" }
+    if ($LASTEXITCODE -ne 0) { throw "音樂設定工具編譯失敗" }
+    Install-Built "$mtExe.new" $mtExe
 }
 $drExe = Join-Path $Sim '舊牌組修復工具.exe'
 if (Newer $drExe 'DeckRescue.cs', 'LegacyDecks.cs') {
-    & $csc /nologo /target:winexe /optimize+ /codepage:65001 "/out:$drExe" `
+    & $csc /nologo /target:winexe /optimize+ /codepage:65001 "/out:$drExe.new" `
         /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll (Join-Path $Here 'DeckRescue.cs') (Join-Path $Here 'LegacyDecks.cs')
     if ($LASTEXITCODE -ne 0) { throw "舊牌組修復工具編譯失敗" }
+    Install-Built "$drExe.new" $drExe
+}
+
+# 主畫面音樂補丁（ReiPatcher 執行在 .NET 3.5，所以用 3.5 的編譯器）
+$patchDll = Join-Path $Sim 'ReiPatcher\Patches\WSZH.MainMenuMusic.Patcher.dll'
+if (Newer $patchDll 'MainMenuMusicPatch.cs') {
+    $csc35 = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v3.5\csc.exe'
+    if (-not (Test-Path $csc35)) { throw "找不到 .NET 3.5 的編譯器（需要在 Windows 功能裡開啟 .NET Framework 3.5）" }
+    & $csc35 /nologo /target:library /optimize+ "/out:$patchDll.new" "/r:$(Join-Path $Sim 'ReiPatcher\ReiPatcher.exe')" "/r:$(Join-Path $Sim 'ReiPatcher\Mono.Cecil.dll')" /r:System.Core.dll (Join-Path $Here 'MainMenuMusicPatch.cs')
+    if ($LASTEXITCODE -ne 0) { throw "主畫面音樂補丁編譯失敗" }
+    Install-Built "$patchDll.new" $patchDll
 }
 
 # ---- 2. 版本號、同步 files\、manifest ----
@@ -57,7 +77,7 @@ $Installer = Join-Path $Dist 'WS模擬器中文化套件安裝程式.exe'
 if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
     $tmpExe = Join-Path $Dist 'installer.new.exe'
     & $csc /nologo /target:winexe /optimize+ /codepage:65001 /nowarn:0414 "/out:$tmpExe" `
-        /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll `
+        /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.Core.dll /r:System.Web.Extensions.dll `
         (Join-Path $Here 'Installer.cs') (Join-Path $Here 'Online.cs') (Join-Path $Here 'LegacyDecks.cs')
     if ($LASTEXITCODE -ne 0) { throw "安裝程式編譯失敗" }
     # 防毒軟體常在掃描剛產生的 exe 時鎖住檔案，等它掃完再換上
@@ -72,7 +92,7 @@ if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
 [IO.File]::WriteAllText((Join-Path $Sim 'wszh_version.txt'), $Version, $utf8)
 Copy-Item $Installer (Join-Path $Sim 'wszh_updater.exe') -Force   # 要放進更新清單，複製失敗就停止
 
-$items = @('WSLaunch.vbs', 'README_中文.txt', 'MusicTool\MusicTool.exe', '舊牌組修復工具.exe', 'wszh_updater.exe')
+$items = @('WSLaunch.vbs', 'README_中文.txt', 'MusicTool\MusicTool.exe', '舊牌組修復工具.exe', 'wszh_updater.exe', 'ReiPatcher\Patches\WSZH.MainMenuMusic.Patcher.dll')
 $items += Get-ChildItem (Join-Path $Sim 'AutoTranslator') -Recurse -File |
     Where-Object { $_.Name -notmatch '\.(bak\d*|orig|old)$' } |
     ForEach-Object { $_.FullName.Substring($Sim.TrimEnd('\').Length + 1) }
