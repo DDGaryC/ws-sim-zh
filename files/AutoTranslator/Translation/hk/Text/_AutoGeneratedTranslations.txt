@@ -872,3 +872,5 @@ r:"^You cannot use events until end of your turn$"=到你的回合結束為止�
 r:"^You cannot use on stage ACT until end of turn[.]$"=到回合結束為止，你不能使用舞台上的起動能力。
 r:"^You cannot use on stage ACT until end of your turn$"=到你的回合結束為止，你不能使用舞台上的起動能力。
 Extra counter step=額外的反擊步驟
+Emotes=表情
+Show=顯示
