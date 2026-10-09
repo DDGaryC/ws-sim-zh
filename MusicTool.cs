@@ -54,9 +54,13 @@ static class MF
         void DeleteAllItems(); void SetUINT32(); void SetUINT64(); void SetDouble(); void SetGUID(); void SetString();
         void SetBlob(); void SetUnknown(); void LockStore(); void UnlockStore(); void GetCount(); void GetItemByIndex();
         void CopyAllItems();
-        void GetSampleFlags(); void SetSampleFlags(); void GetSampleTime(); void SetSampleTime(); void GetSampleDuration();
-        void SetSampleDuration(); void GetBufferCount(); void GetBufferByIndex();
+        void GetSampleFlags(); void SetSampleFlags(); void GetSampleTime();
+        [PreserveSig] int SetSampleTime(long time);
+        void GetSampleDuration();
+        [PreserveSig] int SetSampleDuration(long duration);
+        void GetBufferCount(); void GetBufferByIndex();
         [PreserveSig] int ConvertToContiguousBuffer(out IMFMediaBuffer buffer);
+        [PreserveSig] int AddBuffer(IMFMediaBuffer buffer);
     }
 
     [ComImport, Guid("045FA593-8799-42b8-BC8D-8968C6453507"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -65,6 +69,18 @@ static class MF
         [PreserveSig] int Lock(out IntPtr buffer, out int maxLength, out int currentLength);
         [PreserveSig] int Unlock();
         [PreserveSig] int GetCurrentLength(out int length);
+        [PreserveSig] int SetCurrentLength(int length);
+    }
+
+    [ComImport, Guid("3137f1cd-fe5e-4805-a5d8-fb477448cb3d"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IMFSinkWriter
+    {
+        [PreserveSig] int AddStream(IMFMediaType targetMediaType, out int streamIndex);
+        [PreserveSig] int SetInputMediaType(int streamIndex, IMFMediaType inputMediaType, IntPtr encodingParameters);
+        [PreserveSig] int BeginWriting();
+        [PreserveSig] int WriteSample(int streamIndex, IMFSample sample);
+        void SendStreamTick(); void PlaceMarker(); void NotifyEndOfSegment(); void Flush();
+        [PreserveSig] int DoFinalize();
     }
 
     [ComImport, Guid("70ae66f2-c809-4e4f-8915-bdcb406b7993"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -81,6 +97,9 @@ static class MF
 
     [DllImport("mfplat.dll")] static extern int MFStartup(int version, int flags);
     [DllImport("mfplat.dll")] static extern int MFCreateMediaType(out IMFMediaType mediaType);
+    [DllImport("mfreadwrite.dll")] static extern int MFCreateSinkWriterFromURL([MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr byteStream, IntPtr attributes, out IMFSinkWriter writer);
+    [DllImport("mfplat.dll")] static extern int MFCreateSample(out IMFSample sample);
+    [DllImport("mfplat.dll")] static extern int MFCreateMemoryBuffer(int maxLength, out IMFMediaBuffer buffer);
     [DllImport("mfreadwrite.dll")] static extern int MFCreateSourceReaderFromURL([MarshalAs(UnmanagedType.LPWStr)] string url, IntPtr attributes, out IMFSourceReader reader);
 
     static readonly Guid MT_MAJOR = new Guid("48eba18e-f8c9-4687-bf11-0a74c9f96a8f");
@@ -90,6 +109,9 @@ static class MF
     static readonly Guid MT_BITS = new Guid("f2deb57f-40fa-4764-aa33-ed4f2d1ff669");
     static readonly Guid TYPE_AUDIO = new Guid("73647561-0000-0010-8000-00AA00389B71");
     static readonly Guid FORMAT_PCM = new Guid("00000001-0000-0010-8000-00AA00389B71");
+    static readonly Guid FORMAT_MP3 = new Guid("00000055-0000-0010-8000-00AA00389B71");
+    static readonly Guid MT_AVG_BYTES = new Guid("1aab75c8-cfef-451c-ab95-ac034b8e1731");
+    static readonly Guid MT_BLOCK_ALIGN = new Guid("322de230-9eeb-43bd-ab7a-ff412251541d");
     const int FIRST_AUDIO = -3, ALL_STREAMS = -2, EOS = 2;
     static bool started;
     static readonly object startLock = new object();
@@ -145,6 +167,72 @@ static class MF
             return new AudioData { Pcm = pcm, Channels = ch, Rate = rate };
         }
         finally { Marshal.ReleaseComObject(reader); }
+    }
+
+    // 把 pcm 的 [f0, f1) 編碼成 mp3（Windows 內建的 Media Foundation mp3 編碼器）
+    public static void EncodeMp3(string path, short[] pcm, int ch, int rate, long f0, long f1, int kbps)
+    {
+        lock (startLock) { if (!started) { Check(MFStartup(0x00020070, 0), "MFStartup"); started = true; } }
+        IMFSinkWriter w;
+        Check(MFCreateSinkWriterFromURL(path, IntPtr.Zero, IntPtr.Zero, out w), "建立 mp3 檔");
+        try
+        {
+            IMFMediaType o;
+            Check(MFCreateMediaType(out o), "MFCreateMediaType");
+            o.SetGUID(MT_MAJOR, TYPE_AUDIO); o.SetGUID(MT_SUBTYPE, FORMAT_MP3);
+            o.SetUINT32(MT_CHANNELS, ch); o.SetUINT32(MT_RATE, rate); o.SetUINT32(MT_AVG_BYTES, kbps * 1000 / 8);
+            int si;
+            Check(w.AddStream(o, out si), "設定 mp3 格式（這台電腦可能沒有 mp3 編碼器）");
+            IMFMediaType i;
+            Check(MFCreateMediaType(out i), "MFCreateMediaType");
+            i.SetGUID(MT_MAJOR, TYPE_AUDIO); i.SetGUID(MT_SUBTYPE, FORMAT_PCM);
+            i.SetUINT32(MT_CHANNELS, ch); i.SetUINT32(MT_RATE, rate); i.SetUINT32(MT_BITS, 16);
+            i.SetUINT32(MT_BLOCK_ALIGN, ch * 2); i.SetUINT32(MT_AVG_BYTES, rate * ch * 2);
+            Check(w.SetInputMediaType(si, i, IntPtr.Zero), "設定輸入格式");
+            Check(w.BeginWriting(), "開始寫入 mp3");
+            long t = 0;
+            for (long f = f0; f < f1; f += rate)
+            {
+                int n = (int)Math.Min(rate, f1 - f), bytes = n * ch * 2;
+                IMFMediaBuffer buf; IMFSample smp;
+                Check(MFCreateMemoryBuffer(bytes, out buf), "MFCreateMemoryBuffer");
+                IntPtr ptr; int max, cur;
+                buf.Lock(out ptr, out max, out cur);
+                Marshal.Copy(pcm, checked((int)(f * ch)), ptr, n * ch);
+                buf.Unlock();
+                buf.SetCurrentLength(bytes);
+                Check(MFCreateSample(out smp), "MFCreateSample");
+                smp.AddBuffer(buf);
+                long dur = (long)n * 10000000L / rate;
+                smp.SetSampleTime(t); smp.SetSampleDuration(dur); t += dur;
+                Check(w.WriteSample(si, smp), "寫入 mp3");
+                Marshal.ReleaseComObject(smp); Marshal.ReleaseComObject(buf);
+            }
+            Check(w.DoFinalize(), "完成 mp3");
+        }
+        finally { Marshal.ReleaseComObject(w); }
+    }
+
+    // mp3 編碼／解碼會在開頭多出一小段靜音。找出原音的第 refFrame 個取樣，在解碼後的 enc 裡是第幾個
+    public static long FindOffset(AudioData orig, long refFrame, AudioData enc, long from, long to)
+    {
+        int win = 4096;
+        long best = from; double bestErr = double.MaxValue;
+        int oc = orig.Channels, ec = enc.Channels;
+        for (long lag = Math.Max(0, from); lag <= to; lag++)
+        {
+            if (lag + win >= enc.Frames || refFrame + win >= orig.Frames) break;
+            double err = 0;
+            for (int k = 0; k < win; k += 2)
+            {
+                double a = orig.Pcm[(refFrame + k) * oc] + (oc > 1 ? orig.Pcm[(refFrame + k) * oc + 1] : 0);
+                double b = enc.Pcm[(lag + k) * ec] + (ec > 1 ? enc.Pcm[(lag + k) * ec + 1] : 0);
+                err += (a - b) * (a - b);
+                if (err >= bestErr) break;
+            }
+            if (err < bestErr) { bestErr = err; best = lag; }
+        }
+        return best;
     }
 }
 
@@ -1515,19 +1603,41 @@ class MainForm : Form
         foreach (char c in Path.GetInvalidFileNameChars()) baseName = baseName.Replace(c, '_');
         string dir = Path.Combine(audioRoot, "BGM");
         Directory.CreateDirectory(dir);
-        string dest = Path.Combine(dir, baseName + ".wav"); int n = 2;
-        while (File.Exists(dest)) dest = Path.Combine(dir, baseName + "_" + n++ + ".wav");
+        string dest = Path.Combine(dir, baseName + ".mp3"); int n = 2;
+        while (File.Exists(dest) || File.Exists(Path.ChangeExtension(dest, ".wav"))) dest = Path.Combine(dir, baseName + "_" + n++ + ".mp3");
         double secs = (f1 - f0) / (double)d.Rate;
-        string msg = "要把 " + FmtTime(L2[0]) + " ～ " + FmtTime(L2[1]) + "（" + secs.ToString("0.0", Inv) + " 秒）另存成\n「" + Path.GetFileName(dest) + "」\n並套用到這個項目嗎？\n\n套用後會整段循環播放；原本的音樂檔不會被修改。";
+        string msg = "要把 " + FmtTime(L2[0]) + " ～ " + FmtTime(L2[1]) + "（" + secs.ToString("0.0", Inv) + " 秒）另存成\n「" + Path.GetFileName(dest) + "」\n並套用到這個項目嗎？\n\n套用後會在這一段裡循環播放；原本的音樂檔不會被修改。";
         if (confirm && MessageBox.Show(this, msg, "只用這一段", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
         try
         {
-            WriteWav(dest, d.Pcm, d.Channels, d.Rate, f0, f1);
-            string newRel = "BGM/" + Path.GetFileName(dest);
             var s = sel;
+            double loopA = -1, loopB = -1;
+            try
+            {
+                // mp3：前後各多留 0.2 秒，存好後找出段落的實際位置，循環點就落在真正的音樂上（避開 mp3 前後的靜音）
+                long pad = d.Rate / 5;
+                long s0 = Math.Max(0, f0 - pad), s1 = Math.Min(d.Frames, f1 + pad);
+                MF.EncodeMp3(dest, d.Pcm, d.Channels, d.Rate, s0, s1, 320);
+                var enc = MF.Decode(dest);
+                long expect = f0 - s0;
+                long at = MF.FindOffset(d, f0, enc, expect, expect + 6000);
+                loopA = (double)at / enc.Rate;
+                loopB = loopA + (double)(f1 - f0) / d.Rate;
+                if (loopB > enc.Duration) loopB = enc.Duration;
+            }
+            catch (Exception mp3Error)
+            {
+                // 沒有 mp3 編碼器之類的狀況：改存 wav（檔案較大，但不需要額外處理）
+                try { if (File.Exists(dest)) File.Delete(dest); } catch { }
+                dest = Path.ChangeExtension(dest, ".wav");
+                WriteWav(dest, d.Pcm, d.Channels, d.Rate, f0, f1);
+                Toast("無法存成 mp3（" + mp3Error.Message + "），已改存成 wav", true);
+            }
+            string newRel = "BGM/" + Path.GetFileName(dest);
             SetPath(s, newRel);
+            if (loopA >= 0) EnsureLoop(newRel, loopA, loopB);
             sel = null; SelectItem(s, false);
-            Toast("已另存成「" + Path.GetFileName(dest) + "」並套用，記得按儲存");
+            Toast("已另存成「" + Path.GetFileName(dest) + "」（" + (new FileInfo(dest).Length / 1048576.0).ToString("0.0", Inv) + " MB）並套用，記得按儲存");
         }
         catch (Exception ex) { Toast("另存失敗：" + ex.Message, true); }
     }
@@ -1668,7 +1778,8 @@ class MainForm : Form
     {
         EnsureLoop(PathOf(sel), a, b);
         CutSegment(false);
-        return PathOf(sel);
+        var lp = LoopOf(PathOf(sel));
+        return PathOf(sel) + (lp != null ? "  loop " + lp[0].ToString("0.000") + " - " + lp[1].ToString("0.000") : "  (no loop)");
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -1749,7 +1860,12 @@ static class Program
         for (int i = 0; i < 60; i++) { Application.DoEvents(); Thread.Sleep(50); }
         string cut = f.TestCut(20.0, 35.5);
         log.AppendLine("cut -> " + cut);
-        try { var cd = MF.Decode(Path.Combine(root, "Audio", cut.Replace('/', '\\'))); log.AppendLine("cut wav duration: " + cd.Duration.ToString("0.000") + "s (expect 15.500)"); }
+        try { string cutPath = cut.Split(new[] { "  loop ", "  (no loop)" }, StringSplitOptions.None)[0]; var cd = MF.Decode(Path.Combine(root, "Audio", cutPath.Replace('/', '\\'))); double la = double.Parse(cut.Substring(cut.IndexOf("  loop ") + 7).Split(' ')[0], CultureInfo.InvariantCulture);
+          var od = MF.Decode(Path.Combine(root, @"Audio\BGM\Terraria Calamity Mod Music -  Siren s Call & Forbidden Lullaby  - Theme of Leviathan_320k.mp3"));
+          Func<long, double> diff = lagF => { double e = 0, n = 0; long o0 = (long)(20.0 * od.Rate); for (int k = 0; k < 8000; k++) { double x = od.Pcm[(o0 + k) * od.Channels], y = cd.Pcm[(lagF + k) * cd.Channels]; e += (x - y) * (x - y); n += x * x; } return Math.Sqrt(e / Math.Max(1, n)); };
+          long at = (long)Math.Round(la * cd.Rate);
+          log.AppendLine("alignment error at loop start: " + diff(at).ToString("0.000") + " (shifted 50 samples: " + diff(at + 50).ToString("0.000") + ")");
+          log.AppendLine("cut duration: " + cd.Duration.ToString("0.000") + "s, size " + new FileInfo(Path.Combine(root, "Audio", cutPath.Replace('/', '\\'))).Length + " bytes"); }
         catch (Exception ex) { log.AppendLine("cut decode ERROR " + ex.Message); }
         for (int i = 0; i < 40; i++) { Application.DoEvents(); Thread.Sleep(50); }
         Snap(f, Path.Combine(outDir, "ui_6_cut.png"));
