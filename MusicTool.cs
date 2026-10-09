@@ -924,7 +924,9 @@ class MainForm : Form
 
     readonly Player player = new Player();
     readonly Dictionary<string, AudioData> audioCache = new Dictionary<string, AudioData>();
-    readonly HashSet<string> loading = new HashSet<string>();
+    // 正在讀取的檔案 → 等著結果的動作（同一個檔案正在讀時，後來的請求排隊，不會被丟掉）
+    readonly Dictionary<string, List<Action<AudioData>>> loading = new Dictionary<string, List<Action<AudioData>>>();
+    readonly List<string> cacheOrder = new List<string>();   // 只保留最近 4 首解碼結果（長歌一首約 80 MB）
     double pausedPos;
     string pausedKey;
 
@@ -1196,19 +1198,34 @@ class MainForm : Form
         if (path == null) { Toast("找不到檔案：" + rel, true); wave.Message = "找不到檔案"; wave.Invalidate(); return; }
         string key = path + "|" + File.GetLastWriteTimeUtc(path).Ticks;
         AudioData d;
-        if (audioCache.TryGetValue(key, out d)) { then(d); return; }
-        if (loading.Contains(key)) return;
-        loading.Add(key);
+        if (audioCache.TryGetValue(key, out d))
+        {
+            cacheOrder.Remove(key); cacheOrder.Add(key);
+            then(d); return;
+        }
+        List<Action<AudioData>> waiting;
+        if (loading.TryGetValue(key, out waiting)) { waiting.Add(then); return; }
+        loading[key] = new List<Action<AudioData>> { then };
         ThreadPool.QueueUserWorkItem(delegate
         {
             AudioData r = null; string err = null;
             try { r = MF.Decode(path); } catch (Exception ex) { err = ex.Message; }
             BeginInvoke(new Action(delegate
             {
+                var callbacks = loading[key];
                 loading.Remove(key);
                 if (r == null) { Toast("無法讀取音訊：" + err, true); if (PathOf(sel) == rel) { wave.Message = "無法讀取這個檔案（" + err + "）"; wave.Invalidate(); } return; }
-                audioCache[key] = r;
-                then(r);
+                audioCache[key] = r; cacheOrder.Add(key);
+                // 超過 4 首就清掉最舊、而且目前沒有在顯示或播放的
+                string playingPath = player.Playing && player.Key != null ? ResolveAudio(player.Key) : null;
+                for (int i = 0; i < cacheOrder.Count && cacheOrder.Count > 4; )
+                {
+                    string old = cacheOrder[i];
+                    bool inUse = wave.Data == audioCache[old] || (playingPath != null && old.StartsWith(playingPath + "|"));
+                    if (inUse) { i++; continue; }
+                    audioCache.Remove(old); cacheOrder.RemoveAt(i);
+                }
+                foreach (var cb in callbacks) cb(r);
             }));
         });
     }
@@ -1774,6 +1791,7 @@ class MainForm : Form
     public void TestSelect(Sel s) { SelectItem(s, false); }
     public void TestTab(string t) { tab = t; RenderAll(); }
     public void ForceClose() { dirty = false; Close(); }
+    public bool TestWaveLoaded() { return wave.Data != null; }
     public string TestCut(double a, double b)
     {
         EnsureLoop(PathOf(sel), a, b);
@@ -1840,6 +1858,12 @@ static class Program
         f.StartPosition = FormStartPosition.Manual; f.Location = new Point(-3000, -3000);
         f.Show(); Application.DoEvents();
         Snap(f, Path.Combine(outDir, "ui_1_battle.png"));
+        // 快速連點同一首歌的兩個項目：第二個也要能載入（之前會卡在「載入中」）
+        f.TestSelect(new Sel { Type = "set", Set = 0, Track = "track1" });
+        f.TestSelect(new Sel { Type = "set", Set = 0, Track = "track2" });
+        var swl = Stopwatch.StartNew();
+        while (!f.TestWaveLoaded() && swl.ElapsedMilliseconds < 15000) { Application.DoEvents(); Thread.Sleep(20); }
+        log.AppendLine("rapid switch loaded: " + f.TestWaveLoaded() + " in " + swl.ElapsedMilliseconds + " ms");
         f.ClientSize = new Size(1900, 1000); Application.DoEvents(); Snap(f, Path.Combine(outDir, "ui_1b_wide.png"));
         f.ClientSize = new Size(1280, 860); Application.DoEvents();
         f.TestSelect(new Sel { Type = "set", Set = 0, Track = "track2" });
