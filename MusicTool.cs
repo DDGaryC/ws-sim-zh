@@ -1707,7 +1707,8 @@ class MainForm : Form
         lblFile.Text = Path.GetFileName(rel);
         btnSeam.Visible = music; btnCut.Visible = music; loopRow.Visible = music;
         wave.LoopEditable = music;
-        lblTip.Text = music ? "在波形上「拖曳」選取範圍（循環點）；拖動藍色邊線可微調；按「✂ 只用這一段」可把選取範圍另存成這個項目專用的段落。滾輪縮放，雙擊顯示全部。" : "點一下跳到該位置。滾輪縮放，雙擊顯示全部。";
+        tipDefault = music ? "在波形上「拖曳」選取範圍（循環點）；拖動藍色邊線可微調；按「✂ 只用這一段」可把選取範圍另存成這個項目專用的段落。滾輪縮放，雙擊顯示全部。" : "點一下跳到該位置。滾輪縮放，雙擊顯示全部。";
+        lblTip.Text = tipDefault; lblTip.ForeColor = UI.Muted;
         syncing = true;
         double v = Vol(sel); volSlider.Value = v; lblVol.Text = "音量 " + (int)Math.Round(v * 100) + "%";
         syncing = false;
@@ -1719,10 +1720,19 @@ class MainForm : Form
         LayoutEditor();
     }
 
+    string tipDefault = "";
     void SyncLoopUi()
     {
         var lp = FindLoop(PathOf(sel));
         syncing = true;
+        // 對戰音樂：升級換歌時遊戲一律從 0 秒開始播，循環點不從開頭起算時提醒使用者
+        bool lateStart = false;
+        if (sel != null && sel.Type == "set" && lp != null) { double ls0 = ParseTime(lp["loopStart"] as string); lateStart = ls0 > 1.0; }
+        if (lblTip != null)
+        {
+            lblTip.Text = lateStart ? "⚠ 升級換到這首時，遊戲會從 0 秒開始播（不是從循環開始點）。想直接從選取的段落開始，請按「✂ 只用這一段」。" : tipDefault;
+            lblTip.ForeColor = lateStart ? Color.FromArgb(196, 110, 0) : UI.Muted;
+        }
         lblLoopState.Text = lp != null ? "已設定：播到結束會跳回開始" : "未設定：整首播完後從頭重播";
         lblLoopState.ForeColor = lp != null ? UI.Ok : UI.Muted;
         lblLoopState.BackColor = lp != null ? Color.FromArgb(230, 246, 236) : Color.FromArgb(238, 240, 245);

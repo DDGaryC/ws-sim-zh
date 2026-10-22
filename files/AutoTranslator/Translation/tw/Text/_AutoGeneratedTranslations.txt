@@ -321,7 +321,7 @@ Changelog=更新紀錄
 Only works with default decks beginning with AI_=只適用於名稱以 AI_ 開頭的預設牌組
 Weiss Schwarz belongs to Bushiroad, and all images belong to their respective series' license holders. \nThis is not a Bushiroad product, just something that was made for fun.=Weiß Schwarz 為武士道公司所有，所有圖片版權屬於各系列的版權持有者。\n本程式並非武士道公司產品，只是出於興趣製作的作品。
 Your card data may be out of date.\n\nLast update run: lastRunDisplay\nLatest repo commit: repoCommitDisplay\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：lastRunDisplay\n資料庫最新版本：repoCommitDisplay\n\n要現在前往設定進行更新嗎？
-r:"^Your card data may be out of date[.]\n\nLast update run: (.+)\nLatest repo commit: (.+)\n\nWould you like to go to Settings to update now[?]$"=你的卡片資料可能不是最新的。\n\n上次更新：$1\n資料庫最新版本：$2\n\n要現在前往設定進行更新嗎？
+r:"^Your card data may be out of date[.]\s*Last update run: (.+)\s*Latest repo commit: (.+)\s*Would you like to go to Settings to update now[?]$"=你的卡片資料可能不是最新的。\n\n上次更新：$1\n資料庫最新版本：$2\n\n要現在前往設定進行更新嗎？
 Please note this version is completely incompatable\nwith versions below 0.4.2.1=注意：此版本與 0.4.2.1 以下的版本完全不相容
 The simulator updater is missing from this installation. Please update manually.=找不到模擬器更新程式，請手動更新。
 The updater process did not start.=更新程式沒有啟動。
@@ -355,7 +355,7 @@ Built-in AI decks cannot be renamed.=內建 AI 牌組無法重新命名。
 The deck could not be renamed.=牌組無法重新命名。
 copied to clipboard=已複製到剪貼簿
 Are you sure you want to overwrite\n<name of deck>?=確定要覆蓋\n<name of deck>？
-r:"^(.+) already exists[.] Are you sure you want to overwrite it[?]\n?$"=$1 已經存在，確定要覆蓋嗎？
+r:"^(.+) already exists[.] Are you sure you want to overwrite it[?]\s*?$"=$1 已經存在，確定要覆蓋嗎？
 Your deck has fewer than 8 climax. While this is not against the rules, it is very ill advised. Save anyway?=你的牌組名場面卡少於 8 張。雖然不違反規則，但非常不建議。仍要儲存嗎？
 AI decks cannot be overwritten.=AI 牌組無法被覆蓋。
 The deck you are trying to load does not contain any existing cards.=要讀取的牌組中沒有任何存在的卡片。
@@ -525,7 +525,7 @@ Checking installed images=檢查已安裝的圖片
 Downloading new images=下載新圖片中
 Update already running...=更新進行中...
 Cannot leave options while card update is running.=卡片更新期間無法離開設定。
-r:"^Stage: (.+) [(]([0-9]+)%[)]\nSet: (.+)$"=階段：$1（$2%）\n系列：$3
+r:"^Stage: (.+) [(]([0-9]+)%[)]\s*Set: (.+)$"=階段：$1（$2%）\n系列：$3
 
 // --- 音效設定 ---
 Audio Settings=音效設定
@@ -745,9 +745,9 @@ Total number of climaxes with Chance triggers that were triggered this game by t
 Audio=音效設定
 
 // --- 設定頁：卡片更新資訊 ---
-r:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nCard update complete[.] Card database reloaded; restart is not required[.]$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n卡片更新完成，已重新讀取卡片資料，不需要重新啟動遊戲。
-r:"(?s)^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\n(.*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n$4
-r:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3
+r:"^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)\s*Card update complete[.] Card database reloaded; restart is not required[.]$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n卡片更新完成，已重新讀取卡片資料，不需要重新啟動遊戲。
+r:"(?s)^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)\s*(.*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n$4
+r:"^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3
 Card storage: unavailable (no updater assigned)=卡片存放位置：無法取得
 
 // --- 系列名稱（補充） ---
@@ -817,8 +817,8 @@ Could not connect to the lobby host. The lobby may be stale or unreachable. Try 
 Lobby host is no longer available. Try Quick Match again.=房主已經離開，請再試一次快速配對。
 Could not connect to the lobby host. Try Quick Match again.=無法連線到房主，請再試一次快速配對。
 Lobby search failed. Retrying...=搜尋房間失敗，重試中...
-r:"(?s)^Log is still in use[.]\nClose any open game/processes and retry[.]\n\n(.*)$"=紀錄檔仍在使用中。\n請關閉開著的遊戲或程式後再試一次。\n\n$1
-r:"(?s)^An <b>INHERITANCE</b>/<b>INSPIRE</b> (<sprite[^>]*>) effect has been triggered by a card in play[.]\nResolve these effects[?]\n<b><color[^>]*>Denying will skip resolution of <i>ALL</i> INHERITANCE/INSPIRE effects triggered by this card[.]</color></b>$"=場上的卡片發動了 <b>INHERITANCE</b>／<b>INSPIRE</b> $1 效果。\n要處理這些效果嗎？\n<b><color=red>選擇「否」會略過這張卡發動的<i>所有</i> INHERITANCE／INSPIRE 效果。</color></b>
+r:"(?s)^Log is still in use[.]\s*Close any open game/processes and retry[.]\s*(.*)$"=紀錄檔仍在使用中。\n請關閉開著的遊戲或程式後再試一次。\n\n$1
+r:"(?s)^An <b>INHERITANCE</b>/<b>INSPIRE</b> (<sprite[^>]*>) effect has been triggered by a card in play[.]\s*Resolve these effects[?]\s*<b><color[^>]*>Denying will skip resolution of <i>ALL</i> INHERITANCE/INSPIRE effects triggered by this card[.]</color></b>$"=場上的卡片發動了 <b>INHERITANCE</b>／<b>INSPIRE</b> $1 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡發動的<i>所有</i> INHERITANCE／INSPIRE 效果。</color></b>
 // 判定圖示的提示
 r:"^(<sprite[^>]*mini_bounce[^>]*>) ?Choose up to 1 of your opponent's characters to return to their hand[.]$"=$1【風吹】最多選擇 1 張對手的角色，返回對手的手牌。
 r:"^(<sprite[^>]*mini_bag[^>]*>) ?Put the top card of your deck into your stock[?]$"=$1【寶袋】要將牌庫頂的 1 張卡放置到能量區嗎？
@@ -838,7 +838,7 @@ Stock=能量區
 
 // --- 補充（全面檢查後） ---
 r:"^(.+) Choose 1 card[.](Not enough valid targets[.])?$"=$1 請選擇 1 張卡。$2
-r:"(?s)^A newer version of the simulator is available: (.+)\nYou are currently running (.+)[.]\n\nUpdate now[?] The game will close and restart when the update is complete[.]$"=有新版本的模擬器可以更新：$1\n你目前的版本是 $2。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
+r:"(?s)^A newer version of the simulator is available: (.+)\s*You are currently running (.+)[.]\s*Update now[?] The game will close and restart when the update is complete[.]$"=有新版本的模擬器可以更新：$1\n你目前的版本是 $2。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
 r:"^(<sprite[^>]*mini_shot[^>]*>) ?Deal 1 damage to your opponent[.]$"=$1【火燒】給予對手 1 點傷害。
 r:"^(<sprite[^>]*mini_chance[^>]*>) ?Choose 1 card to put into your stock[.]$"=$1【燈泡】選擇 1 張卡放置到能量區。
 Shot Trigger=火燒判定
@@ -875,3 +875,98 @@ Extra counter step=額外的反擊步驟
 Emotes=表情
 Show=顯示
 main_menu=主畫面
+
+// --- 新版模擬器（2026-10）新增字串 ---
+r:"(?s)^A <b>RECOLLECTION</b> (<sprite[^>]*>) effect has been triggered by a card in play[.]\s*Resolve these effects[?]\s*<b><color[^>]*>Denying will skip resolution of <i>ALL</i> RECOLLECTION effects triggered by this card's placement from anywhere[.]</color></b>$"=場上的卡片發動了 <b>回想（RECOLLECTION）</b> $1 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡這次放置（不論從哪裡放置）發動的<i>所有</i>回想效果。</color></b>
+r:"(?s)^You are ready[.]\s*Opponent is ready[.]\s*([0-9]+)s remaining$"=你已準備。\n對手已準備。\n剩下 $1 秒
+r:"(?s)^You are ready[.]\s*Waiting for opponent readiness[.]\s*([0-9]+)s remaining$"=你已準備。\n等待對手準備。\n剩下 $1 秒
+r:"(?s)^Opponent found[.] Ready up!\s*Opponent is ready[.]\s*([0-9]+)s remaining$"=找到對手了，請按「準備」！\n對手已準備。\n剩下 $1 秒
+r:"(?s)^Opponent found[.] Ready up!\s*Waiting for opponent readiness[.]\s*([0-9]+)s remaining$"=找到對手了，請按「準備」！\n等待對手準備。\n剩下 $1 秒
+r:"^Both players ready[.] Starting in ([0-9]+)s[.][.][.]$"=雙方都已準備，$1 秒後開始…
+Matchmaking paused: readiness expired or the opponent left.\nResume once you are alone, or return to the main menu.=配對已暫停：準備時間已過，或對手已離開。\n等房間只剩你一人時可以繼續配對，或返回主畫面。
+Matchmaking paused: readiness expired or the opponent left.\nFind another opponent.=配對已暫停：準備時間已過，或對手已離開。\n請尋找其他對手。
+Waiting for an opponent...=正在等待對手…
+Waiting for opponent=等待對手
+Starting match...=對戰即將開始…
+Matchmaking paused=配對已暫停
+Not ready=尚未準備
+Ready=準備
+Resume Matchmaking=繼續配對
+Find Another Opponent=尋找其他對手
+Open Lobbies: unavailable=開放中的房間：無法取得
+Open Lobbies: checking...=開放中的房間：查詢中…
+r:"^Open Lobbies: ([0-9]+)$"=開放中的房間：$1
+Leaving lobby. Finding another opponent...=正在離開房間，尋找其他對手…
+Lobby unavailable. Finding another match...=房間已無法使用，正在尋找其他對戰…
+Retrying search for another match...=重新尋找其他對戰…
+Could not update lobby availability. The lobby has been closed. Try Quick Match again.=無法更新房間狀態，房間已關閉。請重新使用快速配對。
+Quick Match could not update lobby availability. The lobby has been closed. Please try again.=快速配對無法更新房間狀態，房間已關閉。請再試一次。
+Could not open the Quick Match lobby. Try again.=無法開啟快速配對的房間，請再試一次。
+Could not join the Steam lobby. Try again.=無法加入 Steam 房間，請再試一次。
+This lobby is no longer searching. Try Quick Match again.=這個房間已不在配對中，請重新使用快速配對。
+Could not finish leaving the lobby. Return to the main menu and try again.=無法順利離開房間，請返回主畫面後再試一次。
+Could not create a Steam lobby. Try again.=無法建立 Steam 房間，請再試一次。
+Could not create a Steam lobby. Try Quick Match again.=無法建立 Steam 房間，請重新使用快速配對。
+You could not connect to this game because your app version does not match the host's.\n\nPlease check Discord for update announcements and make sure you are on the latest version.=你的模擬器版本和房主不同，無法加入這場對戰。\n\n請到 Discord 查看更新公告，並確認你使用的是最新版本。
+You could not connect to this game because your card data does not match the host's.\n\nThis usually means your card content is out of date. You will be taken to Settings to update it.=你的卡片資料和房主不同，無法加入這場對戰。\n\n通常是你的卡片資料不是最新的，接下來會帶你到設定頁面進行更新。
+The connection attempt was cancelled.=已取消連線。
+Previous turn=上一回合
+Next turn=下一回合
+r:"^Speed ([0-9.]+)x$"=速度 $1x
+Back to logs=返回對戰紀錄
+Pause=暫停
+Finished=已結束
+Stopped=已停止
+Restart=重新開始
+Swap sides=交換視角
+Playback=重播
+Messages=訊息
+Chat=聊天
+Confirm=確認
+Preparing replay=正在準備重播
+Playing=播放中
+Playing partial recording=播放中（紀錄不完整）
+End of partial recording=不完整的紀錄已播放完畢
+End of partial recording (an input was not completed)=不完整的紀錄已播放完畢（有操作沒有完成）
+r:"^End of partial recording [(]decision #([0-9]+) was not completed[)]$"=不完整的紀錄已播放完畢（第 $1 個決策沒有完成）
+Replay complete - draw=重播完畢 - 平手
+r:"^Replay complete - Player ([12]) wins$"=重播完畢 - 玩家 $1 獲勝
+Replay ended without reproducing its recorded result=重播結束，但結果和紀錄不同
+Replay stopped before its recorded result=重播在紀錄的結果出現前停止了
+r:"^Replay stopped: (.+)$"=重播已停止：$1
+r:"^Replay unavailable: (.+)$"=無法重播：$1
+Load a GameLog file before starting playback.=請先讀取對戰紀錄檔，再開始重播。
+sr:"^Paused - (.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=已暫停 - $1 ｜ 回合 $2/$3 ｜ 已驗證：$4 ｜ 玩家 $5 ｜ $6%
+sr:"^Seeking turn ([0-9]+) - (.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=跳到第 $1 回合 - $2 ｜ 回合 $3/$4 ｜ 已驗證：$5 ｜ 玩家 $6 ｜ $7%
+sr:"^(.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=$1 ｜ 回合 $2/$3 ｜ 已驗證：$4 ｜ 玩家 $5 ｜ $6%
+r:"(?s)^Log is still in use[.]\s*Close any open game/processes and retry[.]\s*(.+)$"=紀錄檔還在使用中。\n請關閉開著的遊戲或程式後再試一次。\n\n$1
+Total Refresh Cards=洗牌重整的總卡數
+Most Played Card Count=最常打出的卡片次數
+Cards returned during refresh=洗牌重整時回到牌庫的卡
+Clocked=放置到傷害區
+Self-Clocks=自己放傷害區
+Heals=回復
+Plusses=集中收益
+Backups=助太刀
+Hits=命中
+Damage=傷害
+r:"(?s)^Your card data may be out of date[.]\s*Last update run: (.*)\s*Latest repo commit: (.*)\s*Would you like to go to Settings to update now[?]$"=你的卡片資料可能不是最新的。\n\n上次更新：$1\n最新版本：$2\n\n要前往設定進行更新嗎？
+Card update completed, but the database could not be reloaded. Restart the game to load the updated cards.=卡片更新完成，但無法重新載入資料，請重新啟動遊戲以載入新的卡片。
+Card update is already running.=卡片更新已經在進行中。
+Card repo latest commit: unavailable=卡片資料最新版本：無法取得
+Preparing sleeves...=正在準備卡套…
+r:"^Preparing sleeves [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在準備卡套（$1 / $2）…
+r:"^Copying AI decks [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在複製 AI 牌組（$1 / $2）…
+r:"^Preparing audio [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在準備音效（$1 / $2）…
+r:"^Format: <b>(.+)</b>$"=賽制：<b>$1</b>
+Neo Standard EN>JP=Neo Standard（英文版→日文版）
+Neo Standard JP>EN=Neo Standard（日文版→英文版）
+Standard=標準
+Rules=規則
+Notes=備註
+Retry=重試
+Back=返回
+Dismiss=關閉
+You can add custom sleeves in ./Sleeves=可以在 ./Sleeves 資料夾加入自訂卡套
+A <b>RECOLLECTION</b> <sprite name\="auto"/> effect has been triggered by a card in play.\nResolve these effects?\n<b><color\=red>Denying will skip resolution of <i>ALL</i> RECOLLECTION effects triggered by this card's placement from anywhere.</color></b>=場上的卡片發動了 <b>回想（RECOLLECTION）</b> <sprite name\="auto"/> 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡這次放置（不論從哪裡放置）發動的<i>所有</i>回想效果。</color></b>
+An <b>INHERITANCE</b>/<b>INSPIRE</b> <sprite name\="auto"/> effect has been triggered by a card in play.\nResolve these effects?\n<b><color\=red>Denying will skip resolution of <i>ALL</i> INHERITANCE/INSPIRE effects triggered by this card.</color></b>=場上的卡片發動了 <b>INHERITANCE</b>／<b>INSPIRE</b> <sprite name\="auto"/> 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡發動的<i>所有</i> INHERITANCE／INSPIRE 效果。</color></b>

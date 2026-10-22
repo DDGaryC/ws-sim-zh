@@ -365,11 +365,14 @@ class Installer : Form
         MakeShortcut(Path.Combine(dir, "Weiss Schwarz (Patch and Run).lnk"), wscript, gameArgs, dir, gameIcon, "以中文介面啟動 Weiss Schwarz 模擬器");
         MakeShortcut(Path.Combine(dir, "Weiss Schwarz 中文版.lnk"), wscript, gameArgs, dir, gameIcon, "以中文介面啟動 Weiss Schwarz 模擬器");
         if (music) MakeShortcut(Path.Combine(dir, "音樂設定工具.lnk"), musicExe, "", Path.Combine(dir, "MusicTool"), musicIcon, "WS 模擬器 音樂設定工具");
+        string aiExe = Path.Combine(dir, @"AIEditor\AIEditor.exe");
+        if (File.Exists(aiExe)) MakeShortcut(Path.Combine(dir, "AI 對手編輯器.lnk"), aiExe, "", Path.Combine(dir, "AIEditor"), aiExe + ",0", "WS 模擬器 AI 對手編輯器：不用寫程式，做自己牌組的 AI 對手");
         MakeShortcut(Path.Combine(dir, "中文化套件（更新與還原）.lnk"), Path.Combine(dir, "wszh_updater.exe"), "", dir, Path.Combine(dir, "wszh_updater.exe") + ",0", "重新安裝、更新或還原 WS 模擬器中文化套件");
         if (desktop)
         {
             string desk = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
             MakeShortcut(Path.Combine(desk, "Weiss Schwarz 中文版.lnk"), wscript, gameArgs, dir, gameIcon, "以中文介面啟動 Weiss Schwarz 模擬器");
+            if (File.Exists(aiExe)) MakeShortcut(Path.Combine(desk, "WS AI 對手編輯器.lnk"), aiExe, "", Path.Combine(dir, "AIEditor"), aiExe + ",0", "WS 模擬器 AI 對手編輯器");
             if (music) MakeShortcut(Path.Combine(desk, "WS 音樂設定工具.lnk"), musicExe, "", Path.Combine(dir, "MusicTool"), musicIcon, "WS 模擬器 音樂設定工具");
             Log("  已在桌面建立捷徑");
         }
