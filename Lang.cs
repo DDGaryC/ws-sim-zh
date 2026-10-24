@@ -365,6 +365,160 @@ public class WszhLang : MonoBehaviour
         SetTextOf(status, "");
         Place((RectTransform)stGo.transform, new Vector2(cx, by - H * 0.215f), cv);
         StartCoroutine(Replace());
+        StartCoroutine(BuildCardTextLater(os, osType, cv, H));
+    }
+
+    // 「Card storage…」那幾行是遊戲稍後才填的，填完版面會移動，所以等它排好再放按鈕
+    IEnumerator BuildCardTextLater(object os, Type osType, Canvas cv, float H)
+    {
+        var updText = osType.GetField("updateStatusText", Any).GetValue(os) as Text;
+        float until = Time.realtimeSinceStartup + 3f;
+        while (updText != null && string.IsNullOrEmpty(updText.text) && Time.realtimeSinceStartup < until) yield return null;
+        yield return null;
+        yield return new WaitForSecondsRealtime(0.3f);
+        if (cv == null) yield break;
+        Canvas.ForceUpdateCanvases();
+        try { BuildCardTextUI(os, osType, cv, H); }
+        catch (Exception ex) { Debug.Log("[WSZH] card text UI failed: " + ex); }
+    }
+
+    // ---- 設定頁右下：「更新卡片翻譯」按鈕（放在模擬器「更新卡片」那一區的下方） ----
+    Graphic cardStatus;
+    bool cardBusy;
+
+    Button cardUpd; Text cardUpdText; Canvas cardCanvas;
+    RectTransform cardBtnRt, cardStatusRt;
+    float cardLastBottom;
+
+    // 「Card storage…」最後一行文字的下緣（螢幕座標）。按下「更新卡片」後這段文字會變長，所以要隨時重算
+    float CardInfoBottom()
+    {
+        Vector2 pBtn = ScreenPos(cardUpd, cardCanvas);
+        var urt = (RectTransform)cardUpd.transform;
+        float bottom = pBtn.y - urt.rect.height * urt.lossyScale.y * 0.5f;
+        if (cardUpdText != null && cardUpdText.gameObject.activeInHierarchy && !string.IsNullOrEmpty(cardUpdText.text))
+        {
+            // 文字框本身可能比實際文字大很多，用文字實際的高度算出最後一行的位置
+            Camera cam = cardCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : cardCanvas.worldCamera;
+            var tr = (RectTransform)cardUpdText.transform;
+            var corners = new Vector3[4];
+            tr.GetWorldCorners(corners);
+            float top = RectTransformUtility.WorldToScreenPoint(cam, corners[1]).y;
+            bottom = Mathf.Min(bottom, top - cardUpdText.preferredHeight * tr.lossyScale.y);
+        }
+        return bottom;
+    }
+
+    void PlaceCardTextUI()
+    {
+        if (cardBtnRt == null || cardUpd == null || cardCanvas == null) return;
+        float bottom = CardInfoBottom();
+        if (Mathf.Abs(bottom - cardLastBottom) < 0.5f) return;
+        cardLastBottom = bottom;
+        float cx = ScreenPos(cardUpd, cardCanvas).x;
+        float h = cardBtnRt.rect.height * cardBtnRt.lossyScale.y;
+        PlaceAt(cardBtnRt, new Vector2(cx, bottom - h * 0.75f), cardCanvas);
+        if (cardStatusRt != null) PlaceAt(cardStatusRt, new Vector2(cx, bottom - h * 1.6f), cardCanvas);
+    }
+
+    IEnumerator FollowCardInfo()
+    {
+        while (cardBtnRt != null)
+        {
+            PlaceCardTextUI();
+            yield return new WaitForSecondsRealtime(0.1f);
+        }
+    }
+
+    void BuildCardTextUI(object os, Type osType, Canvas cv, float H)
+    {
+        var upd = osType.GetField("updateCardsButton", Any).GetValue(os) as Button;
+        var updText = osType.GetField("updateStatusText", Any).GetValue(os) as Text;
+        if (upd == null) { Debug.Log("[WSZH] card text UI: update button not found"); return; }
+
+        // 位置：「更新卡片」按鈕同一欄，Card storage 那幾行文字的下方
+        Vector2 pBtn = ScreenPos(upd, cv);
+        cardUpd = upd; cardUpdText = updText; cardCanvas = cv;
+        float bottom = CardInfoBottom();
+
+        // 按鈕：新建一顆，只沿用「更新卡片」按鈕的圖樣與字型
+        // （不直接複製：原按鈕上的遊戲元件會把位置與文字改回去）
+        var srcRt = (RectTransform)upd.transform;
+        var go = new GameObject("WSZH_CardTextButton", typeof(RectTransform));
+        go.transform.SetParent(cv.transform, false);
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(srcRt.rect.width * srcRt.lossyScale.x / rt.lossyScale.x, srcRt.rect.height * srcRt.lossyScale.y / rt.lossyScale.y);
+        var img = go.AddComponent<Image>();
+        var srcImg = upd.targetGraphic as Image ?? upd.GetComponent<Image>();
+        if (srcImg != null) { img.sprite = srcImg.sprite; img.type = srcImg.type; img.color = srcImg.color; img.pixelsPerUnitMultiplier = srcImg.pixelsPerUnitMultiplier; }
+        var btn = go.AddComponent<Button>();
+        btn.targetGraphic = img;
+        btn.transition = upd.transition; btn.colors = upd.colors; btn.spriteState = upd.spriteState;
+        btn.onClick.AddListener(OnCardTextUpdate);
+        Graphic srcLabel = (Graphic)upd.GetComponentInChildren<TMP_Text>(true) ?? upd.GetComponentInChildren<Text>(true);
+        if (srcLabel != null)
+        {
+            var lg = MakeText(srcLabel, go.transform, "Label");
+            var lrt = (RectTransform)lg.transform;
+            lrt.anchorMin = Vector2.zero; lrt.anchorMax = Vector2.one; lrt.offsetMin = Vector2.zero; lrt.offsetMax = Vector2.zero;
+            var lgr = lg.GetComponent<Graphic>();
+            lgr.raycastTarget = false;
+            var lt = lgr as TMP_Text; if (lt != null) lt.alignment = TextAlignmentOptions.Center;
+            var lu = lgr as Text; if (lu != null) lu.alignment = TextAnchor.MiddleCenter;
+            SetTextOf(lgr, "更新卡片翻譯");
+        }
+        cardBtnRt = rt;
+
+        // 狀態文字
+        Graphic tmpl = (Graphic)updText ?? upd.GetComponentInChildren<TMP_Text>(true);
+        var stGo = MakeText(tmpl, cv.transform, "WSZH_CardTextStatus");
+        cardStatus = stGo.GetComponent<Graphic>();
+        cardStatus.raycastTarget = false;
+        float size = updText != null ? updText.fontSize : 20f;
+        SetSizeOf(cardStatus, size);
+        Normalize(cardStatus, rt.rect.width * 3f, size);
+        cardStatusRt = (RectTransform)stGo.transform;
+        cardLastBottom = float.NaN;
+        PlaceCardTextUI();
+        StartCoroutine(FollowCardInfo());
+        ShowCardTextInfo();
+        Debug.Log("[WSZH] card text UI: orig=" + pBtn + " active=" + upd.gameObject.activeInHierarchy
+            + " bottom=" + bottom + " new=" + ScreenPos(btn, cv) + " screenH=" + Screen.height
+            + " label=" + (upd.GetComponentInChildren<TMP_Text>(true) != null ? upd.GetComponentInChildren<TMP_Text>(true).text : "?"));
+    }
+
+    void ShowCardTextInfo()
+    {
+        if (cardStatus == null) return;
+        int n = 0;
+        try { n = WszhCardText.LineCount(); } catch { }
+        string when = WszhCardText.LastUpdated();
+        string lang = ReadLanguage();
+        if (lang == "en") SetTextOf(cardStatus, "Card text translation: English mode (not used)");
+        else if (n == 0) SetTextOf(cardStatus, "還沒有卡片翻譯，按上面的按鈕下載");
+        else SetTextOf(cardStatus, "卡片翻譯：" + n + " 條" + (when != null ? "（" + when + " 更新）" : ""));
+    }
+
+    void OnCardTextUpdate()
+    {
+        if (cardBusy) return;
+        cardBusy = true;
+        StartCoroutine(RunCardTextUpdate());
+    }
+
+    IEnumerator RunCardTextUpdate()
+    {
+        string last = null;
+        var e = WszhCardText.Download(s => { last = s; if (cardStatus != null) SetTextOf(cardStatus, s); });
+        while (true)
+        {
+            object cur;
+            try { if (!e.MoveNext()) break; cur = e.Current; }
+            catch (Exception ex) { last = "更新失敗：" + ex.Message; if (cardStatus != null) SetTextOf(cardStatus, last); break; }
+            yield return cur;
+        }
+        cardBusy = false;
     }
 
     // 新建一個文字物件，只沿用範本的字型、顏色與樣式
@@ -450,5 +604,14 @@ public class WszhLang : MonoBehaviour
             StartCoroutine(BuildLater());
         }
         if (status != null && statusShown && Time.realtimeSinceStartup > statusUntil) { SetTextOf(status, ""); statusShown = false; }
+
+        // 開發用：Ctrl+Shift+F12 匯出所有卡片的效果文字（給卡片翻譯用，見 CardText.cs）
+        if (Input.GetKeyDown(KeyCode.F12) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
+        {
+            string err;
+            try { err = WszhCardText.Dump(); }
+            catch (Exception ex) { err = (ex.InnerException ?? ex).Message; }
+            Debug.Log("[WSZH] card text dump " + (err == null ? "done" : "failed: " + err));
+        }
     }
 }

@@ -426,6 +426,12 @@ Check Markers=檢視標記
 Choose an effect.=請選擇一個效果。
 Choose a trait.=請選擇一個特徵。
 Choose 1 card.=請選擇 1 張卡。
+sr:"^(.+?) ?Choose ([0-9]+) cards[.]$"=$1請選擇 $2 張卡。
+sr:"^(.+?) ?Choose ([0-9]+) cards[.](Not enough valid targets[.])$"=$1請選擇 $2 張卡。$3
+sr:"^(.+?) ?Choose up to ([0-9]+) cards[.]?$"=$1最多選擇 $2 張卡。
+sr:"^(.+?) ?Choose up to ([0-9]+) cards[.]?(Not enough valid targets[.])$"=$1最多選擇 $2 張卡。$3
+sr:"^(.+?) ?Choose ([0-9]+) to ([0-9]+) cards[.]$"=$1請選擇 $2 到 $3 張卡。
+sr:"^(.+?) ?Choose ([0-9]+) to ([0-9]+) cards[.](Not enough valid targets[.])$"=$1請選擇 $2 到 $3 張卡。$4
 r:"^(.*?)Choose ([0-9]+) cards[.](Not enough valid targets[.])?$"=$1請選擇 $2 張卡。$3
 r:"^(.*?)Choose up to ([0-9]+) cards[.]?(Not enough valid targets[.])?$"=$1最多選擇 $2 張卡。$3
 r:"^(.*?)Choose ([0-9]+) to ([0-9]+) cards[.](Not enough valid targets[.])?$"=$1請選擇 $2 到 $3 張卡。$4
@@ -970,3 +976,24 @@ Dismiss=關閉
 You can add custom sleeves in ./Sleeves=可以在 ./Sleeves 資料夾加入自訂卡套
 A <b>RECOLLECTION</b> <sprite name\="auto"/> effect has been triggered by a card in play.\nResolve these effects?\n<b><color\=red>Denying will skip resolution of <i>ALL</i> RECOLLECTION effects triggered by this card's placement from anywhere.</color></b>=場上的卡片發動了 <b>回想（RECOLLECTION）</b> <sprite name\="auto"/> 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡這次放置（不論從哪裡放置）發動的<i>所有</i>回想效果。</color></b>
 An <b>INHERITANCE</b>/<b>INSPIRE</b> <sprite name\="auto"/> effect has been triggered by a card in play.\nResolve these effects?\n<b><color\=red>Denying will skip resolution of <i>ALL</i> INHERITANCE/INSPIRE effects triggered by this card.</color></b>=場上的卡片發動了 <b>INHERITANCE</b>／<b>INSPIRE</b> <sprite name\="auto"/> 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡發動的<i>所有</i> INHERITANCE／INSPIRE 效果。</color></b>
+Where do you want to place the card?=要將這張卡放到哪裡？
+Top of Deck=牌庫頂
+Bottom of Deck=牌庫底
+Waiting Room=控制室
+// --- 更新卡片狀態 ---
+sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片資料庫最新版本：$3
+sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片資料庫最新版本：$3\n階段：$4
+sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)\nSet: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片資料庫最新版本：$3\n階段：$4\n系列：$5
+sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)\nSet: ([^\n]*)\n([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片資料庫最新版本：$3\n階段：$4\n系列：$5\n$6
+sr:"^(.+) \(([0-9]+)%\)$"=$1（$2%）
+Checking installed images=檢查已安裝的圖片
+Checking metadata=檢查卡片資料
+Downloading new images=下載新圖片
+never=從未更新
+unavailable=無法取得
+loading...=讀取中…
+unknown=未知
+Card update complete. Card database reloaded; restart is not required.=卡片更新完成，已重新載入卡片資料，不需要重開遊戲。
+Card update completed, but the database could not be reloaded. Restart the game to load the updated cards.=卡片更新完成，但無法重新載入卡片資料，請重開遊戲以載入新卡片。
+Card update is already running.=卡片更新已在進行中。
+r:"^Card update failed: (.*)$"=卡片更新失敗：$1

@@ -3,3 +3,19 @@ dist/
 *.bak
 *.bak2
 *.old
+
+# API 翻譯用的暫存與結果（不上傳；key 只放在環境變數，絕不寫進檔案）
+.env
+*.env
+*api_key*
+card_text/api_work/
+
+# 翻譯過程的中間檔（成品在 card_text/*_tw.json、cardtext/、files/）
+card_text/*_src.json
+card_text/*_src.txt
+card_text/*_src2.*
+card_text/*_part.json
+card_text/*_part[0-9].json
+card_text/queue.json
+card_text/prompts_queue.json
+card_text/review_sample.txt

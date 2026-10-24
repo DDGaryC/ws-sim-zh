@@ -32,9 +32,20 @@ static class Online
 
     public class Entry { public string Sha, Path; public long Size; }
 
+    // 要求伺服器壓縮傳輸（GitHub 對文字檔會用 gzip），下載完自動解壓：卡片翻譯這類大文字檔可以少掉約四分之三的流量
+    class GzipWebClient : WebClient
+    {
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var r = base.GetWebRequest(address) as HttpWebRequest;
+            if (r != null) r.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+            return r ?? base.GetWebRequest(address);
+        }
+    }
+
     static WebClient Client()
     {
-        var wc = new WebClient();
+        var wc = new GzipWebClient();
         wc.Headers[HttpRequestHeader.UserAgent] = "ws-sim-zh-installer";
         wc.Headers[HttpRequestHeader.CacheControl] = "no-cache";
         return wc;

@@ -72,10 +72,10 @@ if (Newer $fixPatch 'AiFixPatch.cs') {
 }
 # 遊戲內語言切換：遊戲執行時載入的程式庫（.NET 4，參考遊戲的 UnityEngine 模組）＋ ReiPatcher 補丁（.NET 3.5）
 $langDll = Join-Path $Sim 'ReiPatcher\WSZH.Lang.dll'
-if (Newer $langDll 'Lang.cs') {
+if (Newer $langDll 'Lang.cs', 'CardText.cs') {
     $managed = Join-Path $Sim 'Weiss Schwarz_Data\Managed'
-    $uref = @('UnityEngine.CoreModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.TextRenderingModule.dll', 'UnityEngine.UIModule.dll', 'UnityEngine.UI.dll', 'Unity.TextMeshPro.dll', 'netstandard.dll') | ForEach-Object { "/r:$(Join-Path $managed $_)" }
-    & $csc /nologo /target:library /optimize+ /codepage:65001 "/out:$langDll.new" @uref /r:System.Core.dll (Join-Path $Here 'Lang.cs')
+    $uref = @('UnityEngine.CoreModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.TextRenderingModule.dll', 'UnityEngine.UIModule.dll', 'UnityEngine.UI.dll', 'Unity.TextMeshPro.dll', 'netstandard.dll', 'UnityEngine.InputLegacyModule.dll', 'UnityEngine.UnityWebRequestModule.dll') | ForEach-Object { "/r:$(Join-Path $managed $_)" }
+    & $csc /nologo /target:library /optimize+ /codepage:65001 "/out:$langDll.new" @uref /r:System.Core.dll (Join-Path $Here 'Lang.cs') (Join-Path $Here 'CardText.cs')
     if ($LASTEXITCODE -ne 0) { throw "語言切換編譯失敗" }
     Install-Built "$langDll.new" $langDll
 }
@@ -133,8 +133,14 @@ if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
 Copy-Item $Installer (Join-Path $Sim 'wszh_updater.exe') -Force   # 要放進更新清單，複製失敗就停止
 
 $items = @('WSLaunch.vbs', 'README_中文.txt', 'AI腳本說明_中文.md', 'MusicTool\MusicTool.exe', 'AIEditor\AIEditor.exe', '舊牌組修復工具.exe', 'wszh_updater.exe', 'ReiPatcher\Patches\WSZH.MainMenuMusic.Patcher.dll', 'ReiPatcher\Patches\WSZH.AiFix.Patcher.dll', 'ReiPatcher\WSZH.AiFix.dll', 'ReiPatcher\Patches\WSZH.Lang.Patcher.dll', 'ReiPatcher\WSZH.Lang.dll')
+# 卡片效果翻譯不放進中文化套件的更新清單：另外產生 cardtext\（遊戲設定頁「更新卡片翻譯」按鈕從這裡下載）
+$ErrorActionPreference = 'Continue'
+$ctOut = & python (Join-Path $Here 'card_text\publish_cardtext.py') 2>&1 | Out-String
+$ErrorActionPreference = 'Stop'
+if ($LASTEXITCODE -ne 0) { throw "產生卡片翻譯失敗：$ctOut" }
+$ctOut.Trim()
 $items += Get-ChildItem (Join-Path $Sim 'AutoTranslator') -Recurse -File |
-    Where-Object { $_.Name -notmatch '\.(bak\d*|orig|old)$' } |
+    Where-Object { $_.Name -notmatch '\.(bak\d*|orig|old)$' -and $_.FullName -notmatch '\\CardText\\' -and $_.Name -ne 'cardtext_updated.txt' } |
     ForEach-Object { $_.FullName.Substring($Sim.TrimEnd('\').Length + 1) }
 
 if (Test-Path $Files) { Remove-Item -LiteralPath $Files -Recurse -Force }
@@ -263,6 +269,12 @@ $ErrorActionPreference = 'Continue'   # git／gh 會把進度寫到 stderr，不
 Push-Location $Here
 try {
     git add -A
+    # 防止 API key 被上傳：準備提交的內容裡只要出現 Anthropic key 的格式就停止
+    $leak = git grep --cached -l -E "sk-ant-[A-Za-z0-9_-]{16,}" 2>$null
+    if ($leak) {
+        git reset -q
+        throw "發現疑似 API key，已停止上傳。請檢查這些檔案：$($leak -join ', ')"
+    }
     git diff --cached --quiet
     if ($LASTEXITCODE -ne 0) {
         git commit -q -m "v$Version"
