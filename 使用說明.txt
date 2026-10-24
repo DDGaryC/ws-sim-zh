@@ -72,8 +72,10 @@
     關掉後再用捷徑開即可。
 
 ■ 換語言
-  用記事本打開模擬器資料夾裡的「AutoTranslator\Config.ini」，
-  把「Language=tw」改成 tw（台灣）、hk（香港）或 cn（簡體），存檔後重開遊戲。
+  主畫面按「設定」，左下有「語言 / Language」選項，
+  可以切換 繁體中文（台灣）／繁體中文（香港）／简体中文／English，馬上生效，
+  下次開遊戲也會沿用。
+  ※ 需要用「Weiss Schwarz 中文版」捷徑開遊戲才會出現這個按鈕。
 
 ■ 換音樂／音效
   開啟「WS 音樂設定工具」：
@@ -201,7 +203,7 @@ A：檔名請盡量用英文，格式用 mp3 或 wav。
 ・完全移除：刪除模擬器資料夾中的
     AutoTranslator 資料夾、arialuni_sdf_u2019、WSLaunch.vbs、
     MusicTool 資料夾、AIEditor 資料夾、舊牌組修復工具.exe、
-    ReiPatcher\WSZH.AiFix.dll、ReiPatcher\Patches 裡 WSZH 開頭的檔案、以及中文化相關的捷徑，
+    ReiPatcher 裡 WSZH 開頭的檔案、ReiPatcher\Patches 裡 WSZH 開頭的檔案、以及中文化相關的捷徑，
   然後用模擬器內的更新功能（或重新下載模擬器）覆蓋 Weiss Schwarz_Data 即可。
 
 
@@ -216,6 +218,11 @@ A：檔名請盡量用英文，格式用 mp3 或 wav。
 更新紀錄
 ==================================================
 適用模擬器版本：0.7.8.10 ～ 0.7.9.4
+
+v1.5.0（2026-10-24）
+  ・新增遊戲內語言切換：設定頁的「語言 / Language」選項，
+    可以切換 繁體中文（台灣）／繁體中文（香港）／简体中文／English，不用重開遊戲
+  ・修正簡體中文的「Weiß」顯示成「Wei?」，以及幾處誤用繁體字「於」
 
 v1.4.0（2026-10-22）
   【AI 對手編輯器（新功能）】

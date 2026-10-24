@@ -70,6 +70,23 @@ if (Newer $fixPatch 'AiFixPatch.cs') {
     if ($LASTEXITCODE -ne 0) { throw "AI 選卡修正補丁編譯失敗" }
     Install-Built "$fixPatch.new" $fixPatch
 }
+# 遊戲內語言切換：遊戲執行時載入的程式庫（.NET 4，參考遊戲的 UnityEngine 模組）＋ ReiPatcher 補丁（.NET 3.5）
+$langDll = Join-Path $Sim 'ReiPatcher\WSZH.Lang.dll'
+if (Newer $langDll 'Lang.cs') {
+    $managed = Join-Path $Sim 'Weiss Schwarz_Data\Managed'
+    $uref = @('UnityEngine.CoreModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.TextRenderingModule.dll', 'UnityEngine.UIModule.dll', 'UnityEngine.UI.dll', 'Unity.TextMeshPro.dll', 'netstandard.dll') | ForEach-Object { "/r:$(Join-Path $managed $_)" }
+    & $csc /nologo /target:library /optimize+ /codepage:65001 "/out:$langDll.new" @uref /r:System.Core.dll (Join-Path $Here 'Lang.cs')
+    if ($LASTEXITCODE -ne 0) { throw "語言切換編譯失敗" }
+    Install-Built "$langDll.new" $langDll
+}
+$langPatch = Join-Path $Sim 'ReiPatcher\Patches\WSZH.Lang.Patcher.dll'
+if (Newer $langPatch 'LangPatch.cs') {
+    $csc35c = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v3.5\csc.exe'
+    if (-not (Test-Path $csc35c)) { throw "找不到 .NET 3.5 的編譯器（需要在 Windows 功能裡開啟 .NET Framework 3.5）" }
+    & $csc35c /nologo /target:library /optimize+ /codepage:65001 "/out:$langPatch.new" "/r:$(Join-Path $Sim 'ReiPatcher\ReiPatcher.exe')" "/r:$(Join-Path $Sim 'ReiPatcher\Mono.Cecil.dll')" /r:System.Core.dll (Join-Path $Here 'LangPatch.cs')
+    if ($LASTEXITCODE -ne 0) { throw "語言切換補丁編譯失敗" }
+    Install-Built "$langPatch.new" $langPatch
+}
 $drExe = Join-Path $Sim '舊牌組修復工具.exe'
 if (Newer $drExe 'DeckRescue.cs', 'LegacyDecks.cs') {
     & $csc /nologo /target:winexe /optimize+ /codepage:65001 "/out:$drExe.new" `
@@ -115,7 +132,7 @@ if (Newer $Installer 'Installer.cs', 'Online.cs', 'LegacyDecks.cs') {
 [IO.File]::WriteAllText((Join-Path $Sim 'wszh_version.txt'), $Version, $utf8)
 Copy-Item $Installer (Join-Path $Sim 'wszh_updater.exe') -Force   # 要放進更新清單，複製失敗就停止
 
-$items = @('WSLaunch.vbs', 'README_中文.txt', 'AI腳本說明_中文.md', 'MusicTool\MusicTool.exe', 'AIEditor\AIEditor.exe', '舊牌組修復工具.exe', 'wszh_updater.exe', 'ReiPatcher\Patches\WSZH.MainMenuMusic.Patcher.dll', 'ReiPatcher\Patches\WSZH.AiFix.Patcher.dll', 'ReiPatcher\WSZH.AiFix.dll')
+$items = @('WSLaunch.vbs', 'README_中文.txt', 'AI腳本說明_中文.md', 'MusicTool\MusicTool.exe', 'AIEditor\AIEditor.exe', '舊牌組修復工具.exe', 'wszh_updater.exe', 'ReiPatcher\Patches\WSZH.MainMenuMusic.Patcher.dll', 'ReiPatcher\Patches\WSZH.AiFix.Patcher.dll', 'ReiPatcher\WSZH.AiFix.dll', 'ReiPatcher\Patches\WSZH.Lang.Patcher.dll', 'ReiPatcher\WSZH.Lang.dll')
 $items += Get-ChildItem (Join-Path $Sim 'AutoTranslator') -Recurse -File |
     Where-Object { $_.Name -notmatch '\.(bak\d*|orig|old)$' } |
     ForEach-Object { $_.FullName.Substring($Sim.TrimEnd('\').Length + 1) }
