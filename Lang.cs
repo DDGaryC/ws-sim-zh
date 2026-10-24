@@ -460,9 +460,18 @@ public class WszhLang : MonoBehaviour
 
     // ---- 日版卡圖開關 ----
     RectTransform jpBtnRt;
-    Graphic jpBtnLabel;
+    Graphic jpBtnLabel, cardBtnLabel;
 
-    static string JpArtLabel() { return WszhJpArt.Enabled ? "日版卡圖：開" : "日版卡圖：關"; }
+    // 換語言後重新顯示按鈕與狀態文字（簡體／繁體）
+    void RefreshCardTextLabels()
+    {
+        if (cardBtnLabel != null) SetTextOf(cardBtnLabel, Zh("更新卡片翻譯"));
+        if (jpBtnLabel != null) SetTextOf(jpBtnLabel, JpArtLabel());
+        updaterShown = null;
+        ShowCardTextInfo();
+    }
+
+    static string JpArtLabel() { return Zh(WszhJpArt.Enabled ? "日版卡圖：開" : "日版卡圖：關"); }
 
     void OnJpArtToggle()
     {
@@ -539,14 +548,19 @@ public class WszhLang : MonoBehaviour
         return s;
     }
 
+    // 這個檔案、CardText.cs、JpArt.cs 裡給玩家看的中文字的繁→簡對照（用 OpenCC 產生；新增文字時要補上）
+    const string TradChars = "個內動區啟單圖場夾庫張後從戲換擬敗時會條構檔檢沒灣為無確穩結經網線裝裡複試語說請譯讀費資載這連進遊過還開關階雲預體";
+    const string SimpChars = "个内动区启单图场夹库张后从戏换拟败时会条构档检没湾为无确稳结经网线装里复试语说请译读费资载这连进游过还开关阶云预体";
     static string ToSimplified(string s)
     {
-        const string T = "卡片存放位置上次更新從未資料庫最新版本階段系列檢查已安裝圖片下載完成經進行中找不到程式重新載入需要開遊戲無法取得沒有讀取知失敗請依說明這裡";
-        const string S = "卡片存放位置上次更新从未资料库最新版本阶段系列检查已安装图片下载完成经进行中找不到程式重新载入需要开游戏无法取得没有读取知失败请依说明这里";
+        if (string.IsNullOrEmpty(s)) return s;
         var sb = new StringBuilder(s);
-        for (int i = 0; i < sb.Length; i++) { int k = T.IndexOf(sb[i]); if (k >= 0) sb[i] = S[k]; }
+        for (int i = 0; i < sb.Length; i++) { int k = TradChars.IndexOf(sb[i]); if (k >= 0) sb[i] = SimpChars[k]; }
         return sb.ToString();
     }
+
+    // 簡體中文模式時把我們自己顯示的文字轉成簡體
+    static string Zh(string s) { return ReadLanguage() == "cn" ? ToSimplified(s) : s; }
 
     void BuildCardTextUI(object os, Type osType, Canvas cv, float H)
     {
@@ -559,8 +573,7 @@ public class WszhLang : MonoBehaviour
         cardUpd = upd; cardUpdText = updText; cardCanvas = cv;
         float bottom = CardInfoBottom();
 
-        Graphic unused;
-        var rt = MakeButton(upd, cv, "WSZH_CardTextButton", "更新卡片翻譯", OnCardTextUpdate, out unused);
+        var rt = MakeButton(upd, cv, "WSZH_CardTextButton", Zh("更新卡片翻譯"), OnCardTextUpdate, out cardBtnLabel);
         var btn = rt.GetComponent<Button>();
         cardBtnRt = rt;
         jpBtnRt = MakeButton(upd, cv, "WSZH_JpArtButton", JpArtLabel(), OnJpArtToggle, out jpBtnLabel);
@@ -591,7 +604,7 @@ public class WszhLang : MonoBehaviour
         string when = WszhCardText.LastUpdated();
         string lang = ReadLanguage();
         string line1;
-        if (lang == "en") line1 = "卡片翻譯：英文模式不使用";
+        if (lang == "en") line1 = "Card text translation: not used in English";
         else if (n == 0) line1 = "卡片翻譯：尚未下載";
         else line1 = "卡片翻譯：" + n + " 條";
         int cnt; long bytes;
@@ -601,7 +614,7 @@ public class WszhLang : MonoBehaviour
         string line2 = WszhJpArt.Enabled
             ? "日版卡圖已開啟：看到卡片時會連網從日版官網即時下載，之後重複使用"
             : "日版卡圖開啟後，看到卡片時會連網從日版官網即時下載卡圖";
-        SetTextOf(cardStatus, line1 + "\n" + line2);
+        SetTextOf(cardStatus, Zh(line1 + "\n" + line2));
     }
 
     void OnCardTextUpdate()
@@ -614,12 +627,12 @@ public class WszhLang : MonoBehaviour
     IEnumerator RunCardTextUpdate()
     {
         string last = null;
-        var e = WszhCardText.Download(s => { last = s; if (cardStatus != null) SetTextOf(cardStatus, s); });
+        var e = WszhCardText.Download(ReadLanguage(), s => { last = s; if (cardStatus != null) SetTextOf(cardStatus, Zh(s)); });
         while (true)
         {
             object cur;
             try { if (!e.MoveNext()) break; cur = e.Current; }
-            catch (Exception ex) { last = "更新失敗：" + ex.Message; if (cardStatus != null) SetTextOf(cardStatus, last); break; }
+            catch (Exception ex) { last = "更新失敗：" + ex.Message; if (cardStatus != null) SetTextOf(cardStatus, Zh(last)); break; }
             yield return cur;
         }
         cardBusy = false;
@@ -686,7 +699,7 @@ public class WszhLang : MonoBehaviour
         string err;
         try { err = Switch(Codes[i]); }
         catch (Exception ex) { err = (ex.InnerException ?? ex).Message; }
-        if (err == null) { current = Codes[i]; Status(Codes[i] == "en" ? "Switched to English" : "已切換為 " + Names[i]); }
+        if (err == null) { current = Codes[i]; Status(Codes[i] == "en" ? "Switched to English" : "已切換為 " + Names[i]); RefreshCardTextLabels(); }
         else Status("切換失敗：" + err);
     }
 

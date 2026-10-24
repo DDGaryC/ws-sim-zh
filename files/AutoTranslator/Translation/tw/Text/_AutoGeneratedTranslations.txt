@@ -1,5 +1,4 @@
-﻿
-Weiß Schwarz\n=Weiß Schwarz\n
+﻿Weiß Schwarz\n=Weiß Schwarz\n
 Version 0.6.3.0=版本 0.6.3.0
 LAN Multiplayer=LAN連線對戰
 Steam Multiplayer=Steam連線對戰
@@ -12,7 +11,6 @@ Learn To Play=學習如何遊玩
 Credits=製作人員名單
 Blake Thoennes 2021   Weiss Schwarz belongs to Bushiroad, and all images belong to their respecitive series' license holders.  This is not a Bushiroad product, just something I made for fun.=Blake Thoennes 2021 Weiß Schwarz是武士道公司製作的產品、所有的圖片版權皆由各系列的版權持有者所擁有。 這並非武士道公司所製作的產品、只是由我個人興趣所製作出來的東西。
 Check for updates at blakethoennes.itch.io=前往blakethoennes.itch.io確認現在最新的遊戲版本。
-
 Save As\n=保存\n
 Load\n=讀取\n
 Load Deck=卡組選擇
@@ -29,7 +27,6 @@ Menu=主選單
 Series:=系列：
 Yes=是
 No=否
-
 Set:=収録：
 Name:=卡片名稱：
 Text:=效果：
@@ -55,8 +52,6 @@ Red=紅
 Green=綠
 Blue=藍
 Sort=排列
-
-
 Accel World=加速世界
 Adventure Time=探險活寶
 Alice Gear Aegis=機戰少女Alice
@@ -218,7 +213,6 @@ Yohane the Parhelion=幻日夜羽 -鏡中暉光-
 Yuru Camp=搖曳露營△
 Yuuna's Haunted Hotspring=搖曳莊的幽奈小姐
 Zombie Land Saga=佐賀偶像是傳奇
-
 AI Deck=選擇AI牌組
 AI_Emilia Book=Re:0　艾米莉婭4書4城門
 AI_Mushoku=無職　4電4城門
@@ -226,7 +220,6 @@ AI_ShionAqua=Holo　鹽水8城門
 AI_Persona5=P5　Joker4風4填費
 AI_AxisChurch=美好世界　阿克西斯教
 AI_5HY_8Door=五等分 五月8門
-
 Steam will show you as playing "Space War".\\nThis is the name it uses for unknown games.=在遊玩此遊戲期間、Steam內會顯示"正在遊玩Space War"。這是Steam對未知遊戲所使用的名稱。
 Host Public=開啟公共房間
 Start Game=開始遊戲
@@ -234,35 +227,26 @@ Join Public=進入公共房間
 Host Private=開啟私人房間
 Join Private=進入私人房間
 Main Menu=回到主界面
-
 Quit=結束
 Are you sure you want to quit the game?=結束正在進行的對戰?
 Reset=重開
 Restart the match?=重新開始？
 Hand:=手牌
-
 Use Encore [3]=使用再演(3)
 Choose Encore Order=手動選擇再演次序
 Skip Counter Step=跳過反擊階段
 Ask before optional effects=手動選擇可選式效果
 Ask before trigger icons=手動選擇可選式判定圖示
 Encore overplayed characters=使用覆蓋角色的再演
-
 Enter Climax Phase=進入名場面階段
 Enter Attack Phase=進入攻擊階段
 Enter Encore Step=進入再演階段
-You still have standing characters on your center stage. Are you//sure you want to end your attack phase?=
 Rematch?=再戰?
-
-Waiting for
-
 Choose None=不選擇
-
 Going First=先攻
 Going Second=後攻
 Select cards to discard and draw the same number of cards.=請選擇需要丟棄的手牌。
 Done=完成
-
 Your Turn=你的回合
 Your Draw Phase=你的抽牌階段
 Your Clock Phase=你的時計階段
@@ -271,49 +255,32 @@ Your Climax Phase=你的名場面階段
 Your Attack Phase=你的攻擊階段
 Your Encore Step=你的再演階段
 End Encore Step=結束再演階段
-
 Play Character=放置到場上
-
 Opponent's Turn=對手的回合
 Opponent's Clock Phase=對手的時計階段
 Opponent's Main Phase=對手的主要階段
 Opponent's Climax Phase=對手的名場面階段
 Opponent's Attack Phase=對手的攻擊階段
 Opponent's Encore Step=對手的再演階段
-
 Clock this card=放置到傷害區
 Don't Clock=不放置卡片
-
 Check Waiting Room=檢視自己的休息室
 Check Memory=檢視自己的回憶區
 Check Opponent's Waiting Room=檢視對手的休息室
 Check Opponent's Memory=檢視對手的回憶區
 Swap Perspective=轉換視點
-
 Discard down to 7 cards=請把手牌丟棄至7張
 Direct Attack=直接攻擊
 Frontal Attack=正面攻擊
 Side Attack=側面攻擊
 Choose card to level.=請選擇放置到等級區的卡片
-
 Hold space to view the stage.=長按空白鍵可直接觀看場地
-
-
 chat...=對話框
 hide=隱藏
-
-
 Choose stage position.=請選擇想要放置的地點。
 Move=移動
 Choose new position.=請選擇想要移動的地點。
 Choose which effect to resolve first=請選擇想要優先發動的效果。
-Place this card on the bottom of the deck? (Press no to return it to the top)=
-Put this card into your hand or your stock?=
-Choose 1
-Choose 0 to 3 cards.=
-
-// ===== 2026-10-05 補充翻譯 =====
-// --- 主選單 ---
 Game Logs\n=對戰紀錄\n
 Game Logs=對戰紀錄
 Your Deck\n=你的牌組\n
@@ -321,12 +288,9 @@ Changelog=更新紀錄
 Only works with default decks beginning with AI_=只適用於名稱以 AI_ 開頭的預設牌組
 Weiss Schwarz belongs to Bushiroad, and all images belong to their respective series' license holders. \nThis is not a Bushiroad product, just something that was made for fun.=Weiß Schwarz 為武士道公司所有，所有圖片版權屬於各系列的版權持有者。\n本程式並非武士道公司產品，只是出於興趣製作的作品。
 Your card data may be out of date.\n\nLast update run: lastRunDisplay\nLatest repo commit: repoCommitDisplay\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：lastRunDisplay\n資料庫最新版本：repoCommitDisplay\n\n要現在前往設定進行更新嗎？
-r:"^Your card data may be out of date[.]\s*Last update run: (.+)\s*Latest repo commit: (.+)\s*Would you like to go to Settings to update now[?]$"=你的卡片資料可能不是最新的。\n\n上次更新：$1\n資料庫最新版本：$2\n\n要現在前往設定進行更新嗎？
 Please note this version is completely incompatable\nwith versions below 0.4.2.1=注意：此版本與 0.4.2.1 以下的版本完全不相容
 The simulator updater is missing from this installation. Please update manually.=找不到模擬器更新程式，請手動更新。
 The updater process did not start.=更新程式沒有啟動。
-
-// --- 牌組選擇 / 牌組編輯 ---
 Search...=搜尋...
 All Series=所有系列
 Show AI Decks=顯示 AI 牌組
@@ -345,8 +309,6 @@ Are you sure you want to delete\n<name of deck>?\n(Deleted decks cannot be resto
 Are you sure you want to import your legacy decklists?\n\nDecklists found with duplicate names to those in your current ./Decks folder will not be imported.=確定要匯入舊版牌組嗎？\n\n與目前 ./Decks 資料夾中同名的牌組不會被匯入。
 (Deleted decks cannot be restored.)=（刪除的牌組無法復原。）
 (This deck is listed as a default deck and will not auto-restore after deletion.)=（此牌組為預設牌組，刪除後不會自動復原。）
-r:"^Are you sure you want to delete (.+)$"=確定要刪除 $1
-r:"^Rename (.+) to:$"=將 $1 重新命名為：
 New deck name...=新牌組名稱...
 No deck is selected.=尚未選擇牌組。
 Please enter a deck name.=請輸入牌組名稱。
@@ -355,7 +317,6 @@ Built-in AI decks cannot be renamed.=內建 AI 牌組無法重新命名。
 The deck could not be renamed.=牌組無法重新命名。
 copied to clipboard=已複製到剪貼簿
 Are you sure you want to overwrite\n<name of deck>?=確定要覆蓋\n<name of deck>？
-r:"^(.+) already exists[.] Are you sure you want to overwrite it[?]\s*?$"=$1 已經存在，確定要覆蓋嗎？
 Your deck has fewer than 8 climax. While this is not against the rules, it is very ill advised. Save anyway?=你的牌組名場面卡少於 8 張。雖然不違反規則，但非常不建議。仍要儲存嗎？
 AI decks cannot be overwritten.=AI 牌組無法被覆蓋。
 The deck you are trying to load does not contain any existing cards.=要讀取的牌組中沒有任何存在的卡片。
@@ -384,8 +345,6 @@ Contains more than 8 climax.=名場面卡超過 8 張。
 Bad Deck=牌組不合法
 Double Soul=雙魂
  Any= 全部
-
-// --- 對戰中 ---
 Smart Counter Step=智慧反擊階段
 Finish turn before winning=獲勝前先完成回合
 Hold Space to View Stage=長按空白鍵觀看場地
@@ -406,7 +365,6 @@ Do you want to use this effect?=要使用這個效果嗎？
 Change Deck=更換牌組
 This deck cannot be used.=這副牌組無法使用。
 Reason:=原因：
-r:"^Reason: (.+)$"=原因：$1
 Draw Phase=抽牌階段
 Clock Phase=時計階段
 Main Phase=主要階段
@@ -417,7 +375,6 @@ End Phase=結束階段
 Counter Step=反擊階段
 Great Performance=精彩對決
 You Win=你贏了
-You Lose=你輸了
 Level Up=升級
 Deck out=牌庫耗盡
 Play Climax=打出名場面卡
@@ -426,15 +383,6 @@ Check Markers=檢視標記
 Choose an effect.=請選擇一個效果。
 Choose a trait.=請選擇一個特徵。
 Choose 1 card.=請選擇 1 張卡。
-sr:"^(.+?) ?Choose ([0-9]+) cards[.]$"=$1請選擇 $2 張卡。
-sr:"^(.+?) ?Choose ([0-9]+) cards[.](Not enough valid targets[.])$"=$1請選擇 $2 張卡。$3
-sr:"^(.+?) ?Choose up to ([0-9]+) cards[.]?$"=$1最多選擇 $2 張卡。
-sr:"^(.+?) ?Choose up to ([0-9]+) cards[.]?(Not enough valid targets[.])$"=$1最多選擇 $2 張卡。$3
-sr:"^(.+?) ?Choose ([0-9]+) to ([0-9]+) cards[.]$"=$1請選擇 $2 到 $3 張卡。
-sr:"^(.+?) ?Choose ([0-9]+) to ([0-9]+) cards[.](Not enough valid targets[.])$"=$1請選擇 $2 到 $3 張卡。$4
-r:"^(.*?)Choose ([0-9]+) cards[.](Not enough valid targets[.])?$"=$1請選擇 $2 張卡。$3
-r:"^(.*?)Choose up to ([0-9]+) cards[.]?(Not enough valid targets[.])?$"=$1最多選擇 $2 張卡。$3
-r:"^(.*?)Choose ([0-9]+) to ([0-9]+) cards[.](Not enough valid targets[.])?$"=$1請選擇 $2 到 $3 張卡。$4
 Not enough valid targets.=沒有足夠的有效目標。
 Are you sure you want to choose fewer than the max number of valid targets?=確定要選擇少於最大數量的目標嗎？
 No valid targets on stage=舞台上沒有有效目標
@@ -462,7 +410,6 @@ Opponent returned to deck:=對手放回牌庫的卡：
 Reorder cards (card highlighted in green will be on top)=重新排列卡片（綠色標示的卡會在最上方）
 Stop Revealing=停止公開
 Stop Milling=停止送入休息室
-r:"^Mill next card[?] [(]([0-9]+) left[)]$"=要將下一張送入休息室嗎？（剩餘 $1 張）
 Do you want to play over this card?=要覆蓋這張卡打出嗎？
 Enter the Attack Phase without your CxCombo?=不發動名場面組合就進入攻擊階段嗎？
 You still have standing characters on your center stage.  Are you sure you want to end your attack phase?=你的前排還有正置的角色。確定要結束攻擊階段嗎？
@@ -475,11 +422,8 @@ Choose a character to send markers from.=請選擇要送出標記的角色。
 Choose a marker to send.=請選擇要送出的標記。
 Choose markers to send.=請選擇要送出的標記。
 Discard 1 card.=丟棄 1 張卡。
-r:"^Discard ([0-9]+) cards[.]$"=丟棄 $1 張卡。
 Rest a character.=橫置 1 名角色。
-r:"^Rest ([0-9]+) characters[.]$"=橫置 $1 名角色。
 Put a card from your hand into your clock.=將 1 張手牌放置到傷害區。
-r:"^Put ([0-9]+) cards from your hand into your clock[.]$"=將 $1 張手牌放置到傷害區。
 Put a card from your hand into your stock.=將 1 張手牌放置到能量區。
 Choose a character to send.=請選擇要送出的角色。
 Send 1 card.=送出 1 張卡。
@@ -489,8 +433,6 @@ Opponent's trigger check:=對手的判定：
 Clock Phase: You may choose a card to clock in order to draw two cards.=時計階段：可以選擇一張手牌放置到傷害區，然後抽兩張卡。
 Click your reversed characters in the order you want to send them to the waiting room.=請依照想要送入休息室的順序點擊倒置的角色。
 Waiting for opponent to put reversed characters into the waiting room.=等待對手將倒置的角色送入休息室。
-r:"^Discard down to ([0-9]+) cards$"=請把手牌丟棄至 $1 張
-r:"^Opponent must discard down to ([0-9]+) cards$"=對手需要把手牌丟棄至 $1 張
 Viewing your waiting room.=正在檢視你的休息室。
 Viewing your opponent's waiting room.=正在檢視對手的休息室。
 Viewing your memory.=正在檢視你的回憶區。
@@ -505,8 +447,6 @@ You cannot play climax cards until end of your next turn.=到你的下個回合�
 Player surrenders=玩家投降
 Choice 1=選項 1
 Encore 3=再演 3
-
-// --- 設定 ---
 turn on=開啟
 turn off=關閉
 Show Opponent's Custom Card Sleeves=顯示對手的自訂卡套
@@ -519,10 +459,8 @@ Update Card Data=更新卡片資料
 Update Cards=更新卡片
 Automatically update card data script and images.\nThis inline update process is clamped up to 15% of overall card data,\nfollow initial install guidance in README.txt for mass updates.\n=自動更新卡片資料腳本與圖片。\n此遊戲內更新最多只會更新全部卡片資料的 15%，\n若需大量更新，請依照 README.txt 的初次安裝說明操作。\n
 Card storage:=卡片存放位置：
-r:"^Last card update run: (.+)$"=上次卡片更新：$1
 Last card update run: never=上次卡片更新：從未
 Last card update run: unavailable=上次卡片更新：無法取得
-r:"^Card repo latest commit: (.+)$"=卡片資料庫最新版本：$1
 Card repo latest commit: loading...=卡片資料庫最新版本：讀取中...
 Card repo latest commit: unknown=卡片資料庫最新版本：未知
 Update complete=更新完成
@@ -531,17 +469,12 @@ Checking installed images=檢查已安裝的圖片
 Downloading new images=下載新圖片中
 Update already running...=更新進行中...
 Cannot leave options while card update is running.=卡片更新期間無法離開設定。
-r:"^Stage: (.+) [(]([0-9]+)%[)]\s*Set: (.+)$"=階段：$1（$2%）\n系列：$3
-
-// --- 音效設定 ---
 Audio Settings=音效設定
 Sound Effects=音效
 Background Music=背景音樂
 Play=播放
 Nothing to save.=沒有需要儲存的變更。
 Preparing audio...=準備音效中...
-
-// --- 線上 / LAN ---
 Enter match ID...=輸入對戰 ID...
 Join Game=加入遊戲
 Join Local Server=加入本機伺服器
@@ -587,8 +520,6 @@ One or more of your cards do not exist on the opponent's game.=你的牌組中�
  Please choose a different deck.= 請選擇其他牌組。
 \nPlease choose a different deck.=\n請選擇其他牌組。
 Host is using a card you don't have.=房主使用了你沒有的卡片。
-
-// --- 對戰紀錄 ---
 Turn Charts=回合圖表
 Quick Stats=快速統計
 Player 1=玩家 1
@@ -680,8 +611,6 @@ How many times this player refreshed their deck this game, by natural game actio
 This player's most played card from this game (from hand).=該玩家本場（從手牌）打出最多次的卡片。
 Total count of cards processed by this player this game.=該玩家本場處理的卡片總數。
 Total number of cards with soul triggers that were triggered this game by this player.=該玩家本場判定出魂圖示的卡片總數。
-
-// --- 音效項目名稱 ---
 DrawCard=抽牌
 DamageTick=受到傷害（每點）
 DamageCancel=傷害取消
@@ -704,15 +633,6 @@ YouLose=落敗
 OpponentChatMessage=對手訊息
 duel_stepped=對戰
 deck_editor=牌組編輯
-
-// --- 對戰紀錄補充 ---
-r:"(?s)^<b>Started:</b>(.+)$"=<b>開始時間：</b>$1
-r:"(?s)^<b>Ended:</b>(.+)$"=<b>結束時間：</b>$1
-r:"(?s)^<b>Duration:</b>(.+)$"=<b>對戰時長：</b>$1
-r:"(?s)^Started:(.+)$"=開始時間：$1
-r:"(?s)^Ended:(.+)$"=結束時間：$1
-r:"(?s)^Duration:(.+)$"=對戰時長：$1
-r:"(?s)^(<sprite.*) Triggered$"=$1 判定
 Triggered=判定
 Decklists=牌組列表
 Export=匯出
@@ -749,14 +669,7 @@ Total number of climaxes with Focus triggers that were triggered this game by th
 Total number of climaxes with Discovery triggers that were triggered this game by this player.=該玩家本場判定出的望遠鏡名場面卡總數。
 Total number of climaxes with Chance triggers that were triggered this game by this player.=該玩家本場判定出的燈泡名場面卡總數。
 Audio=音效設定
-
-// --- 設定頁：卡片更新資訊 ---
-r:"^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)\s*Card update complete[.] Card database reloaded; restart is not required[.]$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n卡片更新完成，已重新讀取卡片資料，不需要重新啟動遊戲。
-r:"(?s)^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)\s*(.*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3\n$4
-r:"^Card storage: ([^\s*]*)\s*Last card update run: ([^\s*]*)\s*Card repo latest commit: ([^\s*]*)$"=卡片存放位置：$1\n上次卡片更新：$2\n卡片資料庫最新版本：$3
 Card storage: unavailable (no updater assigned)=卡片存放位置：無法取得
-
-// --- 系列名稱（補充） ---
 ALICESOFT=ALICESOFT
 AQUAPLUS=AQUAPLUS
 Amagami Sister=結緣甘神神社
@@ -815,82 +728,25 @@ Vividred Operation=Vividred Operation
 YUZU SOFT=柚子社
 anemoi=anemoi
 sprite=sprite
-
-// --- 補充：含符號的程式字串 ---
 Import decklists from previous versions using the Windows registry? Existing deck names in ./Decks will be skipped. This may take a few seconds.=要從 Windows 登錄檔匯入舊版模擬器的牌組嗎？./Decks 裡已有同名的牌組會被略過。這可能需要幾秒鐘。
 Card update complete. Card database reloaded; restart is not required.=卡片更新完成，已重新讀取卡片資料，不需要重新啟動遊戲。
 Could not connect to the lobby host. The lobby may be stale or unreachable. Try Quick Match again.=無法連線到房主。房間可能已失效或無法連線，請再試一次快速配對。
 Lobby host is no longer available. Try Quick Match again.=房主已經離開，請再試一次快速配對。
 Could not connect to the lobby host. Try Quick Match again.=無法連線到房主，請再試一次快速配對。
 Lobby search failed. Retrying...=搜尋房間失敗，重試中...
-r:"(?s)^Log is still in use[.]\s*Close any open game/processes and retry[.]\s*(.*)$"=紀錄檔仍在使用中。\n請關閉開著的遊戲或程式後再試一次。\n\n$1
-r:"(?s)^An <b>INHERITANCE</b>/<b>INSPIRE</b> (<sprite[^>]*>) effect has been triggered by a card in play[.]\s*Resolve these effects[?]\s*<b><color[^>]*>Denying will skip resolution of <i>ALL</i> INHERITANCE/INSPIRE effects triggered by this card[.]</color></b>$"=場上的卡片發動了 <b>INHERITANCE</b>／<b>INSPIRE</b> $1 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡發動的<i>所有</i> INHERITANCE／INSPIRE 效果。</color></b>
-// 判定圖示的提示
-r:"^(<sprite[^>]*mini_bounce[^>]*>) ?Choose up to 1 of your opponent's characters to return to their hand[.]$"=$1【風吹】最多選擇 1 張對手的角色，返回對手的手牌。
-r:"^(<sprite[^>]*mini_bag[^>]*>) ?Put the top card of your deck into your stock[?]$"=$1【寶袋】要將牌庫頂的 1 張卡放置到能量區嗎？
-r:"^(<sprite[^>]*mini_bar[^>]*>) ?Put the top card of your deck into your stock[?]$"=$1【金磚】要將牌庫頂的 1 張卡放置到能量區嗎？
-r:"^(<sprite[^>]*mini_door[^>]*>) ?Choose up to 1 character in your waiting room and return it to your hand[.]$"=$1【木門】最多選擇 1 張休息室的角色，加入手牌。
-r:"^(<sprite[^>]*mini_book[^>]*>) ?Draw a card[?]$"=$1【書】要抽 1 張卡嗎？
-r:"^(<sprite[^>]*mini_gate[^>]*>) ?Choose up to 1 climax in your waiting room and return it to your hand[.]$"=$1【城門】最多選擇 1 張休息室的名場面卡，加入手牌。
-r:"^(Standby: )?(<sprite[^>]*mini_standby[^>]*>) ?Choose up to 1 level (.+) or lower character in your waiting room to place onto your stage rested[.]$"=$2【開機】最多選擇 1 張休息室中等級 $3 以下的角色，以橫置狀態放置到舞台上。
-r:"^(Standby: )?(<sprite[^>]*mini_standby[^>]*>) ?Choose up to 1 character in your waiting room whose level is less than or equal to your level plus one, and place it on any position of your stage rested[.]$"=$2【開機】最多選擇 1 張休息室中等級小於等於「你的等級 +1」的角色，以橫置狀態放置到舞台上任一位置。
-r:"^(<sprite[^>]*mini_choice[^>]*>) ?Choose a card with a soul trigger icon[.]$"=$1【箭頭】請選擇一張有魂判定圖示的卡。
-r:"^(<sprite[^>]*mini_choice[^>]*>) ?Put this card into your hand or your stock[?]$"=$1【箭頭】要將這張卡加入手牌，還是放置到能量區？
-r:"^(<sprite[^>]*mini_focus[^>]*>) ?Choose an event or a 0 cost character in your waiting room to put into your hand[.]$"=$1【橘子】選擇 1 張休息室中的事件卡或費用 0 的角色，加入手牌。
-r:"^(<sprite[^>]*mini_discovery[^>]*>) ?Reveal up to 3 cards from the top of your deck, choose up to 1 character from among those cards, put it into your hand, and put the rest into your waiting room[.]$"=$1【望遠鏡】公開牌庫頂最多 3 張卡，從中最多選擇 1 張角色加入手牌，其餘放置到休息室。
-r:"^(<sprite[^>]*mini_chance[^>]*>) ?Put this card into your waiting room, reveal up to 2 cards from the top of your deck, choose 1 card from among them to put into your stock, and put the rest into your hand[.]$"=$1【燈泡】將這張卡放置到休息室，公開牌庫頂最多 2 張卡，從中選擇 1 張放置到能量區，其餘加入手牌。
 Hand=手牌
 Stock=能量區
-
-// --- 補充（全面檢查後） ---
-sr:"^(.+?) Choose 1 card[.]$"=$1請選擇 1 張卡。
-sr:"^(.+?) Choose 1 card[.](Not enough valid targets[.])$"=$1請選擇 1 張卡。$2
-r:"^(.+) Choose 1 card[.](Not enough valid targets[.])?$"=$1 請選擇 1 張卡。$2
-r:"(?s)^A newer version of the simulator is available: (.+)\s*You are currently running (.+)[.]\s*Update now[?] The game will close and restart when the update is complete[.]$"=有新版本的模擬器可以更新：$1\n你目前的版本是 $2。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
-r:"^(<sprite[^>]*mini_shot[^>]*>) ?Deal 1 damage to your opponent[.]$"=$1【火燒】給予對手 1 點傷害。
-r:"^(<sprite[^>]*mini_chance[^>]*>) ?Choose 1 card to put into your stock[.]$"=$1【燈泡】選擇 1 張卡放置到能量區。
 Shot Trigger=火燒判定
 Opponent added to hand=對手加入手牌的卡
-r:"^Look at up to ([0-9]+) cards$"=查看最多 $1 張卡
-r:"^Reveal up to ([0-9]+) cards$"=公開最多 $1 張卡
-r:"^Choose a slot to place reversed (.+) in[.]$"=請選擇倒置放置 $1 的位置。
-r:"^Choose a slot to place (.+) in[.]$"=請選擇放置 $1 的位置。
-r:"^Remove which trait from (.+)[?]$"=要移除 $1 的哪個特徵？
 Reorder Cards (Green \= Top, Red \= Bottom)=重新排列卡片（綠色＝最上方，紅色＝最下方）
-r:"^Exchange a (.+) card in your hand with (.+) in your clock[?]$"=要將手牌中的 1 張 $1 卡與傷害區的 $2 交換嗎？
-r:"^Send a marker from under (.+) to the waitign room in place of one stock[?]$"=要從 $1 下方送 1 張標記到休息室，代替支付 1 點能量嗎？
-r:"^Choose a characters to put (.+) under as a marker[.]$"=請選擇要將 $1 放在其下方作為標記的角色。
-Choose card to flip face-down=請選擇要翻成背面的卡
-Choose cards to flip face-down=請選擇要翻成背面的卡
-Choose card to flip face-up=請選擇要翻成正面的卡
-Choose cards to flip face-up=請選擇要翻成正面的卡
-r:"^Markers under (.+)$"=$1 下方的標記
-r:"^Opponent refreshed with ([0-9]+) climax[.]$"=對手洗牌重整，其中有 $1 張名場面卡。
-r:"^You refreshed with ([0-9]+) climax[.]$"=你洗牌重整，其中有 $1 張名場面卡。
-r:"^Counter Step: (.+)$"=反擊階段：$1
 No valid target for bond :(=沒有可以羈絆的目標 :(
-r:"^Opponent used the act ability of (.+)$"=對手發動了 $1 的起動能力
 Revealed:=公開：
 REMATCH=再戰
 An effect is preventing you from returning characters from waiting room to hand.=有效果使你無法將角色從休息室返回手牌。
-r:"^You cannot use ENCORE until end of turn[.]$"=到回合結束為止，你不能使用再演。
-r:"^You cannot use ENCORE until end of your turn$"=到你的回合結束為止，你不能使用再演。
-r:"^You cannot use events until end of turn[.]$"=到回合結束為止，你不能使用事件卡。
-r:"^You cannot use events until end of your turn$"=到你的回合結束為止，你不能使用事件卡。
-r:"^You cannot use on stage ACT until end of turn[.]$"=到回合結束為止，你不能使用舞台上的起動能力。
-r:"^You cannot use on stage ACT until end of your turn$"=到你的回合結束為止，你不能使用舞台上的起動能力。
 Extra counter step=額外的反擊步驟
 Emotes=表情
 Show=顯示
 main_menu=主畫面
-
-// --- 新版模擬器（2026-10）新增字串 ---
-r:"(?s)^A <b>RECOLLECTION</b> (<sprite[^>]*>) effect has been triggered by a card in play[.]\s*Resolve these effects[?]\s*<b><color[^>]*>Denying will skip resolution of <i>ALL</i> RECOLLECTION effects triggered by this card's placement from anywhere[.]</color></b>$"=場上的卡片發動了 <b>回想（RECOLLECTION）</b> $1 效果。\n要處理這些效果嗎？\n<b><color\=red>選擇「否」會略過這張卡這次放置（不論從哪裡放置）發動的<i>所有</i>回想效果。</color></b>
-r:"(?s)^You are ready[.]\s*Opponent is ready[.]\s*([0-9]+)s remaining$"=你已準備。\n對手已準備。\n剩下 $1 秒
-r:"(?s)^You are ready[.]\s*Waiting for opponent readiness[.]\s*([0-9]+)s remaining$"=你已準備。\n等待對手準備。\n剩下 $1 秒
-r:"(?s)^Opponent found[.] Ready up!\s*Opponent is ready[.]\s*([0-9]+)s remaining$"=找到對手了，請按「準備」！\n對手已準備。\n剩下 $1 秒
-r:"(?s)^Opponent found[.] Ready up!\s*Waiting for opponent readiness[.]\s*([0-9]+)s remaining$"=找到對手了，請按「準備」！\n等待對手準備。\n剩下 $1 秒
-r:"^Both players ready[.] Starting in ([0-9]+)s[.][.][.]$"=雙方都已準備，$1 秒後開始…
 Matchmaking paused: readiness expired or the opponent left.\nResume once you are alone, or return to the main menu.=配對已暫停：準備時間已過，或對手已離開。\n等房間只剩你一人時可以繼續配對，或返回主畫面。
 Matchmaking paused: readiness expired or the opponent left.\nFind another opponent.=配對已暫停：準備時間已過，或對手已離開。\n請尋找其他對手。
 Waiting for an opponent...=正在等待對手…
@@ -903,7 +759,6 @@ Resume Matchmaking=繼續配對
 Find Another Opponent=尋找其他對手
 Open Lobbies: unavailable=開放中的房間：無法取得
 Open Lobbies: checking...=開放中的房間：查詢中…
-r:"^Open Lobbies: ([0-9]+)$"=開放中的房間：$1
 Leaving lobby. Finding another opponent...=正在離開房間，尋找其他對手…
 Lobby unavailable. Finding another match...=房間已無法使用，正在尋找其他對戰…
 Retrying search for another match...=重新尋找其他對戰…
@@ -920,7 +775,6 @@ You could not connect to this game because your card data does not match the hos
 The connection attempt was cancelled.=已取消連線。
 Previous turn=上一回合
 Next turn=下一回合
-r:"^Speed ([0-9.]+)x$"=速度 $1x
 Back to logs=返回對戰紀錄
 Pause=暫停
 Finished=已結束
@@ -936,18 +790,10 @@ Playing=播放中
 Playing partial recording=播放中（紀錄不完整）
 End of partial recording=不完整的紀錄已播放完畢
 End of partial recording (an input was not completed)=不完整的紀錄已播放完畢（有操作沒有完成）
-r:"^End of partial recording [(]decision #([0-9]+) was not completed[)]$"=不完整的紀錄已播放完畢（第 $1 個決策沒有完成）
 Replay complete - draw=重播完畢 - 平手
-r:"^Replay complete - Player ([12]) wins$"=重播完畢 - 玩家 $1 獲勝
 Replay ended without reproducing its recorded result=重播結束，但結果和紀錄不同
 Replay stopped before its recorded result=重播在紀錄的結果出現前停止了
-r:"^Replay stopped: (.+)$"=重播已停止：$1
-r:"^Replay unavailable: (.+)$"=無法重播：$1
 Load a GameLog file before starting playback.=請先讀取對戰紀錄檔，再開始重播。
-sr:"^Paused - (.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=已暫停 - $1 ｜ 回合 $2/$3 ｜ 已驗證：$4 ｜ 玩家 $5 ｜ $6%
-sr:"^Seeking turn ([0-9]+) - (.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=跳到第 $1 回合 - $2 ｜ 回合 $3/$4 ｜ 已驗證：$5 ｜ 玩家 $6 ｜ $7%
-sr:"^(.+) [|] Turn ([0-9]+)/([0-9]+) [|] Verified: ([0-9]+) [|] Player ([12]) [|] ([0-9]+)%$"=$1 ｜ 回合 $2/$3 ｜ 已驗證：$4 ｜ 玩家 $5 ｜ $6%
-r:"(?s)^Log is still in use[.]\s*Close any open game/processes and retry[.]\s*(.+)$"=紀錄檔還在使用中。\n請關閉開著的遊戲或程式後再試一次。\n\n$1
 Total Refresh Cards=洗牌重整的總卡數
 Most Played Card Count=最常打出的卡片次數
 Cards returned during refresh=洗牌重整時回到牌庫的卡
@@ -958,15 +804,10 @@ Plusses=集中收益
 Backups=助太刀
 Hits=命中
 Damage=傷害
-r:"(?s)^Your card data may be out of date[.]\s*Last update run: (.*)\s*Latest repo commit: (.*)\s*Would you like to go to Settings to update now[?]$"=你的卡片資料可能不是最新的。\n\n上次更新：$1\n最新版本：$2\n\n要前往設定進行更新嗎？
 Card update completed, but the database could not be reloaded. Restart the game to load the updated cards.=卡片更新完成，但無法重新載入資料，請重新啟動遊戲以載入新的卡片。
 Card update is already running.=卡片更新已經在進行中。
 Card repo latest commit: unavailable=卡片資料最新版本：無法取得
 Preparing sleeves...=正在準備卡套…
-r:"^Preparing sleeves [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在準備卡套（$1 / $2）…
-r:"^Copying AI decks [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在複製 AI 牌組（$1 / $2）…
-r:"^Preparing audio [(]([0-9]+) / ([0-9]+)[)][.][.][.]$"=正在準備音效（$1 / $2）…
-r:"^Format: <b>(.+)</b>$"=賽制：<b>$1</b>
 Neo Standard EN>JP=Neo Standard（英文版→日文版）
 Neo Standard JP>EN=Neo Standard（日文版→英文版）
 Standard=標準

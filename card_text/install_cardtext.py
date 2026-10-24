@@ -3,6 +3,7 @@
 # 另外把「獲得以下能力"Auto: ..."」引號裡的能力拆出來另存一份（角色實際獲得能力後會單獨顯示那一段）
 import json, os, glob, sys, re, shutil
 D = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, D)
 EN_Q = re.compile(r'"((?:Auto|Cont|Act): .+?)"(?=\s*(?:$|[.,]|and |After| "|\(|to |until|Then|If |$))')
 ZH_Q = re.compile(r'「(【(?:自|永|起)】.*?)」(?=$|[。，、]|並|，|「|之後|直到|（|$)')
 
@@ -26,13 +27,19 @@ def build_files():
     files['zz_quoted'] = quoted
     return files
 
+# 简体中文版：由台灣版轉換（zhcn.py）
+def build_cn(files):
+    from zhcn import to_cn
+    return {name: {en: to_cn(zh) for en, zh in d.items()} for name, d in files.items()}
+
 if __name__ == '__main__':
     SIM = sys.argv[1] if len(sys.argv) > 1 else r'C:\Users\Gary\Desktop\WS模擬器'
     files = build_files()
-    out = os.path.join(SIM, 'AutoTranslator', 'Translation', 'tw', 'CardText')
-    os.makedirs(out, exist_ok=True)
-    for name, data in files.items():
-        json.dump(data, open(os.path.join(out, name + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+    for lang, fs in (('tw', files), ('cn', build_cn(files))):
+        out = os.path.join(SIM, 'AutoTranslator', 'Translation', lang, 'CardText')
+        os.makedirs(out, exist_ok=True)
+        for name, data in fs.items():
+            json.dump(data, open(os.path.join(out, name + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
     hk = os.path.join(SIM, 'AutoTranslator', 'Translation', 'hk', 'CardText')
     if os.path.isdir(hk): shutil.rmtree(hk)          # 舊版另存的香港版，已改成遊戲裡轉換
     print('files', len(files), 'lines', sum(len(d) for d in files.values()), 'quoted abilities', len(files['zz_quoted']))

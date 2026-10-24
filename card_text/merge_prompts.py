@@ -1,5 +1,5 @@
 # 合併 Pxxx_part.json（對戰提示文字的譯文）→ AutoTranslator 的 CardPrompts.txt
-# 寫到模擬器與 files\ 兩處；香港版用台灣版轉換區域名稱（休息室→控制室、能量區→費用區）
+# 寫到模擬器與 files\ 兩處；香港版用台灣版轉換區域名稱（休息室→控制室、能量區→費用區），简体版用 zhcn.py 轉換
 # 用法：python merge_prompts.py [模擬器路徑]
 import glob, json, os, re, sys
 D = os.path.dirname(os.path.abspath(__file__))
@@ -32,10 +32,14 @@ for src_p in sorted(glob.glob(os.path.join(D, 'P*_src.json'))):
         pairs[t] = norm(z.strip())
 
 head = '// WS 模擬器中文化套件：卡片腳本的對戰提示文字（由 card_text\\merge_prompts.py 產生，請勿手動修改）\n'
-for lang, conv in (('tw', []), ('hk', HK)):
+sys.path.insert(0, D)
+from zhcn import to_cn
+for lang, conv in (('tw', []), ('hk', HK), ('cn', None)):
     lines = []
     for en, zh in pairs.items():
-        for a, b in conv: zh = zh.replace(a, b)
+        if conv is None: zh = to_cn(zh)
+        else:
+            for a, b in conv: zh = zh.replace(a, b)
         lines.append(esc(en) + '=' + esc(zh))
     data = head + '\n'.join(lines) + '\n'
     for root in (os.path.join(SIM, 'AutoTranslator'), os.path.join(REPO, 'files', 'AutoTranslator')):

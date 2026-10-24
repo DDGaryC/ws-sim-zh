@@ -231,7 +231,7 @@ public static class WszhCardText
     }
 
     // ---- 「更新卡片翻譯」按鈕：從 GitHub 下載卡片翻譯（像模擬器的「更新卡片」） ----
-    // 伺服器上 cardtext/manifest.txt 每行「sha256<Tab>大小<Tab>檔名」，檔案在 cardtext/tw/ 底下。
+    // 伺服器上 cardtext/manifest.txt（简体：manifest_cn.txt）每行「sha256<Tab>大小<Tab>檔名」，檔案在 cardtext/tw/（cn/）底下。
     // 只下載本機沒有或內容不同的檔案；伺服器上已經沒有的檔案會刪掉。香港版共用台灣版。
     const string CardTextBase = "https://raw.githubusercontent.com/DDGaryC/ws-sim-zh/main/cardtext/";
 
@@ -260,11 +260,13 @@ public static class WszhCardText
         return r;
     }
 
-    public static System.Collections.IEnumerator Download(Action<string> status)
+    // lang：目前的語言。简体中文下載 cardtext/cn/（清單 manifest_cn.txt），其他（台灣、香港）下載 cardtext/tw/
+    public static System.Collections.IEnumerator Download(string lang, Action<string> status)
     {
+        string sub = lang == "cn" ? "cn" : "tw";
         status("正在檢查卡片翻譯…");
         string manifest;
-        using (var r = Get(CardTextBase + "manifest.txt"))
+        using (var r = Get(CardTextBase + (sub == "cn" ? "manifest_cn.txt" : "manifest.txt")))
         {
             yield return r.SendWebRequest();
             if (r.responseCode == 404) { status("雲端還沒有卡片翻譯檔，請稍後再試"); yield break; }
@@ -279,7 +281,7 @@ public static class WszhCardText
         }
         if (list.Count == 0) { status("伺服器上的卡片翻譯清單是空的"); yield break; }
 
-        string dir = CardTextDir("tw");
+        string dir = CardTextDir(sub);
         Directory.CreateDirectory(dir);
         int changed = 0, n = 0;
         var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -292,7 +294,7 @@ public static class WszhCardText
             try { same = File.Exists(path) && Sha256(File.ReadAllBytes(path)) == p[0].ToLowerInvariant(); } catch { }
             if (same) continue;
             status("正在下載卡片翻譯（" + n + " / " + list.Count + "）…");
-            using (var r = Get(CardTextBase + "tw/" + Uri.EscapeDataString(p[2])))
+            using (var r = Get(CardTextBase + sub + "/" + Uri.EscapeDataString(p[2])))
             {
                 yield return r.SendWebRequest();
                 if (r.result != UnityEngine.Networking.UnityWebRequest.Result.Success) { status("下載失敗：" + p[2] + "（" + r.error + "），請再試一次"); yield break; }
