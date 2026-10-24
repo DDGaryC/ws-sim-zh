@@ -843,6 +843,8 @@ Hand=手牌
 Stock=能量区
 
 // --- 補充（全面檢查後） ---
+sr:"^(.+?) Choose 1 card[.]$"=$1请选择 1 张卡。
+sr:"^(.+?) Choose 1 card[.](Not enough valid targets[.])$"=$1请选择 1 张卡。$2
 r:"^(.+) Choose 1 card[.](Not enough valid targets[.])?$"=$1 请选择 1 张卡。$2
 r:"(?s)^A newer version of the simulator is available: (.+)\s*You are currently running (.+)[.]\s*Update now[?] The game will close and restart when the update is complete[.]$"=有新版本的模拟器可以更新：$1\n你目前的版本是 $2。\n\n要现在更新吗？更新完成後游戏会自动关闭并重新启动。
 r:"^(<sprite[^>]*mini_shot[^>]*>) ?Deal 1 damage to your opponent[.]$"=$1【火烧】给予对手 1 点伤害。
@@ -980,20 +982,3 @@ Where do you want to place the card?=要将这张卡放到哪里？
 Top of Deck=卡组顶
 Bottom of Deck=卡组底
 Waiting Room=控室
-// --- 更新卡片狀態 ---
-sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片资料库最新版本：$3
-sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片资料库最新版本：$3\n阶段：$4
-sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)\nSet: ([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片资料库最新版本：$3\n阶段：$4\n系列：$5
-sr:"^Card storage: ([^\n]*)\nLast card update run: ([^\n]*)\nCard repo latest commit: ([^\n]*)\nStage: ([^\n]*)\nSet: ([^\n]*)\n([^\n]*)$"=卡片存放位置：$1\n上次更新卡片：$2\n卡片资料库最新版本：$3\n阶段：$4\n系列：$5\n$6
-sr:"^(.+) \(([0-9]+)%\)$"=$1（$2%）
-Checking installed images=检查已安装的图片
-Checking metadata=检查卡片资料
-Downloading new images=下载新图片
-never=从未更新
-unavailable=无法取得
-loading...=读取中…
-unknown=未知
-Card update complete. Card database reloaded; restart is not required.=卡片更新完成，已重新载入卡片资料，不需要重开游戏。
-Card update completed, but the database could not be reloaded. Restart the game to load the updated cards.=卡片更新完成，但无法重新载入卡片资料，请重开游戏以载入新卡片。
-Card update is already running.=卡片更新已在进行中。
-r:"^Card update failed: (.*)$"=卡片更新失败：$1

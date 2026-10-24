@@ -72,10 +72,10 @@ if (Newer $fixPatch 'AiFixPatch.cs') {
 }
 # 遊戲內語言切換：遊戲執行時載入的程式庫（.NET 4，參考遊戲的 UnityEngine 模組）＋ ReiPatcher 補丁（.NET 3.5）
 $langDll = Join-Path $Sim 'ReiPatcher\WSZH.Lang.dll'
-if (Newer $langDll 'Lang.cs', 'CardText.cs') {
+if (Newer $langDll 'Lang.cs', 'CardText.cs', 'JpArt.cs') {
     $managed = Join-Path $Sim 'Weiss Schwarz_Data\Managed'
-    $uref = @('UnityEngine.CoreModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.TextRenderingModule.dll', 'UnityEngine.UIModule.dll', 'UnityEngine.UI.dll', 'Unity.TextMeshPro.dll', 'netstandard.dll', 'UnityEngine.InputLegacyModule.dll', 'UnityEngine.UnityWebRequestModule.dll') | ForEach-Object { "/r:$(Join-Path $managed $_)" }
-    & $csc /nologo /target:library /optimize+ /codepage:65001 "/out:$langDll.new" @uref /r:System.Core.dll (Join-Path $Here 'Lang.cs') (Join-Path $Here 'CardText.cs')
+    $uref = @('UnityEngine.CoreModule.dll', 'UnityEngine.IMGUIModule.dll', 'UnityEngine.TextRenderingModule.dll', 'UnityEngine.UIModule.dll', 'UnityEngine.UI.dll', 'Unity.TextMeshPro.dll', 'netstandard.dll', 'UnityEngine.InputLegacyModule.dll', 'UnityEngine.UnityWebRequestModule.dll', 'UnityEngine.ImageConversionModule.dll') | ForEach-Object { "/r:$(Join-Path $managed $_)" }
+    & $csc /nologo /target:library /optimize+ /codepage:65001 "/out:$langDll.new" @uref /r:System.Core.dll (Join-Path $Here 'Lang.cs') (Join-Path $Here 'CardText.cs') (Join-Path $Here 'JpArt.cs')
     if ($LASTEXITCODE -ne 0) { throw "語言切換編譯失敗" }
     Install-Built "$langDll.new" $langDll
 }

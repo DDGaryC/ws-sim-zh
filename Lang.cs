@@ -417,17 +417,135 @@ public class WszhLang : MonoBehaviour
         cardLastBottom = bottom;
         float cx = ScreenPos(cardUpd, cardCanvas).x;
         float h = cardBtnRt.rect.height * cardBtnRt.lossyScale.y;
-        PlaceAt(cardBtnRt, new Vector2(cx, bottom - h * 0.75f), cardCanvas);
-        if (cardStatusRt != null) PlaceAt(cardStatusRt, new Vector2(cx, bottom - h * 1.6f), cardCanvas);
+        float w = cardBtnRt.rect.width * cardBtnRt.lossyScale.x;
+        // 「更新卡片翻譯」和「日版卡圖」左右並排，下面是兩行狀態文字
+        PlaceAt(cardBtnRt, new Vector2(cx - w * 0.55f, bottom - h * 0.65f), cardCanvas);
+        if (jpBtnRt != null) PlaceAt(jpBtnRt, new Vector2(cx + w * 0.55f, bottom - h * 0.65f), cardCanvas);
+        if (cardStatusRt != null) PlaceAt(cardStatusRt, new Vector2(cx, bottom - h * 1.55f), cardCanvas);
+    }
+
+    // 新建一顆按鈕，只沿用範本按鈕的圖樣與字型
+    // （不直接複製：原按鈕上的遊戲元件會把位置與文字改回去）
+    RectTransform MakeButton(Button src, Canvas cv, string name, string label, UnityEngine.Events.UnityAction onClick, out Graphic labelGraphic)
+    {
+        labelGraphic = null;
+        var srcRt = (RectTransform)src.transform;
+        var go = new GameObject(name, typeof(RectTransform));
+        go.transform.SetParent(cv.transform, false);
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(srcRt.rect.width * srcRt.lossyScale.x / rt.lossyScale.x, srcRt.rect.height * srcRt.lossyScale.y / rt.lossyScale.y);
+        var img = go.AddComponent<Image>();
+        var srcImg = src.targetGraphic as Image ?? src.GetComponent<Image>();
+        if (srcImg != null) { img.sprite = srcImg.sprite; img.type = srcImg.type; img.color = srcImg.color; img.pixelsPerUnitMultiplier = srcImg.pixelsPerUnitMultiplier; }
+        var btn = go.AddComponent<Button>();
+        btn.targetGraphic = img;
+        btn.transition = src.transition; btn.colors = src.colors; btn.spriteState = src.spriteState;
+        btn.onClick.AddListener(onClick);
+        Graphic srcLabel = (Graphic)src.GetComponentInChildren<TMP_Text>(true) ?? src.GetComponentInChildren<Text>(true);
+        if (srcLabel != null)
+        {
+            var lg = MakeText(srcLabel, go.transform, "Label");
+            var lrt = (RectTransform)lg.transform;
+            lrt.anchorMin = Vector2.zero; lrt.anchorMax = Vector2.one; lrt.offsetMin = Vector2.zero; lrt.offsetMax = Vector2.zero;
+            var lgr = lg.GetComponent<Graphic>();
+            lgr.raycastTarget = false;
+            var lt = lgr as TMP_Text; if (lt != null) lt.alignment = TextAlignmentOptions.Center;
+            var lu = lgr as Text; if (lu != null) lu.alignment = TextAnchor.MiddleCenter;
+            SetTextOf(lgr, label);
+            labelGraphic = lgr;
+        }
+        return rt;
+    }
+
+    // ---- 日版卡圖開關 ----
+    RectTransform jpBtnRt;
+    Graphic jpBtnLabel;
+
+    static string JpArtLabel() { return WszhJpArt.Enabled ? "日版卡圖：開" : "日版卡圖：關"; }
+
+    void OnJpArtToggle()
+    {
+        WszhJpArt.Enabled = !WszhJpArt.Enabled;
+        if (jpBtnLabel != null) SetTextOf(jpBtnLabel, JpArtLabel());
+        ShowCardTextInfo();
     }
 
     IEnumerator FollowCardInfo()
     {
         while (cardBtnRt != null)
         {
+            TranslateUpdaterStatus();
             PlaceCardTextUI();
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return null;
         }
+    }
+
+    // 「更新卡片」的狀態文字（Card storage…／Stage…／Card update complete…）。
+    // 它是多行、內容一直變的長文字，翻譯檔的規則對不上（長文字的換行會被正規化），所以在這裡逐行翻
+    string updaterShown;
+    void TranslateUpdaterStatus()
+    {
+        if (cardUpdText == null) return;
+        string cur = cardUpdText.text;
+        if (string.IsNullOrEmpty(cur) || cur == updaterShown || ReadLanguage() == "en") return;
+        var lines = cur.Replace("\r", "").Split('\n');
+        for (int i = 0; i < lines.Length; i++) lines[i] = UpdaterLine(lines[i]);
+        string zh = string.Join("\n", lines);
+        if (ReadLanguage() == "cn") zh = ToSimplified(zh);
+        updaterShown = zh;
+        if (zh != cur) cardUpdText.text = zh;
+    }
+
+    static readonly string[][] UpdaterFixed = {
+        new[] { "Checking metadata", "檢查卡片資料" },
+        new[] { "Checking installed images", "檢查已安裝的圖片" },
+        new[] { "Downloading new images", "下載新圖片" },
+        new[] { "Update complete", "更新完成" },
+        new[] { "Update already running...", "已經在更新中…" },
+        new[] { "Card update is already running.", "卡片更新已在進行中。" },
+        new[] { "No card updater is assigned.", "找不到卡片更新程式。" },
+        new[] { "Card update complete. Card database reloaded; restart is not required.", "卡片更新完成，已重新載入卡片資料，不需要重開遊戲。" },
+        new[] { "never", "從未更新" },
+        new[] { "unavailable", "無法取得" },
+        new[] { "unavailable (no updater assigned)", "無法取得（沒有卡片更新程式）" },
+        new[] { "loading...", "讀取中…" },
+        new[] { "unknown", "未知" },
+    };
+
+    static string UpdaterValue(string v)
+    {
+        string t = v.Trim();
+        foreach (var p in UpdaterFixed) if (t == p[0]) return p[1];
+        return v;
+    }
+
+    static string UpdaterLine(string s)
+    {
+        foreach (var p in UpdaterFixed) if (s == p[0]) return p[1];
+        var m = System.Text.RegularExpressions.Regex.Match(s, @"^(Card storage|Last card update run|Card repo latest commit): (.*)$");
+        if (m.Success)
+        {
+            string label = m.Groups[1].Value == "Card storage" ? "卡片存放位置：" : m.Groups[1].Value == "Last card update run" ? "上次更新卡片：" : "卡片資料庫最新版本：";
+            return label + UpdaterValue(m.Groups[2].Value);
+        }
+        m = System.Text.RegularExpressions.Regex.Match(s, @"^(Stage|Set): (.*?) \((\d+)%\)$");
+        if (m.Success) return (m.Groups[1].Value == "Stage" ? "階段：" : "系列：") + UpdaterValue(m.Groups[2].Value) + "（" + m.Groups[3].Value + "%）";
+        if (s.StartsWith("Update failed: ")) return "更新失敗：" + s.Substring(15);
+        if (s.StartsWith("Card update completed, but the database could not be reloaded."))
+            return "卡片更新完成，但無法重新載入卡片資料，請重開遊戲以載入新卡片。" + s.Substring(s.IndexOf("cards.") + 6);
+        if (s.StartsWith("Large update detected: "))
+            return "需要下載的系列太多（超過模擬器的安全上限），請依 README.txt 的初次安裝說明下載完整卡片資料，再用這裡更新。";
+        return s;
+    }
+
+    static string ToSimplified(string s)
+    {
+        const string T = "卡片存放位置上次更新從未資料庫最新版本階段系列檢查已安裝圖片下載完成經進行中找不到程式重新載入需要開遊戲無法取得沒有讀取知失敗請依說明這裡";
+        const string S = "卡片存放位置上次更新从未资料库最新版本阶段系列检查已安装图片下载完成经进行中找不到程式重新载入需要开游戏无法取得没有读取知失败请依说明这里";
+        var sb = new StringBuilder(s);
+        for (int i = 0; i < sb.Length; i++) { int k = T.IndexOf(sb[i]); if (k >= 0) sb[i] = S[k]; }
+        return sb.ToString();
     }
 
     void BuildCardTextUI(object os, Type osType, Canvas cv, float H)
@@ -441,34 +559,11 @@ public class WszhLang : MonoBehaviour
         cardUpd = upd; cardUpdText = updText; cardCanvas = cv;
         float bottom = CardInfoBottom();
 
-        // 按鈕：新建一顆，只沿用「更新卡片」按鈕的圖樣與字型
-        // （不直接複製：原按鈕上的遊戲元件會把位置與文字改回去）
-        var srcRt = (RectTransform)upd.transform;
-        var go = new GameObject("WSZH_CardTextButton", typeof(RectTransform));
-        go.transform.SetParent(cv.transform, false);
-        var rt = (RectTransform)go.transform;
-        rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
-        rt.sizeDelta = new Vector2(srcRt.rect.width * srcRt.lossyScale.x / rt.lossyScale.x, srcRt.rect.height * srcRt.lossyScale.y / rt.lossyScale.y);
-        var img = go.AddComponent<Image>();
-        var srcImg = upd.targetGraphic as Image ?? upd.GetComponent<Image>();
-        if (srcImg != null) { img.sprite = srcImg.sprite; img.type = srcImg.type; img.color = srcImg.color; img.pixelsPerUnitMultiplier = srcImg.pixelsPerUnitMultiplier; }
-        var btn = go.AddComponent<Button>();
-        btn.targetGraphic = img;
-        btn.transition = upd.transition; btn.colors = upd.colors; btn.spriteState = upd.spriteState;
-        btn.onClick.AddListener(OnCardTextUpdate);
-        Graphic srcLabel = (Graphic)upd.GetComponentInChildren<TMP_Text>(true) ?? upd.GetComponentInChildren<Text>(true);
-        if (srcLabel != null)
-        {
-            var lg = MakeText(srcLabel, go.transform, "Label");
-            var lrt = (RectTransform)lg.transform;
-            lrt.anchorMin = Vector2.zero; lrt.anchorMax = Vector2.one; lrt.offsetMin = Vector2.zero; lrt.offsetMax = Vector2.zero;
-            var lgr = lg.GetComponent<Graphic>();
-            lgr.raycastTarget = false;
-            var lt = lgr as TMP_Text; if (lt != null) lt.alignment = TextAlignmentOptions.Center;
-            var lu = lgr as Text; if (lu != null) lu.alignment = TextAnchor.MiddleCenter;
-            SetTextOf(lgr, "更新卡片翻譯");
-        }
+        Graphic unused;
+        var rt = MakeButton(upd, cv, "WSZH_CardTextButton", "更新卡片翻譯", OnCardTextUpdate, out unused);
+        var btn = rt.GetComponent<Button>();
         cardBtnRt = rt;
+        jpBtnRt = MakeButton(upd, cv, "WSZH_JpArtButton", JpArtLabel(), OnJpArtToggle, out jpBtnLabel);
 
         // 狀態文字
         Graphic tmpl = (Graphic)updText ?? upd.GetComponentInChildren<TMP_Text>(true);
@@ -495,9 +590,18 @@ public class WszhLang : MonoBehaviour
         try { n = WszhCardText.LineCount(); } catch { }
         string when = WszhCardText.LastUpdated();
         string lang = ReadLanguage();
-        if (lang == "en") SetTextOf(cardStatus, "Card text translation: English mode (not used)");
-        else if (n == 0) SetTextOf(cardStatus, "還沒有卡片翻譯，按上面的按鈕下載");
-        else SetTextOf(cardStatus, "卡片翻譯：" + n + " 條" + (when != null ? "（" + when + " 更新）" : ""));
+        string line1;
+        if (lang == "en") line1 = "卡片翻譯：英文模式不使用";
+        else if (n == 0) line1 = "卡片翻譯：尚未下載";
+        else line1 = "卡片翻譯：" + n + " 條";
+        int cnt; long bytes;
+        WszhJpArt.CacheInfo(out cnt, out bytes);
+        line1 += "｜日版卡圖：" + (cnt > 0 ? "已存 " + cnt + " 張（" + (bytes / 1048576) + " MB）" : "尚未下載");
+        // 第二行說明日版卡圖的運作方式（會用到網路）
+        string line2 = WszhJpArt.Enabled
+            ? "日版卡圖已開啟：看到卡片時會連網從日版官網即時下載，之後重複使用"
+            : "日版卡圖開啟後，看到卡片時會連網從日版官網即時下載卡圖";
+        SetTextOf(cardStatus, line1 + "\n" + line2);
     }
 
     void OnCardTextUpdate()

@@ -57,6 +57,11 @@ public static class WszhCardText
                 string whole;
                 // 先拿整行比對（判定效果那類句子開頭本身就是圖示標籤）
                 if (map.TryGetValue(line, out whole) || map.TryGetValue(line.TrimEnd(), out whole)) { lines[i] = whole; changed = true; continue; }
+                // 行首有空白（「選擇以下 1 個效果」之後的各選項常見），或整行用引號括起來的選項
+                string tr = line.Trim();
+                if (tr != line && tr.Length > 0 && map.TryGetValue(tr, out whole)) { lines[i] = whole; changed = true; continue; }
+                if (tr.Length > 2 && tr[0] == '"' && tr[tr.Length - 1] == '"' && map.TryGetValue(tr.Substring(1, tr.Length - 2).Trim(), out whole))
+                { lines[i] = "「" + whole + "」"; changed = true; continue; }
                 // 對不到時，行首可能有遊戲加上的標籤（例如 <color=#000000>），拿掉再比對
                 // 一個一個拿掉行首標籤再比對（對戰時是「顏色標籤＋判定圖示＋文字」，判定圖示本身是譯文的一部分）
                 int p = 0;

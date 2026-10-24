@@ -20,6 +20,7 @@ public class WszhLangPatch : PatchBase
     const string CardTag = "WSZH.CardText";
     const string SearchTag = "WSZH.CardSearch";
     const string AlignTag = "WSZH.CardAlign";
+    const string JpArtTag = "WSZH.JpArt";
     const string HelperName = "WSZH.Lang";
     public override string Name { get { return "WS 中文化套件：遊戲內語言切換"; } }
     public override string Version { get { return "1.0"; } }
@@ -52,7 +53,7 @@ public class WszhLangPatch : PatchBase
     {
         if (args.Assembly.Name.Name != "Assembly-CSharp") return false;
         var tags = GetPatchedAttributes(args.Assembly).Select(a => a.Info).ToList();
-        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag);
+        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag) || !tags.Contains(JpArtTag);
     }
 
     public override void Patch(PatcherArguments args)
@@ -148,6 +149,27 @@ public class WszhLangPatch : PatchBase
                     il.InsertBefore(first, il.Create(OpCodes.Ret));
                     SetPatchedAttribute(args.Assembly, SearchTag);
                     Console.WriteLine("[WSZH] card search applied");
+                }
+            }
+            if (!tags.Contains(JpArtTag))
+            {
+                TypeDefinition lib = mod.GetType("CardLibrary");
+                MethodDefinition gi = lib == null ? null : lib.Methods.FirstOrDefault(m => m.Name == "GetImage" && m.IsStatic && m.HasBody
+                    && m.Parameters.Count == 3 && m.Parameters.All(x => x.ParameterType.FullName == "System.String"));
+                if (gi == null) Console.WriteLine("[WSZH] jp art skipped: CardLibrary.GetImage not found");
+                else
+                {
+                    var hook = new MethodReference("Hook", mod.TypeSystem.Void, new TypeReference("", "WszhJpArt", mod, asmRef));
+                    hook.Parameters.Add(new ParameterDefinition(mod.TypeSystem.String));
+                    hook.Parameters.Add(new ParameterDefinition(new ByReferenceType(mod.TypeSystem.String)));
+                    ILProcessor il = gi.Body.GetILProcessor();
+                    Instruction first = gi.Body.Instructions[0];
+                    // WszhJpArt.Hook(cardID, ref altImagePath)
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg, gi.Parameters[0]));
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarga, gi.Parameters[2]));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, hook));
+                    SetPatchedAttribute(args.Assembly, JpArtTag);
+                    Console.WriteLine("[WSZH] jp art applied");
                 }
             }
         }
