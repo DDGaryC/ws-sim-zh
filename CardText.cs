@@ -14,7 +14,11 @@ using UnityEngine;
 public static class WszhCardText
 {
     static string loadedLang;
-    static Dictionary<string, string> map = new Dictionary<string, string>();
+    // 譯文表：4 萬多條如果用 Dictionary<string,string> 放在記憶體，舊版 Unity 每次回收記憶體都要逐一檢查這些字串，
+    // 會造成對戰中一頓一頓（2026-10-27 實測：開著 73MB／最慢一幀 70ms，關掉 43MB／10ms）。
+    // 所以載入後轉成 CompactMap：只有幾個數字、位元組陣列，回收時不用逐一檢查；查詢時才把那一句解出來。
+    static CompactMap map = CompactMap.Empty;
+    static Dictionary<string, string> building;     // 載入時暫用
     static readonly Dictionary<string, string> cache = new Dictionary<string, string>();
     static System.Reflection.FieldInfo langField;
     static bool langLookupDone;
@@ -40,6 +44,13 @@ public static class WszhCardText
 
     public static string Translate(string str)
     {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        try { return TranslateCore(str); }
+        finally { WszhPerf.Add(0, t0); }
+    }
+
+    static string TranslateCore(string str)
+    {
         try
         {
             if (string.IsNullOrEmpty(str)) return str;
@@ -55,6 +66,9 @@ public static class WszhCardText
             {
                 string line = lines[i];
                 string whole;
+                // 卡片預覽的狀態說明（「* Cannot attack.」「* This card's name is also treated as "X".」…，遊戲動態產生）
+                string st = StatusLine(line);
+                if (st != null) { lines[i] = st; changed = true; continue; }
                 // 先拿整行比對（判定效果那類句子開頭本身就是圖示標籤）
                 if (map.TryGetValue(line, out whole) || map.TryGetValue(line.TrimEnd(), out whole)) { lines[i] = whole; changed = true; continue; }
                 // 行首有空白（「選擇以下 1 個效果」之後的各選項常見），或整行用引號括起來的選項
@@ -75,17 +89,63 @@ public static class WszhCardText
                 }
             }
             string result = changed ? string.Join("\n", lines) : str;
-            if (cache.Count > 5000) cache.Clear();
+            if (cache.Count > 300) cache.Clear();          // 快取不要太大（字串多了記憶體回收也會變慢）
             cache[str] = result;
             return result;
         }
         catch { return str; }
     }
 
+    // ---- 卡片預覽的狀態說明（DeckCard 產生預覽文字時加在效果前面的「* ...」各行） ----
+    static readonly Dictionary<string, string> StatusFixed = new Dictionary<string, string> {
+        { "May be played ignoring color requirement.", "可以無視顏色條件使用。" },
+        { "Gains counter icon (can be played during the backup step).", "獲得反擊圖示（可以在反擊步驟使用）。" },
+        { "Cannot be played from your hand.", "不能從手牌使用。" },
+        { "Cannot move.", "不能移動。" },
+        { "Cannot stand during the stand phase.", "正置階段時不能正置。" },
+        { "Will not stand during the next stand phase.", "下次的正置階段時不會正置。" },
+        { "May side attack without soul penalty.", "側面攻擊時不會減少魂。" },
+        { "Cannot attack.", "不能攻擊。" },
+        { "Cannot frontal attack.", "不能正面攻擊。" },
+        { "Cannot side attack.", "不能側面攻擊。" },
+        { "Cannot direct attack.", "不能直接攻擊。" },
+        { "Cannot be chosen by opponent's effects.", "不能被對手的效果選擇。" },
+        { "Cannot deal damage to players.", "不能對玩家造成傷害。" },
+        { "When your opponent attacks, if this card is in the middle position of your center stage and not reversed, your opponent frontal attacks this card instead.",
+          "對手攻擊時，如果這張卡在你前列的中央且不是倒置，對手改為正面攻擊這張卡。" },
+        { "Loses all names.", "失去所有卡名。" },
+        { "Can be played from the waiting room. (Without color requirement)", "可以從休息室使用。（無視顏色條件）" },
+    };
+    static readonly Dictionary<string, string> ColorZh = new Dictionary<string, string> {
+        { "Red", "紅色" }, { "Green", "綠色" }, { "Blue", "藍色" }, { "Yellow", "黃色" }, { "Purple", "紫色" }, { "Undefined", "無色" },
+    };
+
+    static string StatusLine(string line)
+    {
+        // 行首可能有顏色等標籤
+        int p = 0;
+        while (p < line.Length && line[p] == '<') { int e = line.IndexOf('>', p); if (e < 0) return null; p = e + 1; }
+        if (line.Length < p + 3 || line[p] != '*' || line[p + 1] != ' ') return null;
+        string head = line.Substring(0, p), s = line.Substring(p + 2).TrimEnd(), zh = null, v;
+        System.Text.RegularExpressions.Match m;
+        if (StatusFixed.TryGetValue(s, out v)) zh = v;
+        else if ((m = System.Text.RegularExpressions.Regex.Match(s, "^This card's name is also treated as \"(.*)\"\\.$")).Success) zh = "這張卡的卡名也視為「" + m.Groups[1].Value + "」。";
+        else if ((m = System.Text.RegularExpressions.Regex.Match(s, @"^This card's color (is also|has changed to) (\w+)\.$")).Success)
+            zh = (m.Groups[1].Value == "is also" ? "這張卡也視為" : "這張卡的顏色變成") + (ColorZh.TryGetValue(m.Groups[2].Value, out v) ? v : m.Groups[2].Value) + "。";
+        else if ((m = System.Text.RegularExpressions.Regex.Match(s, @"^This card's (cost|level) is (increased|decreased) by (-?\d+)\.$")).Success)
+            zh = "這張卡的" + (m.Groups[1].Value == "cost" ? "費用" : "等級") + (m.Groups[2].Value == "increased" ? " +" : " -") + m.Groups[3].Value + "。";
+        else if ((m = System.Text.RegularExpressions.Regex.Match(s, @"^Can be chosen with the (\w+) trigger icon\.$")).Success) zh = "可以被「" + m.Groups[1].Value + "」判定圖示的效果選擇。";
+        else if ((m = System.Text.RegularExpressions.Regex.Match(s, "^This card has gained (<sprite[^>]*>) trigger\\.$")).Success) zh = "這張卡獲得了 " + m.Groups[1].Value + " 判定圖示。";
+        if (zh == null) return null;
+        if (hkMode) zh = zh.Replace("休息室", "控制室");
+        if (loadedLang == "cn") zh = WszhLang.ToSimplified(zh).Replace("休息室", "控室").Replace("休息室", "控室");
+        return head + "＊" + zh;
+    }
+
     static void Load(string lang)
     {
         loadedLang = lang;
-        map = new Dictionary<string, string>();
+        map = CompactMap.Empty;
         cache.Clear();
         if (string.IsNullOrEmpty(lang)) return;
         try
@@ -94,20 +154,31 @@ public static class WszhCardText
             string dir = CardTextDir(lang == "hk" ? "tw" : lang);
             if (!Directory.Exists(dir)) return;
             hkMode = lang == "hk";
+            building = new Dictionary<string, string>();
             foreach (string f in Directory.GetFiles(dir, "*.json"))
             {
                 try { Parse(File.ReadAllText(f, Encoding.UTF8)); }
                 catch (Exception ex) { Debug.Log("[WSZH] card text: failed to read " + Path.GetFileName(f) + ": " + ex.Message); }
             }
-            Debug.Log("[WSZH] card text loaded for " + lang + ": " + map.Count + " lines");
+            map = CompactMap.Build(building);
+            building = null;
+            GC.Collect();                                   // 載入用的暫存字串現在就清掉（只在載入時一次）
+            Debug.Log("[WSZH] card text loaded for " + lang + ": " + map.Count + " lines, heap=" + (GC.GetTotalMemory(false) / 1048576) + "MB");
         }
-        catch (Exception ex) { Debug.Log("[WSZH] card text load failed: " + ex.Message); }
+        catch (Exception ex) { building = null; Debug.Log("[WSZH] card text load failed: " + ex.Message); }
     }
 
     // ---- EnrichenText 處理完之後：有中文時改成靠左對齊 ----
     // 卡片說明框是左右對齊，中文句子幾乎沒有空格，整行多出來的寬度會全塞進少數幾個空格，出現很大的空白。
     // （不能在 Translate 裡加：EnrichenText 會把沒有「/」的 <...> 標籤當成特徵名稱改成 «...»）
     public static string Post(string s)
+    {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        try { return PostCore(s); }
+        finally { WszhPerf.Add(1, t0); }
+    }
+
+    static string PostCore(string s)
     {
         try
         {
@@ -224,6 +295,7 @@ public static class WszhCardText
     // 下載完新的翻譯後呼叫：下次顯示卡片時重新載入
     public static void Reload() { loadedLang = ""; }
 
+
     public static int LineCount()
     {
         try { string l = CurrentLanguage(); if (l != loadedLang) Load(l); } catch { }
@@ -320,9 +392,9 @@ public static class WszhCardText
         {
             string[] a = en.Split(new[] { "\\n" }, StringSplitOptions.None);
             string[] b = zh.Split(new[] { "\\n" }, StringSplitOptions.None);
-            if (a.Length == b.Length) { for (int i = 0; i < a.Length; i++) map[a[i]] = ForDisplay(b[i]); return; }
+            if (a.Length == b.Length) { for (int i = 0; i < a.Length; i++) building[a[i]] = ForDisplay(b[i]); return; }
         }
-        map[en] = ForDisplay(zh);
+        building[en] = ForDisplay(zh);
     }
 
     // 簡單的 JSON 物件解析（只需要 {"字串": "字串", ...}），不依賴其他程式庫
@@ -371,5 +443,55 @@ public static class WszhCardText
         }
         i++;
         return sb.ToString();
+    }
+}
+
+// 緊湊的譯文表：英文以 64 位元雜湊排序存放，中文以 UTF-8 存在一個大的位元組陣列裡。
+// 全部都是數字、位元組陣列，記憶體回收時不用逐一檢查（見 WszhCardText.map 的說明）。
+public sealed class CompactMap
+{
+    public static readonly CompactMap Empty = new CompactMap(new ulong[0], new int[0], new byte[0]);
+    readonly ulong[] keys;      // 已排序
+    readonly int[] offsets;     // offsets[i]..offsets[i+1] 是第 i 條譯文的 UTF-8 位元組
+    readonly byte[] data;
+
+    CompactMap(ulong[] k, int[] o, byte[] d) { keys = k; offsets = o; data = d; }
+
+    public int Count { get { return keys.Length; } }
+
+    static ulong Hash(string s)
+    {
+        ulong h = 14695981039346656037UL;              // FNV-1a 64
+        for (int i = 0; i < s.Length; i++) { h ^= s[i]; h *= 1099511628211UL; }
+        return h;
+    }
+
+    public static CompactMap Build(Dictionary<string, string> src)
+    {
+        var list = new List<KeyValuePair<ulong, string>>(src.Count);
+        foreach (var kv in src) list.Add(new KeyValuePair<ulong, string>(Hash(kv.Key), kv.Value));
+        list.Sort((a, b) => a.Key.CompareTo(b.Key));
+        var k = new ulong[list.Count];
+        var o = new int[list.Count + 1];
+        var ms = new System.IO.MemoryStream();
+        for (int i = 0; i < list.Count; i++)
+        {
+            k[i] = list[i].Key;
+            o[i] = (int)ms.Length;
+            var b = Encoding.UTF8.GetBytes(list[i].Value);
+            ms.Write(b, 0, b.Length);
+        }
+        o[list.Count] = (int)ms.Length;
+        return new CompactMap(k, o, ms.ToArray());
+    }
+
+    public bool TryGetValue(string key, out string value)
+    {
+        value = null;
+        if (key == null || keys.Length == 0) return false;
+        int i = Array.BinarySearch(keys, Hash(key));
+        if (i < 0) return false;
+        value = Encoding.UTF8.GetString(data, offsets[i], offsets[i + 1] - offsets[i]);
+        return true;
     }
 }

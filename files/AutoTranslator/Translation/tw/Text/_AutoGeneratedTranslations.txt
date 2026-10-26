@@ -1,1 +1,18 @@
-﻿// 中文化套件的翻譯在 WSZH_Translations.txt（這個檔案由翻譯外掛自動寫入，請勿放翻譯）
+﻿Stage: Downloading new images (100%)\nSet: Assault Lily (34%)=階段：Downloading new images（100%）\n系列：Assault Lily (34%)
+<sprite name\="mini_gate"/> Choose up to 1 climax in your waiting room and return it to your hand.=<sprite name\="mini_gate"/>【城門】最多選擇 1 張休息室的名場面卡，加入手牌。
+Look at up to 2 cards=查看最多 2 張卡
+Look at up to 6 cards=查看最多 6 張卡
+Look at up to 3 cards=查看最多 3 張卡
+Choose a slot to place X-Treme X-Men in.=請選擇放置 X-Treme X-Men 的位置。
+Choose a slot to place The most unprecedented battle in history, Hulk in.=請選擇放置 The most unprecedented battle in history, Hulk 的位置。
+Choose 0 to 1 cards.=請選擇 0 到 1 張卡。
+<sprite name\="mini_door"/> Choose up to 1 character in your waiting room and return it to your hand.=<sprite name\="mini_door"/>【木門】最多選擇 1 張休息室的角色，加入手牌。
+<sprite name\="mini_bar"/> Put the top card of your deck into your stock?=<sprite name\="mini_bar"/>【寶袋】要將牌庫頂的 1 張卡放置到能量區嗎？
+Opponent used the act ability of Happy New Year, Kana Arima.=對手發動了 Happy New Year, Kana Arima. 的起動能力
+Choose a slot to place Great Power and Great Responsibility, Spider-Man in.=請選擇放置 Great Power and Great Responsibility, Spider-Man 的位置。
+Choose 1 cards.=請選擇 1 張卡。
+Preparing audio (1 / 1)...=正在準備音效（1 / 1）…
+Choose a slot to place "Controlled Demolition" X-Men in.=請選擇放置 "Controlled Demolition" X-Men 的位置。
+Choose a slot to place Mutant team of Justice, X-MEN in.=請選擇放置 Mutant team of Justice, X-MEN 的位置。
+Choose a slot to place "The Way of the Weird" Doctor Strange in.=請選擇放置 "The Way of the Weird" Doctor Strange 的位置。
+Opponent used the act ability of Living on the Stage, Akane Kurokawa.=對手發動了 Living on the Stage, Akane Kurokawa. 的起動能力

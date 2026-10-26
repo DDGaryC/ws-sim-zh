@@ -39,6 +39,7 @@ public static class WszhJpArt
     static readonly HashSet<string> queued = new HashSet<string>();
     static readonly HashSet<string> missing = new HashSet<string>();      // 日版官網沒有的卡（英文版獨有等）
     static readonly HashSet<string> swapped = new HashSet<string>();      // 已把遊戲記憶體裡的英文圖換掉的卡
+    static readonly Dictionary<string, string> ready = new Dictionary<string, string>();   // 卡號 → 已有的日版圖路徑
     static IDictionary texCache;
     static bool started;
 
@@ -93,34 +94,142 @@ public static class WszhJpArt
     // 由補丁呼叫：altImagePath 是空的（不是異畫卡）時，有日版快取就把路徑換成日版圖
     public static void Hook(string cardID, ref string altImagePath)
     {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        try { HookCore(cardID, ref altImagePath); }
+        finally { WszhPerf.Add(2, t0); }
+    }
+
+    static void HookCore(string cardID, ref string altImagePath)
+    {
         try
         {
             if (!Enabled || string.IsNullOrEmpty(cardID) || !string.IsNullOrEmpty(altImagePath)) return;
+            // 已經確認有日版圖的卡直接用記下的路徑（遊戲讀卡圖很頻繁，不要每次都去硬碟檢查）
+            string known;
+            if (ready.TryGetValue(cardID, out known)) { altImagePath = known; return; }
             string jp = JpNumber(cardID);
             if (jp == null || NoJpSet.IsMatch(jp)) return;
+            lock (lk) if (missing.Contains(jp)) return;
             string f = JpgOf(jp);
-            if (!File.Exists(f) && File.Exists(FileOf(jp))) ToJpg(FileOf(jp), f);
+            string png = FileOf(jp);
+            bool battle = InBattle();
+            if (!File.Exists(f) && File.Exists(png))
+            {
+                // 剛下載好的 PNG：直的可以直接拿來顯示，轉 JPG 留到之後每幀轉一張（避免一次轉很多張造成卡頓）；
+                // 橫的（名場面）要先轉正才能顯示，只好現在轉（對戰中不轉，先顯示原本的卡圖）
+                if (IsLandscape(png)) { if (battle) return; ToJpg(png, f); }
+                else
+                {
+                    lock (lk) if (!toConvert.Contains(png)) toConvert.Enqueue(png);
+                    altImagePath = png;
+                    if (swapped.Add(cardID)) Forget(cardID);
+                    return;
+                }
+            }
             if (File.Exists(f))
             {
+                ready[cardID] = f;
                 altImagePath = f;
                 if (swapped.Add(cardID)) Forget(cardID);       // 記憶體裡若已有英文圖，清掉讓它重新讀
                 return;
             }
+            // 對戰／重播中不下載：只用已經存好的日版圖，沒有的先顯示原本的卡圖
+            if (battle) return;
+            Enqueue(jp, true);
+        }
+        catch (Exception ex) { Debug.Log("[WSZH] jpart hook: " + ex.Message); }
+    }
+
+    // 對戰、重播畫面：不下載、不轉檔，避免對戰中卡頓
+    static string lastScene; static bool lastBattle;
+    static bool InBattle()
+    {
+        string s = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (s != lastScene) { lastScene = s; lastBattle = s == "Duel" || s == "ReplayDuel"; }
+        return lastBattle;
+    }
+    static volatile bool paused;
+
+    // 加入下載清單：front = 畫面上正在看的卡（放最前面）；否則（預先下載）放最後面
+    static void Enqueue(string jp, bool front)
+    {
+        {
             lock (lk)
             {
                 if (missing.Contains(jp)) return;
                 if (queued.Contains(jp))
                 {
+                    if (!front) return;
                     var node = queue.Find(jp);                 // 還在排隊（不是下載中）就移到最前面
                     if (node != null) { queue.Remove(node); queue.AddFirst(node); }
                     return;
                 }
-                queued.Add(jp); queue.AddFirst(jp);
+                queued.Add(jp);
+                if (front) queue.AddFirst(jp); else queue.AddLast(jp);
                 if (!started) { started = true; for (int i = 0; i < Workers; i++) new Thread(Work) { IsBackground = true }.Start(); }
                 Monitor.PulseAll(lk);
             }
         }
-        catch (Exception ex) { Debug.Log("[WSZH] jpart hook: " + ex.Message); }
+    }
+
+    // ---- 預先下載：把所有已存牌組（模擬器資料夾的 Decks\）用到的卡的日版圖下載好 ----
+    // 回傳加入下載清單的張數；下載在背景進行，對戰中會暫停
+    public static int PrefetchDecks()
+    {
+        var ids = new HashSet<string>();
+        string decks = Path.Combine(Path.GetDirectoryName(Application.dataPath), "Decks");
+        if (Directory.Exists(decks))
+            foreach (var file in Directory.GetFiles(decks, "*.txt"))
+            {
+                bool inCards = false;
+                foreach (var raw in File.ReadAllLines(file))
+                {
+                    string l = raw.Trim();
+                    if (l == "Cards:") { inCards = true; continue; }
+                    if (inCards && l.Length > 0 && l.IndexOf('/') > 0 && l.IndexOf('-') > 0) ids.Add(l);
+                }
+            }
+        int n = 0;
+        foreach (var id in ids)
+        {
+            string jp = JpNumber(id);
+            if (jp == null || NoJpSet.IsMatch(jp) || File.Exists(JpgOf(jp)) || File.Exists(FileOf(jp))) continue;
+            lock (lk) if (missing.Contains(jp) || queued.Contains(jp)) continue;
+            Enqueue(jp, false); n++;
+        }
+        Debug.Log("[WSZH] jpart prefetch: " + ids.Count + " cards in decks, " + n + " to download");
+        return n;
+    }
+
+    // 下載清單還剩幾張（含下載中）
+    public static int Pending { get { lock (lk) return queued.Count; } }
+
+    static readonly Queue<string> toConvert = new Queue<string>();
+
+    // 由 WszhLang.Update 每幀呼叫：最多轉一張待轉的 PNG
+    public static void Tick()
+    {
+        paused = InBattle();                     // 下載執行緒在對戰中暫停
+        if (paused) return;
+        string png = null;
+        lock (lk) if (toConvert.Count > 0) png = toConvert.Dequeue();
+        if (png == null || !File.Exists(png)) return;
+        ToJpg(png, Path.ChangeExtension(png, ".jpg"));
+    }
+
+    // 只讀 PNG 檔頭的寬高
+    static bool IsLandscape(string png)
+    {
+        try
+        {
+            var head = new byte[24];
+            using (var fs = File.OpenRead(png)) if (fs.Read(head, 0, 24) < 24) return false;
+            if (head[0] != 0x89) return true;     // 不是 PNG（官網少數卡圖是 JPG）：當成要立刻轉檔處理
+            int w = (head[16] << 24) | (head[17] << 16) | (head[18] << 8) | head[19];
+            int h = (head[20] << 24) | (head[21] << 16) | (head[22] << 8) | head[23];
+            return w > h;
+        }
+        catch { return false; }
     }
 
     // PNG → JPG（品質 80），刪掉 PNG。日版官網的名場面是橫的，模擬器的卡圖一律是直的，
@@ -174,6 +283,7 @@ public static class WszhJpArt
         while (true)
         {
             string jp;
+            while (paused) Thread.Sleep(500);          // 對戰中暫停下載
             lock (lk)
             {
                 while (queue.Count == 0) Monitor.Wait(lk);

@@ -44,12 +44,55 @@ public class WszhLang : MonoBehaviour
     {
         current = ReadLanguage() ?? "tw";
         Debug.Log("[WSZH] language switch ready, current=" + current);
+        ApplyFpsCap();
+        StartCoroutine(PreloadCardText());
+    }
+
+    // 卡片翻譯（4 萬多條）第一次用到時才載入會頓 0.3 秒左右，改成在主選單就先載好
+    IEnumerator PreloadCardText()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+        try { WszhCardText.LineCount(); } catch { }
+    }
+
+    // ---- 幀率上限 ----
+    // 模擬器本身沒有限制幀率，會用 1000 FPS 左右全速跑；翻譯外掛每一幀都要檢查文字，
+    // 幀數越高負擔越重，較弱的電腦會變卡、變燙。預設限制在 60，設定頁可以改。
+    static readonly int[] FpsChoices = { 60, 120, 30, 0 };   // 0 = 不限制
+    const string FpsPref = "WSZH_FpsCap";
+    static int FpsCap { get { return PlayerPrefs.GetInt(FpsPref, 60); } }
+
+    static void ApplyFpsCap()
+    {
+        int cap = FpsCap;
+        if (cap > 0) { QualitySettings.vSyncCount = 0; Application.targetFrameRate = cap; }
+        else Application.targetFrameRate = -1;
+        Debug.Log("[WSZH] fps cap: " + (cap > 0 ? cap.ToString() : "none"));
+    }
+
+    static string FpsLabel()
+    {
+        int cap = FpsCap;
+        if (ReadLanguage() == "en") return "Frame rate limit: " + (cap > 0 ? cap + " FPS" : "None");
+        return Zh("幀率上限：" + (cap > 0 ? cap + " FPS" : "不限制"));
+    }
+
+    Graphic fpsLabel;
+    void OnFpsClick()
+    {
+        int i = Array.IndexOf(FpsChoices, FpsCap);
+        PlayerPrefs.SetInt(FpsPref, FpsChoices[(i + 1) % FpsChoices.Length]);
+        PlayerPrefs.Save();
+        ApplyFpsCap();
+        if (fpsLabel != null) SetTextOf(fpsLabel, FpsLabel());
     }
 
     // ---- XUnity 存取 ----
+    static Assembly xuAsm;
     static Assembly Xu()
     {
-        return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "XUnity.AutoTranslator.Plugin.Core");
+        if (xuAsm == null) xuAsm = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == "XUnity.AutoTranslator.Plugin.Core");
+        return xuAsm;
     }
 
     static Type XuType(string name)
@@ -58,12 +101,18 @@ public class WszhLang : MonoBehaviour
         return a == null ? null : a.GetType("XUnity.AutoTranslator.Plugin.Core." + name);
     }
 
+    // 目前語言：每幀會讀好幾次，欄位只找一次（找程式集、型別很慢）
+    static FieldInfo langField;
     static string ReadLanguage()
     {
         try
         {
-            var s = XuType("Configuration.Settings");
-            return s == null ? null : (string)s.GetField("Language", Any).GetValue(null);
+            if (langField == null)
+            {
+                var s = XuType("Configuration.Settings");
+                langField = s == null ? null : s.GetField("Language", Any);
+            }
+            return langField == null ? null : (string)langField.GetValue(null);
         }
         catch { return null; }
     }
@@ -363,7 +412,13 @@ public class WszhLang : MonoBehaviour
         Normalize(status, textW, titleSize * 0.55f);
         status.raycastTarget = false;
         SetTextOf(status, "");
-        Place((RectTransform)stGo.transform, new Vector2(cx, by - H * 0.215f), cv);
+        Place((RectTransform)stGo.transform, new Vector2(cx, by - H * 0.285f), cv);
+
+        // 幀率上限按鈕（語言選單下方；按一下切換 60 → 120 → 30 → 不限制）
+        var fpsRt = MakeButton(back, cv, "WSZH_FpsButton", FpsLabel(), OnFpsClick, out fpsLabel);
+        fpsRt.sizeDelta = new Vector2(ddRt.rect.width, ddRt.rect.height * 0.85f);
+        if (fpsLabel != null) SetSizeOf(fpsLabel, backLabel.fontSize * 0.7f);
+        Place(fpsRt, new Vector2(cx, by - H * 0.222f), cv);
         StartCoroutine(Replace());
         StartCoroutine(BuildCardTextLater(os, osType, cv, H));
     }
@@ -419,8 +474,10 @@ public class WszhLang : MonoBehaviour
         float h = cardBtnRt.rect.height * cardBtnRt.lossyScale.y;
         float w = cardBtnRt.rect.width * cardBtnRt.lossyScale.x;
         // 「更新卡片翻譯」和「日版卡圖」左右並排，下面是兩行狀態文字
-        PlaceAt(cardBtnRt, new Vector2(cx - w * 0.55f, bottom - h * 0.65f), cardCanvas);
-        if (jpBtnRt != null) PlaceAt(jpBtnRt, new Vector2(cx + w * 0.55f, bottom - h * 0.65f), cardCanvas);
+        // 三顆按鈕並排：更新卡片翻譯｜日版卡圖開關｜下載牌組的日版卡圖
+        PlaceAt(cardBtnRt, new Vector2(cx - w * 1.08f, bottom - h * 0.65f), cardCanvas);
+        if (jpBtnRt != null) PlaceAt(jpBtnRt, new Vector2(cx, bottom - h * 0.65f), cardCanvas);
+        if (prefetchRt != null) PlaceAt(prefetchRt, new Vector2(cx + w * 1.08f, bottom - h * 0.65f), cardCanvas);
         if (cardStatusRt != null) PlaceAt(cardStatusRt, new Vector2(cx, bottom - h * 1.55f), cardCanvas);
     }
 
@@ -467,11 +524,24 @@ public class WszhLang : MonoBehaviour
     {
         if (cardBtnLabel != null) SetTextOf(cardBtnLabel, Zh("更新卡片翻譯"));
         if (jpBtnLabel != null) SetTextOf(jpBtnLabel, JpArtLabel());
+        if (fpsLabel != null) SetTextOf(fpsLabel, FpsLabel());
         updaterShown = null;
         ShowCardTextInfo();
     }
 
     static string JpArtLabel() { return Zh(WszhJpArt.Enabled ? "日版卡圖：開" : "日版卡圖：關"); }
+
+    // ---- 下載牌組用到的日版卡圖（預先下載，對戰中就不用臨時下載） ----
+    RectTransform prefetchRt;
+    int shownPending = -1;
+    void OnPrefetch()
+    {
+        if (!WszhJpArt.Enabled) { WszhJpArt.Enabled = true; if (jpBtnLabel != null) SetTextOf(jpBtnLabel, JpArtLabel()); }
+        int n = 0;
+        try { n = WszhJpArt.PrefetchDecks(); } catch (Exception ex) { Debug.Log("[WSZH] prefetch: " + ex.Message); }
+        if (n == 0 && cardStatus != null) { SetTextOf(cardStatus, Zh("牌組用到的日版卡圖都已經下載好了")); shownPending = 0; }
+        else ShowCardTextInfo();
+    }
 
     void OnJpArtToggle()
     {
@@ -486,6 +556,8 @@ public class WszhLang : MonoBehaviour
         {
             TranslateUpdaterStatus();
             PlaceCardTextUI();
+            // 預先下載進行中：更新剩餘張數（每 0.5 秒）
+            if (Time.frameCount % 30 == 0 && WszhJpArt.Pending != shownPending && shownPending > 0 && !cardBusy) ShowCardTextInfo();
             yield return null;
         }
     }
@@ -549,9 +621,9 @@ public class WszhLang : MonoBehaviour
     }
 
     // 這個檔案、CardText.cs、JpArt.cs 裡給玩家看的中文字的繁→簡對照（用 OpenCC 產生；新增文字時要補上）
-    const string TradChars = "個內動勝區問啟單圖場夾對庫張後從態戰戲換擬敗時暫會條構檔檢沒灣為無狀獲畢確穩紀結經網線與裝裡複視試語說請證譯讀費資載這連進遊過還錄長開間關階雲預題驗體";
-    const string SimpChars = "个内动胜区问启单图场夹对库张后从态战戏换拟败时暂会条构档检没湾为无状获毕确稳纪结经网线与装里复视试语说请证译读费资载这连进游过还录长开间关阶云预题验体";
-    static string ToSimplified(string s)
+    const string TradChars = "個側傷內動勝區問啟單圖場夾對幀庫張後從態戰戲換擇擊擬敗時暫會條構檔檢沒減灣為無狀獲畢確穩紀紅級組結經綠網線編與藍裝裡複視試語說請證譯讀變費資載輯這連進遊過選還錄長開間關階雲預題顏驗驟體黃";
+    const string SimpChars = "个侧伤内动胜区问启单图场夹对帧库张后从态战戏换择击拟败时暂会条构档检没减湾为无状获毕确稳纪红级组结经绿网线编与蓝装里复视试语说请证译读变费资载辑这连进游过选还录长开间关阶云预题颜验骤体黄";
+    internal static string ToSimplified(string s)
     {
         if (string.IsNullOrEmpty(s)) return s;
         var sb = new StringBuilder(s);
@@ -577,6 +649,8 @@ public class WszhLang : MonoBehaviour
         var btn = rt.GetComponent<Button>();
         cardBtnRt = rt;
         jpBtnRt = MakeButton(upd, cv, "WSZH_JpArtButton", JpArtLabel(), OnJpArtToggle, out jpBtnLabel);
+        Graphic pfLabel;
+        prefetchRt = MakeButton(upd, cv, "WSZH_JpPrefetchButton", Zh("下載牌組卡圖"), OnPrefetch, out pfLabel);
 
         // 狀態文字
         Graphic tmpl = (Graphic)updText ?? upd.GetComponentInChildren<TMP_Text>(true);
@@ -611,9 +685,12 @@ public class WszhLang : MonoBehaviour
         WszhJpArt.CacheInfo(out cnt, out bytes);
         line1 += "｜日版卡圖：" + (cnt > 0 ? "已存 " + cnt + " 張（" + (bytes / 1048576) + " MB）" : "尚未下載");
         // 第二行說明日版卡圖的運作方式（會用到網路）
-        string line2 = WszhJpArt.Enabled
-            ? "日版卡圖已開啟：看到卡片時會連網從日版官網即時下載，之後重複使用"
-            : "日版卡圖開啟後，看到卡片時會連網從日版官網即時下載卡圖";
+        int pending = WszhJpArt.Pending;
+        shownPending = pending;
+        string line2 = !WszhJpArt.Enabled
+            ? "日版卡圖開啟後，牌組編輯看到的卡會連網從日版官網下載；對戰中不下載"
+            : pending > 0 ? "日版卡圖下載中：還剩 " + pending + " 張（對戰中會暫停）"
+            : "日版卡圖已開啟：牌組編輯看到的卡會自動下載，對戰中只用已下載的圖";
         SetTextOf(cardStatus, Zh(line1 + "\n" + line2));
     }
 
@@ -716,19 +793,30 @@ public class WszhLang : MonoBehaviour
     // ---- 戰紀錄／重播畫面：翻譯外掛翻不到的文字 ----
     // 重播狀態列每一幀都重寫（翻譯外掛會因為變動太頻繁放棄翻譯），在 LateUpdate 遊戲寫完之後再翻；
     // 戰紀錄的「<b>Started:</b>\n日期」是標籤＋日期組成的一段文字，翻譯檔對不上，定時掃描替換。
-    object replayCtl; System.Reflection.FieldInfo replayStatusField; float replayLookAt, logScanAt;
+    object replayCtl; Type replayCtlType; System.Reflection.FieldInfo replayStatusField; float replayLookAt, logScanAt;
     TextMeshProUGUI replayStatus; Color replayColor;
 
     void LateUpdate()
     {
+        long t0 = System.Diagnostics.Stopwatch.GetTimestamp();
+        try { LateUpdateCore(); }
+        finally { WszhPerf.Add(3, t0); }
+    }
+
+    void LateUpdateCore()
+    {
         try
         {
             string lang = null;
-            if (Time.realtimeSinceStartup >= replayLookAt && replayCtl == null)
+            // 只在重播畫面、戰紀錄畫面做事；其他畫面（尤其對戰中）什麼都不做，避免拖慢遊戲
+            string scene = SceneManager.GetActiveScene().name;
+            bool inReplay = scene == "ReplayDuel", inLogs = scene == "GameLogs";
+            if (!inReplay && !inLogs && replayCtl == null) return;
+            if (inReplay && Time.realtimeSinceStartup >= replayLookAt && replayCtl == null)
             {
                 replayLookAt = Time.realtimeSinceStartup + 1f;
-                Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("GameLogReplayController")).FirstOrDefault(x => x != null);
-                if (t != null) { replayCtl = FindObjectOfType(t); replayStatusField = t.GetField("statusText", Any); }
+                if (replayCtlType == null) replayCtlType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("GameLogReplayController")).FirstOrDefault(x => x != null);
+                if (replayCtlType != null) { replayCtl = FindObjectOfType(replayCtlType); replayStatusField = replayCtlType.GetField("statusText", Any); }
             }
             if (replayCtl != null && (UnityEngine.Object)replayCtl == null) { replayCtl = null; godBtn = null; godPanel = null; godImgs.Clear(); replayStatus = null; }   // 離開重播畫面
             if (replayCtl != null) GodView();
@@ -769,7 +857,7 @@ public class WszhLang : MonoBehaviour
                     }
                 }
             }
-            if (Time.realtimeSinceStartup >= logScanAt)
+            if (inLogs && Time.realtimeSinceStartup >= logScanAt)
             {
                 logScanAt = Time.realtimeSinceStartup + 0.5f;
                 if ((lang ?? (lang = ReadLanguage())) != "en")
@@ -971,8 +1059,38 @@ public class WszhLang : MonoBehaviour
         return System.Text.RegularExpressions.Regex.Replace(s, @"\b(\d+)h (\d+)m (\d+)s\b", "$1 小時 $2 分 $3 秒");
     }
 
+    // ---- 中文字型的查找順序（2026-10-27 找到的卡頓主因）----
+    // 遊戲的 TMP 字型（LiberationSans SDF）找不到中文字時，會先去「LiberationSans SDF - Fallback」這個動態字型找；
+    // 它本身沒有中文字，但每次都要用字型引擎讀字檔確認，才輪到翻譯外掛加進來的中文字型（arialuni）。
+    // 一段 300 字的卡片說明排版一次要 10ms 以上，牌組編輯滑鼠一移動就頓。
+    // 把中文字型插到每個字型的備用清單最前面，中文字一次就找到。
+    float fontFixAt;
+    readonly HashSet<int> fontFixed = new HashSet<int>();
+    void FixFontFallbacks()
+    {
+        if (Time.realtimeSinceStartup < fontFixAt) return;
+        fontFixAt = Time.realtimeSinceStartup + 2f;            // 新場景可能載入新字型，每 2 秒檢查一次（很便宜）
+        TMP_FontAsset cjk = null;
+        var all = Resources.FindObjectsOfTypeAll<TMP_FontAsset>();
+        foreach (var f in all) if (f != null && f.name.IndexOf("arialuni", StringComparison.OrdinalIgnoreCase) >= 0) { cjk = f; break; }
+        if (cjk == null) return;
+        foreach (var f in all)
+        {
+            if (f == null || f == cjk || fontFixed.Contains(f.GetInstanceID())) continue;
+            if (f.fallbackFontAssetTable == null) f.fallbackFontAssetTable = new List<TMP_FontAsset>();
+            var fb = f.fallbackFontAssetTable;
+            fb.Remove(cjk);
+            fb.Insert(0, cjk);
+            fontFixed.Add(f.GetInstanceID());
+            Debug.Log("[WSZH] font fallback: " + cjk.name + " first for " + f.name);
+        }
+    }
+
     void Update()
     {
+        WszhPerf.Frame();
+        try { if (ReadLanguage() != "en") FixFontFallbacks(); } catch { }
+        WszhJpArt.Tick();
         if (!building && built == null && SceneManager.GetActiveScene().name == "Options")
         {
             building = true;
