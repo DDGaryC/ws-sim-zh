@@ -21,6 +21,8 @@ public class WszhLangPatch : PatchBase
     const string SearchTag = "WSZH.CardSearch";
     const string AlignTag = "WSZH.CardAlign";
     const string JpArtTag = "WSZH.JpArt";
+    const string ReplayFixTag = "WSZH.ReplayFix";
+    const string ReplayFix2Tag = "WSZH.ReplayFix2";
     const string HelperName = "WSZH.Lang";
     public override string Name { get { return "WS 中文化套件：遊戲內語言切換"; } }
     public override string Version { get { return "1.0"; } }
@@ -53,7 +55,7 @@ public class WszhLangPatch : PatchBase
     {
         if (args.Assembly.Name.Name != "Assembly-CSharp") return false;
         var tags = GetPatchedAttributes(args.Assembly).Select(a => a.Info).ToList();
-        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag) || !tags.Contains(JpArtTag);
+        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag) || !tags.Contains(JpArtTag) || !tags.Contains(ReplayFixTag) || !tags.Contains(ReplayFix2Tag);
     }
 
     public override void Patch(PatcherArguments args)
@@ -170,6 +172,46 @@ public class WszhLangPatch : PatchBase
                     il.InsertBefore(first, il.Create(OpCodes.Call, hook));
                     SetPatchedAttribute(args.Assembly, JpArtTag);
                     Console.WriteLine("[WSZH] jp art applied");
+                }
+            }
+            if (!tags.Contains(ReplayFixTag))
+            {
+                TypeDefinition player = mod.GetType("Player");
+                MethodDefinition end = player == null ? null : player.Methods.FirstOrDefault(m => m.Name == "ChangePhaseButtonClickedImmediate" && !m.IsStatic && !m.HasParameters && m.HasBody);
+                if (end == null) Console.WriteLine("[WSZH] replay fix skipped: Player.ChangePhaseButtonClickedImmediate not found");
+                else
+                {
+                    var hook = new MethodReference("Intercept", mod.TypeSystem.Boolean, new TypeReference("", "WszhReplayFix", mod, asmRef));
+                    hook.Parameters.Add(new ParameterDefinition(mod.TypeSystem.Object));
+                    ILProcessor il = end.Body.GetILProcessor();
+                    Instruction first = end.Body.Instructions[0];
+                    // if (WszhReplayFix.Intercept(this)) return;
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg_0));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, hook));
+                    il.InsertBefore(first, il.Create(OpCodes.Brfalse, first));
+                    il.InsertBefore(first, il.Create(OpCodes.Ret));
+                    SetPatchedAttribute(args.Assembly, ReplayFixTag);
+                    Console.WriteLine("[WSZH] replay fix applied");
+                }
+            }
+            // 打出名場面後走的是 ChangePhaseButtonClicked()（重播時一開頭就 return），同樣在開頭插入檢查
+            if (!tags.Contains(ReplayFix2Tag))
+            {
+                TypeDefinition player = mod.GetType("Player");
+                MethodDefinition clicked = player == null ? null : player.Methods.FirstOrDefault(m => m.Name == "ChangePhaseButtonClicked" && !m.IsStatic && !m.HasParameters && m.HasBody);
+                if (clicked == null) Console.WriteLine("[WSZH] replay fix 2 skipped: Player.ChangePhaseButtonClicked not found");
+                else
+                {
+                    var hook = new MethodReference("Intercept", mod.TypeSystem.Boolean, new TypeReference("", "WszhReplayFix", mod, asmRef));
+                    hook.Parameters.Add(new ParameterDefinition(mod.TypeSystem.Object));
+                    ILProcessor il = clicked.Body.GetILProcessor();
+                    Instruction first = clicked.Body.Instructions[0];
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg_0));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, hook));
+                    il.InsertBefore(first, il.Create(OpCodes.Brfalse, first));
+                    il.InsertBefore(first, il.Create(OpCodes.Ret));
+                    SetPatchedAttribute(args.Assembly, ReplayFix2Tag);
+                    Console.WriteLine("[WSZH] replay fix 2 applied");
                 }
             }
         }

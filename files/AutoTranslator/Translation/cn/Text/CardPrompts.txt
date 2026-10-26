@@ -5558,3 +5558,5 @@ Choose cards to put into your waiting room.=请选择要放置到你控室的卡
 Choose cards to return to the top of your opponents deck.=请选择要返回对手卡组顶的卡。
 Choose a climax in your deck to exchange with one in your hand.=请选择你卡组中的 1 张高潮，与你手牌中的 1 张交换。
 Choose a climax in your hand to return to your deck..=请选择你手牌中的 1 张高潮，返回卡组。
+Exchange a card in your hand with a 1 <RPG> Character in your level?=要将你的 1 张手牌与等级区的 1 张《RPG》角色交换吗？
+Exchange a card in your hand with a 1 «RPG» Character in your level?=要将你的 1 张手牌与等级区的 1 张《RPG》角色交换吗？
