@@ -33,6 +33,7 @@ RULES = [
     (r'^Opponent must discard down to %s cards\.$' % N, '對手必須把手牌丟棄到剩 $1 張。', '对手必须把手牌丢弃到剩 $1 张。'),
     (r'^You Lose(.*)$', '你輸了$1', '你输了$1'),
     (r'^Player ([12]) wins$', '玩家 $1 獲勝', '玩家 $1 获胜'),
+    (r'^Replay$', '重播', '重播'),
     (r'^(.+) Please choose a different deck\.$', '$1 請換一副牌組。', '$1 请换一副卡组。'),
     (r'^Deck is not legal for format (.+) \((.*)\)\.$', '牌組不符合「$1」賽制的規定（$2）。', '卡组不符合「$1」赛制的规定（$2）。'),
     (r'^Contains more than max \(%s\) copies of (.+)$' % N, '「$2」超過上限 $1 張', '「$2」超过上限 $1 张'),

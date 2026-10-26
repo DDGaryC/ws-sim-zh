@@ -1,4 +1,4 @@
-// WS 中文化套件：遊戲內語言切換（遊戲執行時載入的小程式庫，WSZH.Lang.dll）
+﻿// WS 中文化套件：遊戲內語言切換（遊戲執行時載入的小程式庫，WSZH.Lang.dll）
 // LangPatch.cs 會在 MainMenuNew.Start() 開頭插入 WszhLang.Init()。
 // 設定頁左下會出現「語言 / Language」選項，可以切換 繁體中文（台灣）／繁體中文（香港）／简体中文／English。
 // 切換方式：改 XUnity.AutoTranslator 的語言設定、重新計算翻譯檔路徑，再呼叫它內建的「重新載入翻譯」
@@ -426,12 +426,12 @@ public class WszhLang : MonoBehaviour
 
     // 新建一顆按鈕，只沿用範本按鈕的圖樣與字型
     // （不直接複製：原按鈕上的遊戲元件會把位置與文字改回去）
-    RectTransform MakeButton(Button src, Canvas cv, string name, string label, UnityEngine.Events.UnityAction onClick, out Graphic labelGraphic)
+    RectTransform MakeButton(Button src, Canvas cv, string name, string label, UnityEngine.Events.UnityAction onClick, out Graphic labelGraphic, Transform parent = null)
     {
         labelGraphic = null;
         var srcRt = (RectTransform)src.transform;
         var go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(cv.transform, false);
+        go.transform.SetParent(parent ?? cv.transform, false);
         var rt = (RectTransform)go.transform;
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
         rt.sizeDelta = new Vector2(srcRt.rect.width * srcRt.lossyScale.x / rt.lossyScale.x, srcRt.rect.height * srcRt.lossyScale.y / rt.lossyScale.y);
@@ -549,8 +549,8 @@ public class WszhLang : MonoBehaviour
     }
 
     // 這個檔案、CardText.cs、JpArt.cs 裡給玩家看的中文字的繁→簡對照（用 OpenCC 產生；新增文字時要補上）
-    const string TradChars = "個內動區啟單圖場夾庫張後從戲換擬敗時會條構檔檢沒灣為無確穩結經網線裝裡複試語說請譯讀費資載這連進遊過還開關階雲預體";
-    const string SimpChars = "个内动区启单图场夹库张后从戏换拟败时会条构档检没湾为无确稳结经网线装里复试语说请译读费资载这连进游过还开关阶云预体";
+    const string TradChars = "個內動勝區問啟單圖場夾對庫張後從態戰戲換擬敗時暫會條構檔檢沒灣為無狀獲畢確穩紀結經網線與裝裡複視試語說請證譯讀費資載這連進遊過還錄長開間關階雲預題驗體";
+    const string SimpChars = "个内动胜区问启单图场夹对库张后从态战戏换拟败时暂会条构档检没湾为无状获毕确稳纪结经网线与装里复视试语说请证译读费资载这连进游过还录长开间关阶云预题验体";
     static string ToSimplified(string s)
     {
         if (string.IsNullOrEmpty(s)) return s;
@@ -713,6 +713,264 @@ public class WszhLang : MonoBehaviour
     // 每一幀檢查：進到設定頁、而且還沒建立過選單時就建立（設定頁每次進入都是新的物件）
     GameObject built;
     bool building;
+    // ---- 戰紀錄／重播畫面：翻譯外掛翻不到的文字 ----
+    // 重播狀態列每一幀都重寫（翻譯外掛會因為變動太頻繁放棄翻譯），在 LateUpdate 遊戲寫完之後再翻；
+    // 戰紀錄的「<b>Started:</b>\n日期」是標籤＋日期組成的一段文字，翻譯檔對不上，定時掃描替換。
+    object replayCtl; System.Reflection.FieldInfo replayStatusField; float replayLookAt, logScanAt;
+    TextMeshProUGUI replayStatus; Color replayColor;
+
+    void LateUpdate()
+    {
+        try
+        {
+            string lang = null;
+            if (Time.realtimeSinceStartup >= replayLookAt && replayCtl == null)
+            {
+                replayLookAt = Time.realtimeSinceStartup + 1f;
+                Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("GameLogReplayController")).FirstOrDefault(x => x != null);
+                if (t != null) { replayCtl = FindObjectOfType(t); replayStatusField = t.GetField("statusText", Any); }
+            }
+            if (replayCtl != null && (UnityEngine.Object)replayCtl == null) { replayCtl = null; godBtn = null; godPanel = null; godImgs.Clear(); replayStatus = null; }   // 離開重播畫面
+            if (replayCtl != null) GodView();
+            if (replayCtl != null && replayStatusField != null)
+            {
+                // 遊戲每一幀都重寫狀態列，直接改它的文字會和遊戲（及翻譯外掛）互相覆蓋，播放中看不到。
+                // 改成：原本的狀態列設成透明，另外疊一個我們自己的文字顯示翻譯後的內容
+                var tg = replayStatusField.GetValue(replayCtl) as TMP_Text;
+                if (tg != null)
+                {
+                    bool en = (lang = ReadLanguage()) == "en";
+                    if (replayStatus == null && !en)
+                    {
+                        var go = MakeText(tg, tg.transform.parent, "WSZH_ReplayStatus");
+                        replayStatus = go.GetComponent<TextMeshProUGUI>();
+                        var rt = (RectTransform)go.transform; var src = tg.rectTransform;
+                        rt.anchorMin = src.anchorMin; rt.anchorMax = src.anchorMax; rt.pivot = src.pivot;
+                        rt.sizeDelta = src.sizeDelta; rt.anchoredPosition = src.anchoredPosition;
+                        var le = go.AddComponent<LayoutElement>(); le.ignoreLayout = true;
+                        // 原本的字型沒有中文字：改用按鈕列上已經顯示中文的按鈕字型
+                        var pb = replayCtl.GetType().GetField("perspectiveButton", Any).GetValue(replayCtl) as Button;
+                        var pl = pb == null ? null : pb.GetComponentInChildren<TMP_Text>(true);
+                        if (pl != null && pl.font != null) replayStatus.font = pl.font;
+                        replayStatus.alignment = tg.alignment;
+                        replayStatus.color = tg.color;
+                        // 狀態列只有 14 像素高，中文行高比較高，允許超出、不換行
+                        replayStatus.overflowMode = TextOverflowModes.Overflow;
+                        replayStatus.enableWordWrapping = false;
+                        replayStatus.raycastTarget = false;
+                        replayColor = tg.color;
+                    }
+                    if (replayStatus != null)
+                    {
+                        replayStatus.gameObject.SetActive(!en);
+                        var c = tg.color; c.a = en ? replayColor.a : 0f; tg.color = c;
+                        string zh = en ? "" : Zh(ReplayStatusLine(tg.text ?? ""));
+                        if (replayStatus.text != zh) replayStatus.text = zh;
+                    }
+                }
+            }
+            if (Time.realtimeSinceStartup >= logScanAt)
+            {
+                logScanAt = Time.realtimeSinceStartup + 0.5f;
+                if ((lang ?? (lang = ReadLanguage())) != "en")
+                    foreach (var t in FindObjectsOfType<TMP_Text>())
+                    {
+                        string s = t.text;
+                        if (string.IsNullOrEmpty(s) || s.IndexOf(":</b>", StringComparison.Ordinal) < 0) continue;
+                        string zh = Zh(LogHeader(s));
+                        if (zh != s) t.text = zh;
+                    }
+            }
+        }
+        catch { }
+    }
+
+    // ---- 重播的上帝視角：在畫面上方顯示對手手牌的卡圖 ----
+    // 重播時對手的手牌在鏡頭外（畫面最上方），所以另外用一排小卡圖顯示；滑鼠移上去會在左邊預覽。
+    // 只讀卡片的圖與資料，不改任何遊戲狀態，所以不影響重播驗證。
+    bool godOn;
+    RectTransform godBtn, godPanel;
+    Graphic godLabel, godTitle;
+    readonly List<RawImage> godImgs = new List<RawImage>();
+    readonly List<Component> godShown = new List<Component>();
+    static System.Reflection.FieldInfo fGame, fFront, fContents;
+
+    string GodLabel()
+    {
+        if (ReadLanguage() == "en") return godOn ? "God view: On" : "God view: Off";
+        return Zh(godOn ? "上帝視角：開" : "上帝視角：關");
+    }
+
+    void GodView()
+    {
+        var ctlType = replayCtl.GetType();
+        Button persp = null, exit = null;
+        if (godBtn == null)
+        {
+            persp = ctlType.GetField("perspectiveButton", Any).GetValue(replayCtl) as Button;
+            exit = ctlType.GetField("exitButton", Any).GetValue(replayCtl) as Button;
+            if (persp == null || exit == null) return;
+            Canvas cv = persp.GetComponentInParent<Canvas>().rootCanvas;
+            // 按鈕列沒有自動排版，新按鈕放在最左邊「暫停」的左側、間距和其他按鈕一樣
+            var play = ctlType.GetField("playButton", Any).GetValue(replayCtl) as Button;
+            godBtn = MakeButton(persp, cv, "WSZH_GodViewButton", GodLabel(), () => { godOn = !godOn; if (godLabel != null) SetTextOf(godLabel, GodLabel()); }, out godLabel, persp.transform.parent);
+            var pr = (RectTransform)persp.transform; var er = (RectTransform)exit.transform;
+            var lr = play != null ? (RectTransform)play.transform : er;
+            godBtn.anchorMin = lr.anchorMin; godBtn.anchorMax = lr.anchorMax; godBtn.pivot = lr.pivot;
+            godBtn.sizeDelta = lr.sizeDelta;
+            godBtn.anchoredPosition = play != null ? lr.anchoredPosition - (er.anchoredPosition - pr.anchoredPosition)
+                                                   : er.anchoredPosition + (er.anchoredPosition - pr.anchoredPosition);
+            var lt = persp.GetComponentInChildren<TMP_Text>(true);
+            if (godLabel != null && lt != null) { SetSizeOf(godLabel, lt.fontSize); var gl = godLabel as TMP_Text; if (gl != null) { gl.enableAutoSizing = lt.enableAutoSizing; gl.fontSizeMin = lt.fontSizeMin; gl.fontSizeMax = lt.fontSizeMax; } }
+
+            // 對手手牌的顯示區（畫布最上層，按鈕列下方置中）
+            var pgo = new GameObject("WSZH_GodHand", typeof(RectTransform));
+            pgo.transform.SetParent(cv.transform, false);
+            godPanel = (RectTransform)pgo.transform;
+            godPanel.anchorMin = godPanel.anchorMax = new Vector2(0f, 1f);
+            godPanel.pivot = new Vector2(0f, 1f);
+            var bg = pgo.AddComponent<Image>(); bg.color = new Color(0f, 0f, 0f, 0.45f); bg.raycastTarget = false;
+            var tgo = MakeText(lt != null ? (Graphic)lt : godLabel, godPanel, "Title");
+            godTitle = tgo.GetComponent<Graphic>(); godTitle.raycastTarget = false; godTitle.color = Color.white;
+            var trt = (RectTransform)tgo.transform;
+            trt.anchorMin = new Vector2(0f, 1f); trt.anchorMax = new Vector2(1f, 1f); trt.pivot = new Vector2(0.5f, 1f);
+            trt.sizeDelta = new Vector2(0f, 26f); trt.anchoredPosition = new Vector2(0f, -2f);
+            var tt = godTitle as TMP_Text; if (tt != null) { tt.alignment = TextAlignmentOptions.Center; tt.enableAutoSizing = false; tt.fontSize = 20; }
+            pgo.SetActive(false);
+        }
+        if (godPanel == null) return;
+
+        var cards = new List<Component>();
+        Component local = null;
+        if (godOn)
+        {
+            if (fGame == null) fGame = ctlType.GetField("game", Any);
+            var game = fGame == null ? null : fGame.GetValue(replayCtl) as Component;
+            local = game == null ? null : game.GetType().GetField("localPlayer", Any).GetValue(game) as Component;
+            var opp = local == null ? null : local.GetType().GetProperty("opponent", Any).GetValue(local, null) as Component;
+            var hand = opp == null ? null : opp.GetType().GetField("hand", Any).GetValue(opp) as Component;
+            if (hand != null)
+            {
+                if (fContents == null) fContents = hand.GetType().GetField("contents", Any);
+                var list = fContents == null ? null : fContents.GetValue(hand) as IEnumerable;
+                if (list != null) foreach (var o in list) { var c = o as Component; if (c != null) cards.Add(c); }
+            }
+        }
+        godPanel.gameObject.SetActive(godOn);
+        if (!godOn) return;
+
+        // 放在左邊卡片預覽區右側的空白處（上方的提示訊息下面），兩欄往下排；大小依畫布縮放
+        var prt = (RectTransform)godPanel.parent;
+        float scale = prt.rect.height / 1080f, sx = prt.rect.width / 1920f;
+        float cw = 82f * scale, ch = cw * 1.395f, gap = 5f * scale, top = 28f * scale;
+        int n = cards.Count, cols = 2, rows = Mathf.Max(1, (n + cols - 1) / cols);
+        godPanel.sizeDelta = new Vector2(cols * (cw + gap) + gap, top + rows * (ch + gap) + gap);
+        godPanel.anchoredPosition = new Vector2(468f * sx, -215f * scale);
+        SetTextOf(godTitle, ReadLanguage() == "en" ? "Opponent's hand " + n : Zh("對手手牌 " + n + " 張"));
+        if (godLabel != null) { string gl = GodLabel(); if (!(godLabel is TMP_Text) || ((TMP_Text)godLabel).text != gl) SetTextOf(godLabel, gl); }
+        while (godImgs.Count < n)
+        {
+            var go = new GameObject("Card", typeof(RectTransform));
+            go.transform.SetParent(godPanel, false);
+            var img = go.AddComponent<RawImage>();
+            int idx = godImgs.Count;
+            var trig = go.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+            var e = new UnityEngine.EventSystems.EventTrigger.Entry { eventID = UnityEngine.EventSystems.EventTriggerType.PointerEnter };
+            e.callback.AddListener(_ => PreviewGodCard(idx));
+            trig.triggers.Add(e);
+            godImgs.Add(img);
+        }
+        godShown.Clear(); godShown.AddRange(cards);
+        for (int i = 0; i < godImgs.Count; i++)
+        {
+            var img = godImgs[i];
+            bool on = i < n;
+            img.gameObject.SetActive(on);
+            if (!on) continue;
+            var rt = (RectTransform)img.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f); rt.pivot = new Vector2(0f, 1f);
+            rt.sizeDelta = new Vector2(cw, ch);
+            rt.anchoredPosition = new Vector2(gap + (i % cols) * (cw + gap), -top - (i / cols) * (ch + gap));
+            img.texture = CardTexture(cards[i]);
+        }
+    }
+
+    static Texture CardTexture(Component card)
+    {
+        if (fFront == null) fFront = card.GetType().GetField("frontFace", Any);
+        var go = fFront == null ? null : fFront.GetValue(card) as GameObject;
+        var mr = go == null ? null : go.GetComponent<MeshRenderer>();
+        return mr == null || mr.sharedMaterial == null ? null : mr.sharedMaterial.GetTexture("_MainTex");
+    }
+
+    void PreviewGodCard(int i)
+    {
+        try
+        {
+            if (i >= godShown.Count || replayCtl == null) return;
+            var game = fGame.GetValue(replayCtl) as Component;
+            var local = game.GetType().GetField("localPlayer", Any).GetValue(game) as Component;
+            var ui = local.GetType().GetField("ui", Any).GetValue(local);
+            var m = ui.GetType().GetMethod("PreviewCardInGame", Any);
+            if (m != null) m.Invoke(ui, new object[] { godShown[i] });
+        }
+        catch (Exception ex) { Debug.Log("[WSZH] god view preview: " + ex.Message); }
+    }
+
+    static readonly string[][] ReplayStates = {
+        new[] { "Playing partial recording", "播放中（紀錄不完整）" },
+        new[] { "Playing", "播放中" },
+        new[] { "Finished", "已結束" },
+        new[] { "End of partial recording (an input was not completed)", "不完整的紀錄已播放完畢（有操作沒有完成）" },
+        new[] { "End of partial recording", "不完整的紀錄已播放完畢" },
+        new[] { "Replay complete - draw", "重播完畢 - 平手" },
+        new[] { "Replay ended without reproducing its recorded result", "重播結束，但結果和紀錄不同" },
+        new[] { "Replay stopped before its recorded result", "重播在紀錄的結果之前停止" },
+        new[] { "Different build; validating inputs/state", "模擬器版本不同，正在驗證操作與狀態" },
+    };
+
+    // 「Paused - Playing partial recording | Turn 0/6 | Verified: 0 | Player 1 | 0%」
+    static string ReplayStatusLine(string s)
+    {
+        string head = "";
+        var m = System.Text.RegularExpressions.Regex.Match(s, @"^(Paused - |Seeking turn (\d+) - )");
+        if (m.Success) { head = m.Groups[2].Success ? "跳到第 " + m.Groups[2].Value + " 回合 - " : "已暫停 - "; s = s.Substring(m.Length); }
+        var parts = s.Split(new[] { " | " }, StringSplitOptions.None);
+        for (int i = 0; i < parts.Length; i++)
+        {
+            string p = parts[i];
+            // 「Input differs at #161 (EndPhase/accepted). Expected context …」：模擬器重播時操作和紀錄對不上
+            p = System.Text.RegularExpressions.Regex.Replace(p, @"Input differs at #(\d+) \([^)]*\)\..*$", "第 $1 步的操作和紀錄不一致（模擬器重播功能的問題）");
+            if (p.StartsWith("重播已停止：")) goto done;           // 翻譯外掛已經翻過前半段
+            foreach (var r in ReplayStates) if (p == r[0]) { p = r[1]; goto done; }
+            if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^Turn (\d+)/(\d+)$")).Success) p = "回合 " + m.Groups[1].Value + "/" + m.Groups[2].Value;
+            else if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^Verified: (\d+)$")).Success) p = "已驗證：" + m.Groups[1].Value;
+            else if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^Player ([12])$")).Success) p = "玩家 " + m.Groups[1].Value;
+            else if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^Replay complete - Player ([12]) wins$")).Success) p = "重播完畢 - 玩家 " + m.Groups[1].Value + " 獲勝";
+            else if (p.StartsWith("Replay stopped: ")) p = "重播已停止：" + p.Substring(16);
+            else if (p.StartsWith("Replay unavailable: ")) p = "無法重播：" + p.Substring(20);
+        done:
+            parts[i] = p;
+        }
+        return head + string.Join(" ｜ ", parts);
+    }
+
+    static readonly string[] Months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+    // 「<b>Started:</b>\nOct 25, 2026 1:12 AM」「<b>Duration:</b> 0h 0m 0s」
+    static string LogHeader(string s)
+    {
+        s = s.Replace("<b>Started:</b>", "<b>開始時間：</b>").Replace("<b>Ended:</b>", "<b>結束時間：</b>").Replace("<b>Duration:</b>", "<b>對戰時長：</b>")
+             .Replace("<b>Mode:</b>", "<b>模式：</b>");
+        s = System.Text.RegularExpressions.Regex.Replace(s, @"\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4}) (\d{1,2}):(\d{2}) (AM|PM)", m =>
+        {
+            if (m.Groups[3].Value == "1970") return "（沒有紀錄）";           // 對戰沒有正常結束時，結束時間是 0
+            return m.Groups[3].Value + "/" + (Array.IndexOf(Months, m.Groups[1].Value) + 1) + "/" + m.Groups[2].Value + " "
+                + (m.Groups[6].Value == "AM" ? "上午 " : "下午 ") + m.Groups[4].Value + ":" + m.Groups[5].Value;
+        });
+        return System.Text.RegularExpressions.Regex.Replace(s, @"\b(\d+)h (\d+)m (\d+)s\b", "$1 小時 $2 分 $3 秒");
+    }
+
     void Update()
     {
         if (!building && built == null && SceneManager.GetActiveScene().name == "Options")

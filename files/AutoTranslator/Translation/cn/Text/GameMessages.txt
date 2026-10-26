@@ -24,6 +24,7 @@ r:"^Opponent chose (.+)\.$"=对手选择了「$1」。
 r:"^Opponent must discard down to ([0-9]+) cards\.$"=对手必须把手牌丢弃到剩 $1 张。
 r:"^You Lose(.*)$"=你输了$1
 r:"^Player ([12]) wins$"=玩家 $1 获胜
+r:"^Replay$"=重播
 r:"^(.+) Please choose a different deck\.$"=$1 请换一副卡组。
 r:"^Deck is not legal for format (.+) \((.*)\)\.$"=卡组不符合「$1」赛制的规定（$2）。
 r:"^Contains more than max \(([0-9]+)\) copies of (.+)$"=「$2」超过上限 $1 张

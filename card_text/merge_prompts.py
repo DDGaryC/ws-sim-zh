@@ -35,12 +35,19 @@ head = '// WS 模擬器中文化套件：卡片腳本的對戰提示文字（由
 sys.path.insert(0, D)
 from zhcn import to_cn
 for lang, conv in (('tw', []), ('hk', HK), ('cn', None)):
-    lines = []
-    for en, zh in pairs.items():
+    lines, seen = [], set()
+    for en0, zh in pairs.items():
         if conv is None: zh = to_cn(zh)
         else:
             for a, b in conv: zh = zh.replace(a, b)
-        lines.append(esc(en) + '=' + esc(zh))
+        # 遊戲顯示前會把特徵的 <XXX> 換成 «XXX»（sprite／b／i 等標籤除外），兩種寫法都放
+        variants = [en0]
+        alt = re.sub(r'<(?!/?(?:sprite|b|i|color|size|u|s)\b)([^<>/=]+)>', r'«\1»', en0)
+        if alt != en0: variants.append(alt)
+        for en in variants:
+            if en in seen: continue
+            seen.add(en)
+            lines.append(esc(en) + '=' + esc(zh))
     data = head + '\n'.join(lines) + '\n'
     for root in (os.path.join(SIM, 'AutoTranslator'), os.path.join(REPO, 'files', 'AutoTranslator')):
         d = os.path.join(root, 'Translation', lang, 'Text')
