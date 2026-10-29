@@ -23,6 +23,8 @@ public class WszhLangPatch : PatchBase
     const string JpArtTag = "WSZH.JpArt";
     const string ReplayFixTag = "WSZH.ReplayFix";
     const string ReplayFix2Tag = "WSZH.ReplayFix2";
+    const string NameSearchTag = "WSZH.NameSearch";
+    const string SeriesSearchTag = "WSZH.SeriesSearch";
     const string HelperName = "WSZH.Lang";
     public override string Name { get { return "WS 中文化套件：遊戲內語言切換"; } }
     public override string Version { get { return "1.0"; } }
@@ -55,7 +57,8 @@ public class WszhLangPatch : PatchBase
     {
         if (args.Assembly.Name.Name != "Assembly-CSharp") return false;
         var tags = GetPatchedAttributes(args.Assembly).Select(a => a.Info).ToList();
-        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag) || !tags.Contains(JpArtTag) || !tags.Contains(ReplayFixTag) || !tags.Contains(ReplayFix2Tag);
+        return !tags.Contains(Tag) || !tags.Contains(CardTag) || !tags.Contains(SearchTag) || !tags.Contains(AlignTag) || !tags.Contains(JpArtTag) || !tags.Contains(ReplayFixTag) || !tags.Contains(ReplayFix2Tag)
+            || !tags.Contains(NameSearchTag) || !tags.Contains(SeriesSearchTag);
     }
 
     public override void Patch(PatcherArguments args)
@@ -192,6 +195,59 @@ public class WszhLangPatch : PatchBase
                     il.InsertBefore(first, il.Create(OpCodes.Ret));
                     SetPatchedAttribute(args.Assembly, ReplayFixTag);
                     Console.WriteLine("[WSZH] replay fix applied");
+                }
+            }
+            // 卡片名稱欄有中文／日文時改走 SearchCjk（比對日文卡名）
+            if (!tags.Contains(NameSearchTag))
+            {
+                TypeDefinition lib = mod.GetType("CardLibrary");
+                MethodDefinition search = lib == null ? null : lib.Methods.FirstOrDefault(m => m.Name == "Search" && m.IsStatic && m.HasBody
+                    && m.Parameters.Count == 11 && m.Parameters.All(x => x.ParameterType.FullName == "System.String"));
+                if (search == null) Console.WriteLine("[WSZH] name search skipped: CardLibrary.Search not found");
+                else
+                {
+                    TypeReference helper = new TypeReference("", "WszhNames", mod, asmRef);
+                    var hasCjk = new MethodReference("HasCjk", mod.TypeSystem.Boolean, helper);
+                    hasCjk.Parameters.Add(new ParameterDefinition(mod.TypeSystem.String));
+                    var cjk = new MethodReference("SearchCjk", mod.TypeSystem.Object, new TypeReference("", "WszhCardText", mod, asmRef));
+                    for (int i = 0; i < 11; i++) cjk.Parameters.Add(new ParameterDefinition(mod.TypeSystem.String));
+                    ILProcessor il = search.Body.GetILProcessor();
+                    Instruction first = search.Body.Instructions[0];
+                    // if (WszhNames.HasCjk(cardName)) return (List<WeissCard>)WszhCardText.SearchCjk(...所有參數...);
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg, search.Parameters[2]));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, hasCjk));
+                    il.InsertBefore(first, il.Create(OpCodes.Brfalse, first));
+                    for (int i = 0; i < 11; i++) il.InsertBefore(first, il.Create(OpCodes.Ldarg, search.Parameters[i]));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, cjk));
+                    il.InsertBefore(first, il.Create(OpCodes.Castclass, search.ReturnType));
+                    il.InsertBefore(first, il.Create(OpCodes.Ret));
+                    SetPatchedAttribute(args.Assembly, NameSearchTag);
+                    Console.WriteLine("[WSZH] name search applied");
+                }
+            }
+            // 牌組編輯的系列欄打中文：DeckBuilderSearch.SeriesMatchesQuery(series, query) 開頭插入
+            //   if (WszhNames.SeriesMatch(series, query)) return true;
+            if (!tags.Contains(SeriesSearchTag))
+            {
+                TypeDefinition dbs = mod.GetType("DeckBuilderSearch");
+                MethodDefinition sm = dbs == null ? null : dbs.Methods.FirstOrDefault(m => m.Name == "SeriesMatchesQuery" && !m.IsStatic && m.HasBody
+                    && m.Parameters.Count == 2 && m.ReturnType.FullName == "System.Boolean");
+                if (sm == null) Console.WriteLine("[WSZH] series search skipped: DeckBuilderSearch.SeriesMatchesQuery not found");
+                else
+                {
+                    var hook = new MethodReference("SeriesMatch", mod.TypeSystem.Boolean, new TypeReference("", "WszhNames", mod, asmRef));
+                    hook.Parameters.Add(new ParameterDefinition(mod.TypeSystem.String));
+                    hook.Parameters.Add(new ParameterDefinition(mod.TypeSystem.String));
+                    ILProcessor il = sm.Body.GetILProcessor();
+                    Instruction first = sm.Body.Instructions[0];
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg, sm.Parameters[0]));
+                    il.InsertBefore(first, il.Create(OpCodes.Ldarg, sm.Parameters[1]));
+                    il.InsertBefore(first, il.Create(OpCodes.Call, hook));
+                    il.InsertBefore(first, il.Create(OpCodes.Brfalse, first));
+                    il.InsertBefore(first, il.Create(OpCodes.Ldc_I4_1));
+                    il.InsertBefore(first, il.Create(OpCodes.Ret));
+                    SetPatchedAttribute(args.Assembly, SeriesSearchTag);
+                    Console.WriteLine("[WSZH] series search applied");
                 }
             }
             // 打出名場面後走的是 ChangePhaseButtonClicked()（重播時一開頭就 return），同樣在開頭插入檢查

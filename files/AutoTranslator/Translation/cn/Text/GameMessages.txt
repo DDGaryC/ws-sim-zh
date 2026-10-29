@@ -25,6 +25,7 @@ r:"^Opponent must discard down to ([0-9]+) cards\.$"=对手必须把手牌丢弃
 r:"^You Lose(.*)$"=你输了$1
 r:"^Player ([12]) wins$"=玩家 $1 获胜
 r:"^Replay$"=重播
+r:"^Penalty$"=重整惩罚
 r:"^Emote Pack$"=表情包
 r:"^Default$"=默认
 r:"^Rematch$"=再来一局

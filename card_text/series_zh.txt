@@ -1,0 +1,207 @@
+# 系列英文名<Tab>中文名（多個別名用 | 分隔；台灣常用譯名優先）。make_name_maps.py 會自動加上簡體版本。
+ALICESOFT	ALICESOFT|愛麗絲軟體
+AQUAPLUS	AQUAPLUS|傳頌之物|白色相簿
+AUGUST	AUGUST|穢翼的尤斯蒂婭|千戀萬花
+Accel World	加速世界
+Adventure Time	探險活寶
+Alice Gear Aegis	機戰少女Alice
+Amagami Sister	女神咖啡廳|甘神家
+Angel Beats!	Angel Beats|天使的心跳
+Aogiri High School	青桐高校
+Apothecary Diaries	藥師少女的獨語|藥屋少女的呢喃
+Arifureta	平凡職業造就世界最強|平凡職業
+Assault Lily	突擊莉莉
+Atelier Resleriana	萊斯萊莉安娜的鍊金工房|鍊金工房
+Attack on Titan	進擊的巨人
+Avatar the Last Airbender	降世神通
+Ayakashi Triangle	妖幻三重奏
+Azur Lane	碧藍航線
+BanG Dream!	BanG Dream|邦邦|少女樂團派對
+Batman Ninja	忍者蝙蝠俠|蝙蝠俠
+Black Rock Shooter	黑岩射手
+Blue Archive	蔚藍檔案|碧藍檔案
+Blue Lock	藍色監獄
+Bocchi The Rock!	孤獨搖滾
+Bofuri	因為太怕痛就全點防禦力了|怕痛
+Brown Dust 2	棕色塵埃2|棕色塵埃
+Bunny Girl Senpai	青春豬頭少年|兔女郎學姊
+Canaan	迦南
+Captain Tsubasa	足球小將翼|足球小將
+Card Game Shiyoko	Card Game Shiyoko
+Cardcaptor Sakura (EN)	庫洛魔法使|百變小櫻
+Cardcaptor Sakura (JP)	庫洛魔法使|百變小櫻
+Chain Chronicle	鎖鏈戰記
+Chainsaw Man	鏈鋸人
+Charlotte	Charlotte|夏洛特
+Chiikawa	吉伊卡哇
+Clannad	CLANNAD|克蘭納德
+Colorful Peach	Colorful Peach
+Crayon Shin-Chan	蠟筆小新
+D4DJ	D4DJ
+D_Cide Traumerei	D_CIDE TRAUMEREI
+Da Capo	初音島|D.C.
+Dandadan	膽大黨
+Danmachi	在地下城尋求邂逅是否搞錯了什麼|地下城邂逅
+Darling in the Franxx	DARLING in the FRANXX|國家隊
+Date A Live	約會大作戰
+Day Break Illusion	Day Break Illusion
+Day I Became a God	成為神的那一天|神之日
+Dengeki Bunko	電擊文庫
+Detective Conan	名偵探柯南|柯南
+Devil Survivor 2	惡魔倖存者2|惡魔倖存者
+Disgaea	魔界戰記
+Disney	迪士尼
+Disney Mirrorverse	迪士尼鏡像世界|迪士尼
+Disney Tsum Tsum	迪士尼Tsum Tsum|疊疊樂|迪士尼
+Disney100	迪士尼100|迪士尼
+Dog Days	DOG DAYS
+Eminence in Shadow	我想成為影之強者|影之強者
+Evangelion	新世紀福音戰士|福音戰士|EVA
+Extra PR	特典卡|PR
+Fairy Tail	魔導少年|妖精的尾巴
+Familiar of Zero	零之使魔
+Fate	Fate|命運
+Fate (CN)	Fate|命運
+Fate/Apocrypha	Fate/Apocrypha|命運
+Fate/Grand Order	Fate/Grand Order|FGO|命運冠位指定
+Fate/Kaleid Prisma Illya	魔法少女伊莉雅|伊莉雅
+Frieren: Beyond Journey's End	葬送的芙莉蓮|芙莉蓮
+Fruit of Grisaia	灰色的果實
+Fujimi Fantasia Bunko	富士見Fantasia文庫|富士見
+GA Bunko	GA文庫
+Gakuen Idolmaster	學園偶像大師|偶像大師
+Gargantia on the Verdurous Planet	翠星之加爾剛蒂亞
+Gigant Shooter Tsukasa	Gigant Shooter
+Girl Friend Beta	女友伴身邊
+Girls Band Cry	Girls Band Cry|少女樂團 吶喊吧
+Girls' Frontline	少女前線
+Goblin Slayer	哥布林殺手
+Godzilla	哥吉拉
+Granblue Fantasy	碧藍幻想
+Guilty Crown	罪惡王冠
+Guilty Gear	聖騎士之戰|GUILTY GEAR
+Gun Gale Online	刀劍神域外傳|GGO
+Gurren Lagann	天元突破紅蓮螺巖|紅蓮螺巖
+Gushing over Magical Girls	夢想成為魔法少女|魔法少女
+HARUKAZE	HARUKAZE
+Haruhi Suzumiya	涼宮春日
+Heaven Burns Red	緋染天空|HBR
+Hina Logic	Hina Logic
+Hololive	hololive|荷洛萊夫
+Holostars	HOLOSTARS
+HoneyWorks	HoneyWorks
+Idolm@ster	偶像大師
+Idolm@ster Cinderella Girls	偶像大師 灰姑娘女孩|灰姑娘女孩|偶像大師
+Idolm@ster Million Live	偶像大師 百萬人演唱會|百萬人演唱會|偶像大師
+Idolm@ster Shiny Colors	偶像大師 閃耀色彩|閃耀色彩|偶像大師
+Idolm@ster Side M	偶像大師 SideM|偶像大師
+Index & Railgun	魔法禁書目錄|科學超電磁砲|禁書目錄|超電磁砲
+Interspecies Reviewers	異種族風俗娘評鑑指南
+Is the Order a Rabbit (Gochiusa)	請問您今天要來點兔子嗎|點兔
+Jojo's Bizarre Adventure	JOJO的奇妙冒險|JOJO
+Kadokawa Sneaker Bunko	角川Sneaker文庫|角川
+Kaguya-sama, Love is War	輝夜姬想讓人告白|輝夜姬
+Kaiju No. 8	怪獸8號
+Kantai Collection	艦隊收藏|艦これ
+Katanagatari	刀語
+Kemono Friends	動物朋友
+Key	Key
+Kill la Kill	斬服少女
+King of Fighters	拳皇|KOF
+Kiniro Mosaic	黃金拼圖
+Kiznaiver	羈絆者
+Konosuba	為美好的世界獻上祝福|美好世界
+Little Busters!	Little Busters|校園克星
+Log Horizon	記錄的地平線
+Lose&Whisp	Lose|Whisp
+Lost Decade	Lost Decade
+Love Live	Love Live|LL|學園偶像祭
+Love Live Hasu No Sora	Love Live 蓮之空|蓮之空
+Love Live Nijigasaki	Love Live 虹咲學園|虹咲
+Love Live! Miracle Live	Love Live 奇蹟演唱會
+Love Live! Sunshine!!	Love Live Sunshine|水團|Aqours
+Love Live! Superstar!!	Love Live Superstar|Liella
+Lucky Star	幸運星
+Lycoris Recoil	莉可麗絲
+MARVEL	漫威|MARVEL
+Macross	超時空要塞
+Madoka Magica	魔法少女小圓|小圓
+Magical Girl Lyrical Nanoha	魔法少女奈葉|奈葉
+Melty Blood	月姬格鬥|MELTY BLOOD
+Milky Holmes	偵探歌劇少女福爾摩斯|少女福爾摩斯
+Miss Kobayashi's Dragon Maid	小林家的龍女僕|龍女僕
+Mob Psycho 100	路人超能100|靈能百分百
+Monogatari	物語系列|化物語
+Mushoku Tensei	無職轉生
+Navel	Navel
+Nichijou	日常
+Nikke: Goddess of Victory	勝利女神妮姬|妮姬|NIKKE
+Nisekoi	偽戀
+No Game No Life	遊戲人生
+Oshi No Ko	我推的孩子
+Osomatsu-san	阿松
+Overlord (Nazarick)	OVERLORD|不死者之王
+PIXAR Animation Studio	皮克斯|PIXAR
+Persona	女神異聞錄|Persona
+Persona 5 X (CN)	女神異聞錄夜幕魅影|P5X|女神異聞錄
+Phantom ~Requiem for the Phantom~	PHANTOM|幻影鎮魂曲
+Pillow	Pillow
+Princess Connect! Re: Dive	超異域公主連結|公主連結
+Project Diva	初音未來 Project DIVA|初音未來
+Project SEKAI	世界計畫|PJSK|初音未來
+Psycho-Pass	心靈判官
+Purple Software	Purple software
+Puyo Puyo	魔法氣泡
+Puzzle & Dragons	龍族拼圖|PAD
+Quintessential Quintuplets	五等分的新娘|五等分
+RWBY	RWBY
+Re:Zero	Re:從零開始的異世界生活|從零開始
+Rear Sekai	Rear Sekai
+Reborn!	家庭教師HITMAN REBORN|家教
+Rent a Girlfriend	出租女友
+Revue Starlight	少女歌劇
+Revue Starlight (Blau)	少女歌劇
+Rewrite	Rewrite
+Rin-ne	境界之輪迴
+Robotics;Notes	機器人筆記
+Rurouni Kenshin 	神劍闖江湖|浪客劍心
+Saekano	不起眼女主角培育法|路人女主
+Sakura Taisen	櫻花大戰
+Schoolgirl Strikers	Schoolgirl Strikers
+Sengoku Basara	戰國BASARA
+Seven Deadly Sins	七大罪
+Shakugan No Shana	灼眼的夏娜|夏娜
+Shining Force	光明力量|Shining
+Sora wo Kakeru Shoujo	翱翔天際的少女
+Spy X Family	SPY×FAMILY 間諜家家酒|間諜家家酒
+Star Wars	星際大戰
+Steins;Gate	命運石之門
+Steins;Gate (CN)	命運石之門
+Stella Sora	星塔旅人|Stella Sora
+Strawberry Prince	草莓王子
+Summer Pockets	Summer Pockets|夏日口袋
+Sword Art Online	刀劍神域|SAO
+Symphogear	戰姬絕唱
+Tale of Series	傳奇系列|Tales of
+Tales of Series (Blau)	傳奇系列|Tales of
+Terra Formars	火星任務
+That Time I Got Reincarnated as a Slime	關於我轉生變成史萊姆這檔事|轉生史萊姆|史萊姆
+The New Prince of Tennis	新網球王子|網球王子
+To Love Ru	出包王女
+Tokyo Revengers	東京卍復仇者|東京復仇者
+Tokyo Revengers Christmas Showdown	東京卍復仇者 聖夜決戰篇|東京復仇者
+Too Many Losing Heroines	敗北女角太多了|敗北女角
+Touhou Project	東方Project|東方
+Uma Musume	賽馬娘
+Virtual Girl @ World's End	世界末日的虛擬少女
+Vivid Strike!	ViVid Strike
+Vividred Operation	Vividred Operation|維維紅作戰
+Wooser's Hand-To-Mouth Life	Wooser
+World Trigger	境界觸發者
+YUZU SOFT	柚子社|YUZUSOFT
+Yohane the Parhelion	幻日的夜羽|夜羽
+Yuru Camp	搖曳露營
+Yuuna's Haunted Hotspring	搖曳莊的幽奈小姐|幽奈小姐
+Zombie Land Saga	佐賀偶像是傳奇|殭屍樂園
+anemoi	anemoi
+sprite	sprite

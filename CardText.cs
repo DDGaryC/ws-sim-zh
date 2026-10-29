@@ -205,12 +205,17 @@ public static class WszhCardText
         Type lib = null;
         foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) { lib = a.GetType("CardLibrary"); if (lib != null) break; }
         var search = lib.GetMethod("Search", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-        var list = search.Invoke(null, new object[] { seriesName, setName, cardName, levelInput, costInput, colorInput, typeInput, triggerInput, traitName, "", cardIdInput }) as System.Collections.IList;
+        // 效果欄有中文：比對翻譯後的效果；卡片名稱欄有中文／日文：比對日文卡名（Names.cs）
+        bool cjkText = IsCjk(textInput), cjkName = WszhNames.HasCjk(cardName);
+        var list = search.Invoke(null, new object[] { seriesName, setName, cjkName ? "" : cardName, levelInput, costInput, colorInput, typeInput, triggerInput, traitName,
+            cjkText ? "" : textInput, cardIdInput }) as System.Collections.IList;
         if (list == null) return list;
-        string q = textInput.Trim().ToLowerInvariant();
+        string q = cjkText ? textInput.Trim().ToLowerInvariant() : null;
         for (int i = list.Count - 1; i >= 0; i--)
         {
             var c = list[i];
+            if (cjkName && !WszhNames.NameMatch(c, cardName)) { list.RemoveAt(i); continue; }
+            if (q == null) continue;
             string text = c.GetType().GetField("text").GetValue(c) as string ?? "";
             string zh = Translate(text);
             if (zh.ToLowerInvariant().IndexOf(q, StringComparison.Ordinal) < 0 && text.ToLowerInvariant().IndexOf(q, StringComparison.Ordinal) < 0) list.RemoveAt(i);

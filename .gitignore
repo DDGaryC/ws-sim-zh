@@ -19,3 +19,4 @@ card_text/*_part[0-9].json
 card_text/queue.json
 card_text/prompts_queue.json
 card_text/review_sample.txt
+card_text/jpnames_pages/

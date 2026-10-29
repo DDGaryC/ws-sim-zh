@@ -19,3 +19,4 @@ Opponent used the act ability of Living on the Stage, Akane Kurokawa.=對手發�
 A newer version of the simulator is available: 0.7.9.5\nYou are currently running 0.7.9.4.\n\nUpdate now? The game will close and restart when the update is complete.=有新版本的模擬器可以更新：0.7.9.5\n\n你目前的版本是 0.7.9.4。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
 Default=預設
 Emote Pack=表情包
+Open Lobbies: 1=開放中的房間：1

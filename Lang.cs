@@ -839,6 +839,7 @@ public class WszhLang : MonoBehaviour
             string lang = null;
             // 只在重播畫面、戰紀錄畫面做事；其他畫面（尤其對戰中）什麼都不做，避免拖慢遊戲
             string scene = SceneManager.GetActiveScene().name;
+            if (scene == "DeckEditorRedo" || scene == "Duel" || scene == "ReplayDuel") JpNamePreview(scene);
             bool inReplay = scene == "ReplayDuel", inLogs = scene == "GameLogs";
             if (!inReplay && !inLogs && replayCtl == null) return;
             if (inReplay && Time.realtimeSinceStartup >= replayLookAt && replayCtl == null)
@@ -1034,6 +1035,35 @@ public class WszhLang : MonoBehaviour
         catch (Exception ex) { Debug.Log("[WSZH] god view preview: " + ex.Message); }
     }
 
+    // ---- 卡片預覽：遊戲資料沒有日文卡名的卡（例如 MARVEL），在說明最下面補上日文名（補充資料，見 Names.cs） ----
+    // 遊戲本身只在 card.japaneseName 有值時才顯示；這裡在遊戲寫完說明之後補一行，只影響顯示
+    string jpScene; float jpLookAt; Component[] jpUis = new Component[0];
+    static System.Reflection.FieldInfo fViewing, fDesc, fShowJp;
+    void JpNamePreview(string scene)
+    {
+        if (ReadLanguage() == "en") return;
+        if (scene != jpScene || (jpUis.Length == 0 && Time.realtimeSinceStartup >= jpLookAt))
+        {
+            jpScene = scene; jpLookAt = Time.realtimeSinceStartup + 1f;
+            Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("PlayerUI")).FirstOrDefault(x => x != null);
+            if (t == null) return;
+            fViewing = t.GetField("viewingCard", Any); fDesc = t.GetField("cardDescriptionText", Any); fShowJp = t.GetField("showJPNames", Any);
+            jpUis = FindObjectsOfType(t).Cast<Component>().ToArray();
+        }
+        if (fViewing == null || fDesc == null || fShowJp == null) return;
+        foreach (var ui in jpUis)
+        {
+            if (ui == null || !(bool)fShowJp.GetValue(ui)) continue;
+            var card = fViewing.GetValue(ui);
+            if (card == null || WszhNames.HasGameJapaneseName(card)) continue;
+            string jp = WszhNames.SupplementName(card.GetType().GetField("id").GetValue(card) as string);
+            var desc = fDesc.GetValue(ui) as TMP_Text;
+            if (string.IsNullOrEmpty(jp) || desc == null) continue;
+            string s = desc.text ?? "";
+            if (!s.EndsWith(jp)) desc.text = s + "\n" + jp;
+        }
+    }
+
     static readonly string[][] ReplayStates = {
         new[] { "Playing partial recording", "播放中（紀錄不完整）" },
         new[] { "Playing", "播放中" },
@@ -1119,9 +1149,30 @@ public class WszhLang : MonoBehaviour
         }
     }
 
+    // 卡片預覽顯示日文卡名：遊戲本來就有（PlayerUI.showJPNames，按 Ctrl+J 切換），只是預設關閉；
+    // 中文模式下每進一個畫面就幫它打開（之後按 Ctrl+J 仍可關掉）
+    string jpNameScene;
+    IEnumerator ShowJpNamesLater()
+    {
+        yield return new WaitForSecondsRealtime(0.5f);
+        try
+        {
+            Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("PlayerUI")).FirstOrDefault(x => x != null);
+            var f = t == null ? null : t.GetField("showJPNames", Any);
+            if (f != null) foreach (var ui in FindObjectsOfType(t)) f.SetValue(ui, true);
+        }
+        catch { }
+    }
+
     void Update()
     {
         WszhPerf.Frame();
+        string sceneNow = SceneManager.GetActiveScene().name;
+        if (sceneNow != jpNameScene)
+        {
+            jpNameScene = sceneNow;
+            if (ReadLanguage() != "en") StartCoroutine(ShowJpNamesLater());
+        }
         try { if (ReadLanguage() != "en") FixFontFallbacks(); } catch { }
         WszhJpArt.Tick();
         if (!building && built == null && SceneManager.GetActiveScene().name == "Options")
