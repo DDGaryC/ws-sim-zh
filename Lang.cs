@@ -320,6 +320,35 @@ public class WszhLang : MonoBehaviour
         float titleSize = refTitle != null ? SizeOf(refTitle) : backLabel.fontSize * 1.25f;
         if (tmpl == null) tmpl = backLabel;
 
+        // 擺放位置：預設是左欄「讓對手看到你的自訂卡套」下方，標題／選單／幀率按鈕／提示由上往下
+        Vector2 titlePos = new Vector2(cx, by - H * 0.085f), ddPos = new Vector2(cx, by - H * 0.155f),
+                fpsPos = new Vector2(cx, by - H * 0.222f), stPos = new Vector2(cx, by - H * 0.285f);
+        Vector2 ddSize = Vector2.zero;
+        // 模擬器 0.7.9.5 起那裡多了「Emote Pack」（標籤在左、下拉選單在右）：改成跟它同樣的排法，放在它下面
+        var emote = osType.GetField("emotePackDropdown", Any) == null ? null : osType.GetField("emotePackDropdown", Any).GetValue(os) as TMP_Dropdown;
+        if (emote != null && emote.gameObject.activeInHierarchy)
+        {
+            var ert = (RectTransform)emote.transform;
+            Vector2 ep = ScreenPos(emote, cv);
+            float rh = ert.rect.height * ert.lossyScale.y, rw = ert.rect.width * ert.lossyScale.x;
+            float labelX = ep.x - rw * 1.05f;
+            Graphic emoteLabel = null; float best = float.MaxValue;
+            foreach (var t in all)
+            {
+                Canvas tc = t.canvas; if (tc == null || t.GetComponentInParent<TMP_Dropdown>() != null) continue;
+                Vector2 p = ScreenPos(t, tc.rootCanvas);
+                if (Mathf.Abs(p.y - ep.y) > rh || p.x >= ep.x - rw * 0.5f) continue;
+                float dist = ep.x - p.x;
+                if (dist < best) { best = dist; emoteLabel = t; labelX = p.x; }
+            }
+            titlePos = new Vector2(labelX, ep.y - rh * 1.35f);
+            ddPos = new Vector2(ep.x, ep.y - rh * 1.35f);
+            fpsPos = new Vector2(ep.x, ep.y - rh * 2.6f);
+            stPos = new Vector2(labelX, ep.y - rh * 2.6f);
+            ddSize = ert.rect.size;
+            if (emoteLabel != null) { tmpl = emoteLabel; titleSize = SizeOf(emoteLabel); }
+        }
+
         // 標題
         var titleGo = MakeText(tmpl, cv.transform, "WSZH_LanguageTitle");
         titleGo.name = "WSZH_LanguageTitle";
@@ -330,7 +359,7 @@ public class WszhLang : MonoBehaviour
         titleGo.GetComponent<Graphic>().raycastTarget = false;
         SetTextOf(titleGo.GetComponent<Graphic>(), "語言 / Language");
         placed.Clear();
-        Place((RectTransform)titleGo.transform, new Vector2(cx, by - H * 0.085f), cv);
+        Place((RectTransform)titleGo.transform, titlePos, cv);
 
         // 下拉選單（用「回到主界面」按鈕的圖樣與字型）
         Image backImg = back.GetComponent<Image>();
@@ -342,8 +371,8 @@ public class WszhLang : MonoBehaviour
         var dd = ddGo.GetComponent<TMP_Dropdown>();
         var ddRt = (RectTransform)ddGo.transform;
         var backRt = (RectTransform)back.transform;
-        ddRt.sizeDelta = new Vector2(backRt.rect.width * 1.05f, backRt.rect.height);
-        Place(ddRt, new Vector2(cx, by - H * 0.155f), cv);
+        ddRt.sizeDelta = ddSize != Vector2.zero ? ddSize : new Vector2(backRt.rect.width * 1.05f, backRt.rect.height);
+        Place(ddRt, ddPos, cv);
 
         foreach (var t in ddGo.GetComponentsInChildren<TMP_Text>(true))
         {
@@ -412,13 +441,13 @@ public class WszhLang : MonoBehaviour
         Normalize(status, textW, titleSize * 0.55f);
         status.raycastTarget = false;
         SetTextOf(status, "");
-        Place((RectTransform)stGo.transform, new Vector2(cx, by - H * 0.285f), cv);
+        Place((RectTransform)stGo.transform, stPos, cv);
 
         // 幀率上限按鈕（語言選單下方；按一下切換 60 → 120 → 30 → 不限制）
         var fpsRt = MakeButton(back, cv, "WSZH_FpsButton", FpsLabel(), OnFpsClick, out fpsLabel);
         fpsRt.sizeDelta = new Vector2(ddRt.rect.width, ddRt.rect.height * 0.85f);
         if (fpsLabel != null) SetSizeOf(fpsLabel, backLabel.fontSize * 0.7f);
-        Place(fpsRt, new Vector2(cx, by - H * 0.222f), cv);
+        Place(fpsRt, fpsPos, cv);
         StartCoroutine(Replace());
         StartCoroutine(BuildCardTextLater(os, osType, cv, H));
     }
@@ -1013,7 +1042,9 @@ public class WszhLang : MonoBehaviour
         new[] { "End of partial recording", "不完整的紀錄已播放完畢" },
         new[] { "Replay complete - draw", "重播完畢 - 平手" },
         new[] { "Replay ended without reproducing its recorded result", "重播結束，但結果和紀錄不同" },
+        new[] { "Replay ended without reproducing its recorded result.", "重播結束，但結果和紀錄不同" },
         new[] { "Replay stopped before its recorded result", "重播在紀錄的結果之前停止" },
+        new[] { "Replay stopped before its recorded result.", "重播在紀錄的結果之前停止" },
         new[] { "Different build; validating inputs/state", "模擬器版本不同，正在驗證操作與狀態" },
     };
 
@@ -1037,6 +1068,8 @@ public class WszhLang : MonoBehaviour
             else if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^Replay complete - Player ([12]) wins$")).Success) p = "重播完畢 - 玩家 " + m.Groups[1].Value + " 獲勝";
             else if (p.StartsWith("Replay stopped: ")) p = "重播已停止：" + p.Substring(16);
             else if (p.StartsWith("Replay unavailable: ")) p = "無法重播：" + p.Substring(20);
+            else if ((m = System.Text.RegularExpressions.Regex.Match(p, @"^End of partial recording \((?:action|decision) #(\d+) was not completed\)$")).Success) p = "不完整的紀錄已播放完畢（第 " + m.Groups[1].Value + " 步沒有完成）";
+            else if (p.StartsWith("Recording ended: ")) p = "紀錄到此結束（" + p.Substring(17).Replace(" (no match result)", "，沒有對戰結果") + "）";
         done:
             parts[i] = p;
         }

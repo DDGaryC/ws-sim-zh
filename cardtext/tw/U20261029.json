@@ -1,0 +1,5 @@
+{
+"Auto: When your other character's battle opponent becomes <sprite name=\"reverse\"/> in battle, choose 1 of your <PIXAR> characters, it gets +3000 power until end of turn.": "【自】你的其他角色的戰鬥對手在戰鬥中變成<sprite name=\"reverse\"/>時，選擇你的 1 張《PIXAR》角色，那張角色直到回合結束為止戰力 +3000。",
+"Auto: [<sprite name=\"1cost\"/> Put 1 card from your hand into your waiting room] When this card is placed on the stage from your hand or placed into the waiting room from the stage, you may pay the cost. If you do, search your deck for up to 1 «Doll» character, and put it into your hand.": "【自】[<sprite name=\"1cost\"/> 將你的 1 張手牌放置到休息室]這張卡從手牌放置到舞台時，或從舞台放置到休息室時，你可以支付費用。支付的話，從你的牌庫搜尋最多 1 張《Doll》角色，加入手牌。",
+"Cont: During your turn, if all of your characters are <MARVEL>, this card gets +7000 power and the following ability. \"Auto: When this card attacks, perform the trigger check twice during this attack. If you triggered twice, put the top card of your Stock to Waiting Room.\"": "【永】你的回合中，如果你的角色全都是《MARVEL》，這張卡的戰力 +7000 並獲得以下能力。「【自】這張卡攻擊時，那次攻擊中，判定步驟時進行 2 次判定。進行了 2 次的話，將你能量區最上面的 1 張卡放置到休息室。」"
+}

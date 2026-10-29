@@ -37,14 +37,21 @@ public class WszhMainMenuMusicPatch : PatchBase
             TypeDefinition audio = mod.GetType("GameAudioManager");
             if (menu == null || audio == null) { Skip("找不到 MainMenuNew 或 GameAudioManager"); return; }
 
-            MethodDefinition start = menu.Methods.FirstOrDefault(m => m.Name == "Start" && !m.HasParameters && m.HasBody);
             MethodDefinition play = audio.Methods.FirstOrDefault(m => m.Name == "PlayBgm" && m.Parameters.Count == 2
                 && m.Parameters[0].ParameterType.FullName == "System.String" && m.Parameters[1].ParameterType.FullName == "System.Boolean");
-            if (start == null || play == null) { Skip("找不到 Start 或 PlayBgm"); return; }
+            if (play == null) { Skip("找不到 PlayBgm"); return; }
 
-            Instruction stop = start.Body.Instructions.FirstOrDefault(i =>
-                (i.OpCode == OpCodes.Callvirt || i.OpCode == OpCodes.Call) && i.Operand is MethodReference
-                && ((MethodReference)i.Operand).Name == "StopBgm" && ((MethodReference)i.Operand).DeclaringType.FullName == "GameAudioManager");
+            // 主選單進場時呼叫 StopBgm 的地方：舊版在 Start() 裡，0.7.9.5 起搬到 StopMenuEntryAudio()
+            MethodDefinition start = null; Instruction stop = null;
+            foreach (string name in new[] { "Start", "StopMenuEntryAudio" })
+            {
+                MethodDefinition m = menu.Methods.FirstOrDefault(x => x.Name == name && !x.HasParameters && x.HasBody);
+                if (m == null) continue;
+                Instruction s = m.Body.Instructions.FirstOrDefault(i =>
+                    (i.OpCode == OpCodes.Callvirt || i.OpCode == OpCodes.Call) && i.Operand is MethodReference
+                    && ((MethodReference)i.Operand).Name == "StopBgm" && ((MethodReference)i.Operand).DeclaringType.FullName == "GameAudioManager");
+                if (s != null) { start = m; stop = s; break; }
+            }
             if (stop == null || stop.Previous == null) { Skip("找不到 StopBgm 呼叫"); return; }
 
             // StopBgm 前一個指令是載入 GameAudioManager 實例（例如 ldloc），複製它來當 PlayBgm 的對象
