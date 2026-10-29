@@ -21,7 +21,7 @@ RULES = [
     (r'^Choose %s characters to put under (.+) as a marker\.$' % N, '請選擇 $1 張角色，放置到「$2」下方作為標記。', '请选择 $1 张角色，放置到「$2」下方作为标记。'),
     (r'^Choose a characters to put (.+) under as a marker\.$', '請選擇 1 張角色，將「$1」放置到它下方作為標記。', '请选择 1 张角色，将「$1」放置到它下方作为标记。'),
     (r'^Choose %s cards to reveal$' % N, '請選擇 $1 張卡公開', '请选择 $1 张卡公开'),
-    (r'^Choose %s cards to send from memory to waiting room\.$' % N, '請選擇回想區的 $1 張卡放置到休息室。', '请选择回想区的 $1 张卡放置到控室。'),
+    (r'^Choose %s cards to send from memory to waiting room\.$' % N, '請選擇思出區的 $1 張卡放置到休息室。', '请选择思出区的 $1 张卡放置到控室。'),
     (r'^Choose %s cards to send\.$' % N, '請選擇 $1 張卡（支付費用）。', '请选择 $1 张卡（支付费用）。'),
     (r'^Choose %s characters to send\.$' % N, '請選擇 $1 張角色（支付費用）。', '请选择 $1 张角色（支付费用）。'),
     (r'^Send %s cards\.$' % N, '選擇 $1 張卡（支付費用）。', '选择 $1 张卡（支付费用）。'),
@@ -37,6 +37,7 @@ RULES = [
     (r'^Penalty$', '重整懲罰', '重整惩罚'),     # 洗牌重整時放 1 張到傷害區，場上浮出的文字
     # 模擬器 0.7.9.5 新增
     (r'^Emote Pack$', '表情包', '表情包'),
+    (r'^Game complete\. Inspect the final board, or use Quit / Reset to leave\.$', '對戰結束。可以查看最後的場面，或按「結束」／「重開」離開。', '对战结束。可以查看最后的场面，或按「结束」／「重开」离开。'),
     (r'^Default$', '預設', '默认'),
     (r'^Rematch$', '再來一場', '再来一局'),
     (r'^Inspect Board$', '查看場面', '查看场面'),

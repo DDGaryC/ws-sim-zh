@@ -18,7 +18,7 @@
 "Auto: When this card is placed on the stage from your hand, if you have 5 or less cards in your deck, shuffle your waiting room into your deck and deal 1 damage to your opponent.": "【自】這張卡從手牌放置到舞台時，如果你的牌庫有 5 張以下的卡，將你的休息室洗入牌庫，並給予對手 1 點傷害。",
 "Auto: [<sprite name=\"1cost\"/>] When this card is put into your waiting room from the stage, if there are 4 or more climax in your waiting room, you may pay the cost, choose a character in your waiting room and return it to your hand.": "【自】[<sprite name=\"1cost\"/>]這張卡從舞台放置到休息室時，如果你的休息室有 4 張以上名場面，你可以支付費用，選擇你休息室的 1 張角色，返回手牌。",
 "Cont: Your other <Demon> characters get \"Auto: ENCORE [Discard a character]\".": "【永】你其他的《Demon》角色獲得「【自】【再演】[將 1 張角色捨棄]」。",
-"Act: [Put this card into your memory] Choose up to 2 <Angel> or <Demon> characters in your waiting room, and return them to your hand.": "【起】[將這張卡放置到回想區]選擇你休息室最多 2 張《Angel》或《Demon》角色，返回手牌。",
+"Act: [Put this card into your memory] Choose up to 2 <Angel> or <Demon> characters in your waiting room, and return them to your hand.": "【起】[將這張卡放置到思出區]選擇你休息室最多 2 張《Angel》或《Demon》角色，返回手牌。",
 "Auto: When you use this card's BACKUP, put the top 3 cards of all player's decks into the waiting room.": "【自】你使用這張卡的【助太刀】時，將所有玩家牌庫頂的 3 張卡放置到休息室。",
 "Auto: When this card is placed on the stage from your hand, choose 1 of your other <Demon> characters, it gets +1000 power until end of turn.": "【自】這張卡從手牌放置到舞台時，選擇你其他的 1 張《Demon》角色，那張角色直到回合結束為止戰力 +1000。",
 "Cont: ASSIST All of your <Demon> or <Angel> characters in front of this card get +X power where X is 500 times the level of that character.": "【永】【應援】你在這張卡前面的所有《Demon》或《Angel》角色戰力 +X。X 等於 500 × 那張角色的等級。",

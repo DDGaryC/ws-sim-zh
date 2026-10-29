@@ -1,6 +1,6 @@
 {
 "Act: This card gets +2000 power for the turn.": "【起】这张卡这个回合战力 +2000。",
-"Auto: When this card is <sprite name=\"reverse\"/> in battle, put this card to your memory.": "【自】这张卡在战斗中变成<sprite name=\"reverse\"/>时，将这张卡放置到你的回想区。",
+"Auto: When this card is <sprite name=\"reverse\"/> in battle, put this card to your memory.": "【自】这张卡在战斗中变成<sprite name=\"reverse\"/>时，将这张卡放置到你的思出区。",
 "Auto: CxCombo [<sprite name=\"2cost\"/>] When this card attacks, if \"Light Aviation Cruiser Gotland, setting off\" is in your climax area, you may pay the cost. If you do, deal X damage to your opponent. X is equal to your \"Gotland-class Light (Aviation) Cruiser, Gotland\".": "【自】【名場面連動】[<sprite name=\"2cost\"/>]这张卡攻击时，如果「Light Aviation Cruiser Gotland, setting off」在你的高潮区，你可以支付费用。支付的话，给予对手 X 点伤害。X 等于你的「Gotland-class Light (Aviation) Cruiser, Gotland」数量。",
 "Cont: This card gets +500 power for each character in your opponent's back stage.": "【永】对手的后列每有 1 张角色，这张卡的战力 +500。",
 "Auto: [Put 2 cards from your hand to your waiting room] When this card's battle opponent becomes <sprite name=\"reverse\"/>, you may pay the cost. If you do, put that character into your opponent's clock.": "【自】[将你的 2 张手牌放置到控室]这张卡的战斗对手变成<sprite name=\"reverse\"/>时，你可以支付费用。支付的话，将那张角色放置到对手的时计区。",

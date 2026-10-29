@@ -71,7 +71,7 @@
 "If you do not have a character with \"Kazuma\" in its name, this card cannot be played from your hand. Choose 1 of the following effects and perform it.": "如果你沒有卡名含有「Kazuma」的角色，這張卡不能從手牌使用。從以下效果中選擇 1 個執行。",
 "\"Choose a character in your waiting room and return it to your hand.\"": "「選擇你休息室的 1 張角色，返回手牌。」",
 "\"Choose a character on your opponent's center stage, and return it to his or her hand.\"": "「選擇對手前列的 1 張角色，返回對手的手牌。」",
-"\"If there are 5 or more cards in your opponent's memory, your opponent puts all characters from his or her memory into the waiting room.\"": "「如果對手的回想區有 5 張以上的卡，對手將自己回想區的所有角色放置到休息室。」",
+"\"If there are 5 or more cards in your opponent's memory, your opponent puts all characters from his or her memory into the waiting room.\"": "「如果對手的思出區有 5 張以上的卡，對手將自己思出區的所有角色放置到休息室。」",
 "Auto: When this card is placed on the stage from your hand, put 2 cards from the top of your deck into the waiting room, and this card gets +X power until end of turn, X is 1000 times the number of <Adventurer> or <Magic> characters revealed.": "【自】這張卡從手牌放置到舞台時，將你牌庫頂的 2 張卡放置到休息室，這張卡直到回合結束為止戰力 +X。X 等於那些卡中《Adventurer》或《Magic》角色的數量 ×1000。",
 "Auto: At the beginning of your opponent's draw phase, reveal the top card of your deck, if it is level 1 or higher, you may return this card to your hand.": "【自】對手的抽牌階段開始時，公開你牌庫頂的 1 張卡。如果那張卡的等級在 1 以上，你可以將這張卡返回手牌。",
 "Auto: When a climax is placed in your climax area, if that card's trigger icon is <sprite name=\"mini_door\"/>, choose 1 of your characters, it gets +1 soul until end of turn.": "【自】名場面放置到你的名場面區時，如果那張卡的判定圖示是<sprite name=\"mini_door\"/>，選擇你的 1 張角色，那張角色直到回合結束為止魂 +1。",
@@ -118,5 +118,5 @@
 "Cont: Your other <Adventurer> or <Magic> characters get +1000 power.": "【永】你的其他《Adventurer》或《Magic》角色戰力 +1000。",
 "Auto: When this card is placed on the stage from your hand, you may choose the bottom card of your clock, and a <Magic> character in your waiting room, and exchange them.": "【自】這張卡從手牌放置到舞台時，你可以選擇你傷害區最下面的 1 張卡與休息室的 1 張《Magic》角色，將兩者交換。",
 "Auto: [Discard a \"'Foremost Mage' Megumin\"] When this card is placed on the stage from your hand, you may pay the cost, choose an <Adventurer> or <Magic> character in your waiting room, and return it to your hand.": "【自】[將手牌中 1 張「'Foremost Mage' Megumin」放置到休息室]這張卡從手牌放置到舞台時，你可以支付費用。支付的話，選擇你休息室的 1 張《Adventurer》或《Magic》角色，返回手牌。",
-"If you have a character with \"Kazuma\" in its name, put this card into your memory.": "如果你有卡名含有「Kazuma」的角色，將這張卡放置到回想區。"
+"If you have a character with \"Kazuma\" in its name, put this card into your memory.": "如果你有卡名含有「Kazuma」的角色，將這張卡放置到思出區。"
 }

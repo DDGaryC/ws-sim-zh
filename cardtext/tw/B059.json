@@ -104,7 +104,7 @@
 "Auto: When this card becomes <sprite name=\"reverse\"/>, if this card's battle opponent is level 1 or lower, you may return that character to your opponent's hand.": "【自】這張卡變成<sprite name=\"reverse\"/>時，如果這張卡的戰鬥對手是等級 1 以下，你可以將那張角色返回對手的手牌。",
 "Auto: CxCombo [<sprite name=\"1cost\"/>] When this card attacks, if \"I... Must Go...\" is in your climax area, you may pay the cost, choose 1 of your opponent's characters and return it to the hand.": "【自】【名場面連動】[<sprite name=\"1cost\"/>]這張卡攻擊時，如果「I... Must Go...」在你的名場面區，你可以支付費用。支付的話，選擇對手的 1 張角色，返回對手的手牌。",
 "Your opponent discards a card.": "對手捨棄 1 張卡。",
-"Choose 1 of your <Magic> characters, it gets +2000 power and +2 soul until end of turn. At the end of your turn, put that character into your memory.": "選擇你的 1 張《Magic》角色，那張角色直到回合結束為止戰力 +2000 且魂 +2。你的回合結束時，將那張角色放置到你的回想區。",
+"Choose 1 of your <Magic> characters, it gets +2000 power and +2 soul until end of turn. At the end of your turn, put that character into your memory.": "選擇你的 1 張《Magic》角色，那張角色直到回合結束為止戰力 +2000 且魂 +2。你的回合結束時，將那張角色放置到你的思出區。",
 "<sprite name=\"backup\"/>: Choose 1 of your characters, it gets +1500 power and +1 soul until end of turn.": "<sprite name=\"backup\"/>：選擇你的 1 張角色，那張角色直到回合結束為止戰力 +1500 且魂 +1。",
 "Choose 1 of your opponent's characters. It gets -2 level until end of turn.": "選擇對手的 1 張角色，那張角色直到回合結束為止等級 -2。",
 "Choose 1 of your characters, it gets +6000 power until end of turn.": "選擇你的 1 張角色，那張角色直到回合結束為止戰力 +6000。",

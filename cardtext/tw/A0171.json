@@ -12,7 +12,7 @@
 "Auto: When this card is played and placed on the stage, you may choose a card in your opponent's waiting room, and put it on top of your opponent's deck.": "【自】這張卡被使用並放置到舞台時，你可以選擇對手休息室的 1 張卡，放置到對手的牌庫頂。",
 "Auto: [<sprite name=\"1cost\"/>] When this card is played and placed on the stage, you may pay the cost. Choose one of your opponent's level 1 or lower characters and put it into the waiting room.": "【自】[<sprite name=\"1cost\"/>]這張卡被使用並放置到舞台時，你可以支付費用。選擇對手等級 1 以下的 1 張角色，放置到休息室。",
 "Cont: If you have another \"Chidori\", this card gets +1000 power.": "【永】如果你有其他的「Chidori」，這張卡的戰力 +1000。",
-"Auto: When this card is played and placed on the stage, you may choose an event card in your opponent's waiting room and put it into memory.": "【自】這張卡被使用並放置到舞台時，你可以選擇對手休息室的 1 張事件卡，放置到回想區。",
+"Auto: When this card is played and placed on the stage, you may choose an event card in your opponent's waiting room and put it into memory.": "【自】這張卡被使用並放置到舞台時，你可以選擇對手休息室的 1 張事件卡，放置到思出區。",
 "Auto: CxCombo When this card attacks, if \"Promise to Friends\" is in your climax area, choose a character in your waiting room, and return it to your hand.": "【自】【名場面連動】這張卡攻擊時，如果「Promise to Friends」在你的名場面區，選擇你休息室的 1 張角色，返回手牌。",
 "Auto: CxCombo When this card attacks, if \"Thank You\" is in your climax area, choose a character in your waiting room, and return it to your hand.": "【自】【名場面連動】這張卡攻擊時，如果「Thank You」在你的名場面區，選擇你休息室的 1 張角色，返回手牌。",
 "Auto: When your other character becomes <sprite name=\"reverse\"/> in battle, this card gets +2000 power until end of turn.": "【自】你其他的角色在戰鬥中變成<sprite name=\"reverse\"/>時，這張卡直到回合結束為止戰力 +2000。",

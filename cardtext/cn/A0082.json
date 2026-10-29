@@ -35,7 +35,7 @@
 "Auto: CHANGE [Put this card into your waiting room] At the start of your climax phase, you may pay the cost. If you do, choose a \"Successor to TATARI, Vampire Sion\" or \"Sand of Osiris\" in your waiting room and place it on the stage position this card was on.": "【自】【交替】[将这张卡放置到控室]你的高潮阶段开始时，你可以支付费用。支付的话，选择你控室的 1 张「Successor to TATARI, Vampire Sion」或「Sand of Osiris」，放置到这张卡原本所在的舞台位置。",
 "Choose 1 of your opponent's cost 1 or lower character and put it into their stock.": "选择对手的 1 张费用 1 以下的角色，放置到对手的能量区。",
 "If you have 2 or less YELLOW characters, you cannot play this card from your hand.": "如果你有 2 张以下的黄色角色，你不能从手牌使用这张卡。",
-"At the end of your turn, choose 1 of your characters and send that character to your memory.": "你的回合结束时，选择你的 1 张角色，放置到你的回想区。",
+"At the end of your turn, choose 1 of your characters and send that character to your memory.": "你的回合结束时，选择你的 1 张角色，放置到你的思出区。",
 "All of your characters gain +1000 power and +1 soul until end of turn.": "你的所有角色直到回合结束为止战力 +1000、魂 +1。",
 "Cont: If there another character in your center stage with \"Shiki\" in it's card name, this card gains +1000 power.": "【永】如果你的前列有其他卡名含有「Shiki」的角色，这张卡的战力 +1000。",
 "Auto: When this card's trigger check reveals a climax, this card gains +4000 power and +1 soul until end of turn.": "【自】这张卡的判定翻出高潮时，这张卡直到回合结束为止战力 +4000、魂 +1。",
@@ -56,7 +56,7 @@
 "Cont: During your turn, if you have another character with \"Meryl\" in it's card name, this card gets +7500 power.": "【永】你的回合中，如果你有其他卡名含有「Meryl」的角色，这张卡的战力 +7500。",
 "Auto: When your other <Purple> character attacks, this card gets +X power until end of turn. X is equal to the number of other <Flame> characters you have ×500.": "【自】你其他的《Purple》角色攻击时，这张卡直到回合结束为止战力 +X。X 等于你其他的《Flame》角色数量 × 500。",
 "Auto: [Put 1 card from your hand into your waiting room] When this is put into your waiting room from the stage, you may pay the cost. If you do, put the top 4 cards of your deck into your waiting room, choose up to 1 level X or lower <Purple> character in your waiting room, and return it to your hand. X is equal to the total number of <sprite name=\"mini_soul\"/> in the trigger icons of those cards.": "【自】[将你的 1 张手牌放置到控室]这张卡从舞台放置到控室时，你可以支付费用。支付的话，将你卡组顶的 4 张卡放置到控室，选择你控室最多 1 张等级 X 以下的《Purple》角色，返回手牌。X 等于那些卡的判定图示中<sprite name=\"mini_soul\"/>的总数。",
-"Cont: MEMORY If you have \"A Girl who gave up on reality, Yuuko\" in your memory, this card gets +3000 power.": "【永】【回想】如果你的回想区有「A Girl who gave up on reality, Yuuko」，这张卡的战力 +3000。",
+"Cont: MEMORY If you have \"A Girl who gave up on reality, Yuuko\" in your memory, this card gets +3000 power.": "【永】【记忆】如果你的思出区有「A Girl who gave up on reality, Yuuko」，这张卡的战力 +3000。",
 "Auto: When this card's battle opponent is <sprite name=\"reverse\"/>, choose 1 <Purple> character in your waiting room, add it to hand, then discard a card.": "【自】这张卡的战斗对手是<sprite name=\"reverse\"/>时，选择你控室的 1 张《Purple》角色，加入手牌，然后丢弃 1 张手牌。",
 "Auto: CxCombo During your climax phase, when \"Bout with Lightning Speed\" is placed on your climax area, reveal the top card of your deck. If that card is a <Purple> character, put it into your stock, choose 1 of your characters, it gets +1000 power until end of turn.": "【自】【名場面連動】你的高潮阶段中，「Bout with Lightning Speed」放置到你的高潮区时，公开你卡组顶的 1 张卡。如果那张卡是《Purple》角色，放置到能量区，选择你的 1 张角色，那张角色直到回合结束为止战力 +1000。"
 }

@@ -161,6 +161,10 @@ foreach ($rel in ($items | Sort-Object)) {
 }
 [IO.File]::WriteAllText((Join-Path $Here 'manifest.txt'), ($manifest -join "`n") + "`n", $utf8)
 [IO.File]::WriteAllText((Join-Path $Here 'version.txt'), $Version + "`n", $utf8)
+# 最近 15 版的更新紀錄：啟動腳本詢問更新時，顯示「目前版本之後」的內容
+$clStart = [Math]::Max(0, $guideFull.IndexOf('更新紀錄'))
+$cl = [regex]::Matches($guideFull.Substring($clStart), "(?ms)^v\d+(?:\.\d+)+（.*?(?=^v\d|\z)") | Select-Object -First 15 | ForEach-Object { $_.Value.Replace("`r", '').TrimEnd() }
+[IO.File]::WriteAllText((Join-Path $Here 'changelog.txt'), ($cl -join "`n`n") + "`n", $utf8)
 "files: $($items.Count)"
 
 # ---- 4. 壓縮檔 ----

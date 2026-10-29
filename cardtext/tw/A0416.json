@@ -1,6 +1,6 @@
 {
 "<sprite name=\"rest\"/> one of your <sprite name=\"stand\"/> characters with \"Hanayo\" in its card name. If you do, look at up to four cards from the top of your deck, choose a card from among them, put it into your hand, put the rest on the top of your deck in any order, choose one of your characters, it gets +2000 power until end of turn.": "將你的 1 張卡名有「Hanayo」且為<sprite name=\"stand\"/>的角色<sprite name=\"rest\"/>。這樣做的話，查看你牌庫頂最多 4 張卡，從中選擇 1 張卡加入手牌，其餘的以任意順序放置到牌庫頂，選擇你的 1 張角色，那張角色直到回合結束為止戰力 +2000。",
-"Choose one of your characters, it gets +3000 power until the end of your opponent's next turn. Put this card into your memory.": "選擇你的 1 張角色，那張角色直到對手的下個回合結束為止戰力 +3000。將這張卡放置到回想區。",
+"Choose one of your characters, it gets +3000 power until the end of your opponent's next turn. Put this card into your memory.": "選擇你的 1 張角色，那張角色直到對手的下個回合結束為止戰力 +3000。將這張卡放置到思出區。",
 "Auto: When your other blue character attacks, this card gets +1500 power until end of turn.": "【自】你其他的藍色角色攻擊時，這張卡直到回合結束為止戰力 +1500。",
 "Cont: EXPERIENCE If the number of cards named \"\"Happy Maker!\" Hanayo Koizumi\" in your level is two or more, this card gets +4000 power.": "【永】【經驗】如果你的等級區中卡名為「\"Happy Maker!\" Hanayo Koizumi」的卡有 2 張以上，這張卡的戰力 +4000。",
 "Cont: During your opponent's turn, all of your other characters get +1500 power.": "【永】對手的回合中，你其他的所有角色戰力 +1500。",

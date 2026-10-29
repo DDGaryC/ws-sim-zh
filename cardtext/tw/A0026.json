@@ -51,7 +51,7 @@
 "Cont: If this card is in the left position of your back stage, all of your other <Villain> characters get +1000 power.": "【永】如果這張卡在你後列的左側位置，你其他的所有《Villain》角色戰力 +1000。",
 "Auto: When this card attacks, if all of the other characters on your center stage are <sprite name=\"stand\"/>, this card gets +2000 power until end of turn.": "【自】這張卡攻擊時，如果你前列其他的角色全部都是<sprite name=\"stand\"/>，這張卡直到回合結束為止戰力 +2000。",
 "Auto: BOND / \"Harley Quinn: Battle on the Big Boat\" [Discard 1 card]": "【自】【羈絆】/「Harley Quinn: Battle on the Big Boat」[捨棄 1 張卡]",
-"Act: [<sprite name=\"1cost\"/>] This card gets +2500 power until end of turn. At the end of turn, put this card into your memory.": "【起】[<sprite name=\"1cost\"/>]這張卡直到回合結束為止戰力 +2500。回合結束時，將這張卡放置到你的回想區。",
+"Act: [<sprite name=\"1cost\"/>] This card gets +2500 power until end of turn. At the end of turn, put this card into your memory.": "【起】[<sprite name=\"1cost\"/>]這張卡直到回合結束為止戰力 +2500。回合結束時，將這張卡放置到你的思出區。",
 "Cont: During your turn, if this card is in the right position of your back stage, your other character in the middle position of your center stage gets +1000 power.": "【永】你的回合中，如果這張卡在你後列的右側位置，你前列中間位置的其他角色戰力 +1000。",
 "Auto: [<sprite name=\"2cost\"/>] When you use this card's BACKUP you may pay the cost, deal 1 damage to your opponent.": "【自】[<sprite name=\"2cost\"/>]你使用這張卡的【助太刀】時，你可以支付費用，給予對手 1 點傷害。",
 "Auto: When this card attacks, if you have 2 or more other <Villain> characters, this card gets +2000 power until end of turn.": "【自】這張卡攻擊時，如果你有 2 張以上其他的《Villain》角色，這張卡直到回合結束為止戰力 +2000。",

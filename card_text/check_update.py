@@ -55,7 +55,8 @@ def card_effects():
         for line in open(f, encoding='utf-8', errors='ignore'):
             m = re.match(r'^(Character|Event|Climax):\s*(\S+)', line)
             if m: cur = m.group(2); continue
-            m = re.match(r'^Text:?\s+(.*)$', line.rstrip('\n'))
+            # 縮排在效果區塊裡的 Text 也要（角色獲得那個能力後，預覽會顯示這段，例如「Auto: (Canace) When…」）
+            m = re.match(r'^\s*Text:?\s+(.*)$', line.rstrip('\n'))
             if m and cur:
                 for part in m.group(1).split(BS):
                     part = part.strip()

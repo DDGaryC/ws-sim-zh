@@ -19,7 +19,7 @@
  "Cont: If \"\"KO'd\" Amitie\" is in your clock, this card gets -1 level in your hand.": "【永】如果「\"KO'd\" Amitie」在你的傷害區，這張卡在手牌中時等級 -1。",
  "Auto: CxCombo When your opponent levels up, if \"Bayoe~n\" is in your climax area and this card is on your center stage, you may choose a character in your waiting room, and return it to your hand.": "【自】【名場面連動】對手升級時，如果「Bayoe~n」在你的名場面區且這張卡在你的前列，你可以選擇你休息室的 1 張角色，返回手牌。",
  "Cont: While on the stage, this card's name is also regarded as \"Red Puyo\".": "【永】在舞台上時，這張卡的卡名也視為「Red Puyo」。",
- "Choose a character in your clock, and return it to your hand. Put this card into your memory.": "選擇你傷害區的 1 張角色，返回手牌。將這張卡放置到回想區。",
+ "Choose a character in your clock, and return it to your hand. Put this card into your memory.": "選擇你傷害區的 1 張角色，返回手牌。將這張卡放置到思出區。",
  "BRAINSTORM Flip over 7 cards from the top of your deck and put them into the waiting room, and deal X damage to your opponent. X is the number of \"Green Puyo\" among the revealed cards.": "【集中】將你牌庫頂的 7 張卡翻開，放置到休息室，並給予對手 X 點傷害。X 等於那些公開的卡中「Green Puyo」的數量。",
  "Cont: This card gets +2000 power for each other \"Oniko\" on your center stage.": "【永】你前列每有 1 張其他的「Oniko」，這張卡的戰力 +2000。",
  "Auto: [<sprite name=\"2cost\"/>] When you use this card's \"BACKUP\", if you have 4 or more <Puyo> characters, you may pay the cost. If you do, choose 1 of your opponent's characters whose level is greater than your opponent's level, and put it into the waiting room.": "【自】[<sprite name=\"2cost\"/>]你使用這張卡的「助太刀」時，如果你有 4 張以上《Puyo》角色，你可以支付費用。支付的話，選擇對手的 1 張等級高於對手等級的角色，放置到休息室。",

@@ -20,3 +20,16 @@ A newer version of the simulator is available: 0.7.9.5\nYou are currently runnin
 Default=預設
 Emote Pack=表情包
 Open Lobbies: 1=開放中的房間：1
+Your card data may be out of date.\n\nLast update run: 10月 29, 2026 2:22 下午 local\nLatest repo commit: 10月 29, 2026 11:03 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：10月 29, 2026 2:22 下午 local\n\n最新版本：10月 29, 2026 11:03 下午 local\n\n\n\n要前往設定進行更新嗎？
+Choose a slot to place The Gentle Heart Residing in Steel, Firenze in.=請選擇放置 The Gentle Heart Residing in Steel, Firenze 的位置。
+Opponent used the act ability of Pure White Shining Lily, Riri.=對手發動了 Pure White Shining Lily, Riri. 的起動能力
+Penalty=重整懲罰
+Markers under Mainstay of Post Haste, Donna=Mainstay of Post Haste, Donna 下方的標記
+Choose 2 cards.=請選擇 2 張卡。
+Choose a slot to place The Charismatic Teacher's Worries, Canace in.=請選擇放置 The Charismatic Teacher's Worries, Canace 的位置。
+Flip Stock=翻開能量區
+View My Deck=查看我的牌庫
+View Opponent's Deck=查看對手的牌庫
+Flip Opponent's Stock=翻開對手的能量區
+Viewing your remaining deck.=正在查看你剩下的牌庫。
+Viewing your opponent's remaining deck.=正在查看對手剩下的牌庫。
