@@ -53,12 +53,14 @@ public static class WszhCardText
     {
         try
         {
-            if (string.IsNullOrEmpty(str)) return str;
+            if (string.IsNullOrEmpty(str) || Bypass) return str;
             string lang = CurrentLanguage();
             if (lang != loadedLang) Load(lang);
             if (map.Count == 0) return str;
             string hit;
             if (cache.TryGetValue(str, out hit)) return hit;
+            string q = UseOn(str);
+            if (q != null) { cache[str] = q; return q; }
 
             string[] lines = str.Split('\n');
             bool changed = false;
@@ -76,6 +78,13 @@ public static class WszhCardText
                 if (tr != line && tr.Length > 0 && map.TryGetValue(tr, out whole)) { lines[i] = whole; changed = true; continue; }
                 if (tr.Length > 2 && tr[0] == '"' && tr[tr.Length - 1] == '"' && map.TryGetValue(tr.Substring(1, tr.Length - 2).Trim(), out whole))
                 { lines[i] = "「" + whole + "」"; changed = true; continue; }
+                // 「選擇效果的處理順序」各選項：「1. 效果」（效果拆自卡片原文的引號段落，見 install_cardtext.py）
+                int dot = tr.IndexOf(". ");
+                if (dot > 0 && dot <= 2 && char.IsDigit(tr[0]) && map.TryGetValue(tr.Substring(dot + 2).Trim(), out whole))
+                { lines[i] = tr.Substring(0, dot + 2) + whole; changed = true; continue; }
+                // 誘發效果排序：傷害相關的自動能力後面接「(3 Damage)」
+                var dm = Regex.Match(tr, @"^\((\d+) Damage\)$");
+                if (dm.Success) { lines[i] = "（" + dm.Groups[1].Value + (loadedLang == "cn" ? " 点伤害）" : " 點傷害）"); changed = true; continue; }
                 // 對不到時，行首可能有遊戲加上的標籤（例如 <color=#000000>），拿掉再比對
                 // 一個一個拿掉行首標籤再比對（對戰時是「顏色標籤＋判定圖示＋文字」，判定圖示本身是譯文的一部分）
                 int p = 0;
@@ -94,6 +103,56 @@ public static class WszhCardText
             return result;
         }
         catch { return str; }
+    }
+
+    // ---- 連線對戰：對方傳來的卡片預覽 ----
+    // 對戰中的預覽文字（DeckCard.savedPreviewText）是同步變數，由主機那台組好、已經 EnrichenText 過才傳來；
+    // 對方是英文版時，我們收到的是加工過的英文（圖示標籤、«特徵»），不會經過 Translate。
+    // 這裡把它還原成卡片資料的寫法，再交給那張卡的 EnrichenText 重做一次（就會翻譯）。由 Lang.cs 的預覽檢查呼叫。
+    static readonly string[][] Unenrich = {
+        new[] { "<sprite name=\"cxcombo\"/>", "CxCombo" }, new[] { "<sprite name=\"auto\"/>", "Auto:" }, new[] { "<sprite name=\"act\"/>", "Act:" },
+        new[] { "<sprite name=\"cont\"/>", "Cont:" }, new[] { "<sprite name=\"replay\"/>", "REPLAY" }, new[] { "<b>Bond/</b>", "BOND/" },
+    };
+    static readonly string[] BoldWords = { "Encore", "Brainstorm", "Alarm", "Shift", "Backup", "Great Performance", "Accelerate", "Force", "Sunder", "Merge",
+        "Fusion", "Inheritance", "Resonate", "Memory", "Experience", "Change", "Assist", "Inspire", "Boarding", "Recollection" };
+    static string syncedIn, syncedOut;
+    public static bool Bypass;          // 測試用：暫時不翻譯（模擬英文版主機組出來的預覽）
+    static System.Reflection.MethodInfo enrich;
+
+    public static string TranslateSynced(object card, string shown)
+    {
+        try
+        {
+            if (map.Count == 0 || card == null || string.IsNullOrEmpty(shown)) return null;
+            if (shown == syncedIn) return syncedOut;
+            string s = shown.StartsWith("<align=left>") ? shown.Substring(12) : shown;
+            foreach (var p in Unenrich) s = s.Replace(p[0], p[1]);
+            foreach (var w in BoldWords) s = s.Replace("<b>" + w + "</b>", w.ToUpperInvariant());
+            s = Regex.Replace(s, "<b>(\"[^\"]*\")</b>", "$1");           // 名場面連動的卡名
+            s = Regex.Replace(s, "«([^«»\n]+)»", "<$1>");
+            if (enrich == null) enrich = card.GetType().GetMethod("EnrichenText", new[] { typeof(string) });
+            string r = enrich == null ? null : enrich.Invoke(card, new object[] { s }) as string;
+            syncedIn = shown; syncedOut = (r != null && r != shown && HasHan(r)) ? r : null;
+            return syncedOut;
+        }
+        catch { return null; }
+    }
+
+    static bool HasHan(string s) { foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return true; return false; }
+
+    // ---- 再演詢問：DeckCard 把能力文字和卡名拼成「Use <能力> on <卡名>?」，再經過 EnrichenText 顯示 ----
+    // 能力文字和卡名裡都可能有「 on 」，所以從左邊一個一個試，能力文字查得到譯文的那個位置才算數
+    static string UseOn(string str)
+    {
+        if (!str.StartsWith("Use ") || !str.EndsWith("?")) return null;
+        for (int on = str.IndexOf(" on ", 4); on > 0; on = str.IndexOf(" on ", on + 1))
+        {
+            string eff = str.Substring(4, on - 4).Trim(), zh;
+            if (!map.TryGetValue(eff, out zh)) continue;
+            string name = str.Substring(on + 4, str.Length - on - 5);
+            return loadedLang == "cn" ? "要对「" + name + "」使用" + zh + "吗？" : "要對「" + name + "」使用" + zh + "嗎？";
+        }
+        return null;
     }
 
     // ---- 卡片預覽的狀態說明（DeckCard 產生預覽文字時加在效果前面的「* ...」各行） ----
@@ -182,7 +241,7 @@ public static class WszhCardText
     {
         try
         {
-            if (map.Count == 0 || string.IsNullOrEmpty(s) || s.StartsWith("<align")) return s;
+            if (map.Count == 0 || string.IsNullOrEmpty(s) || Bypass || s.StartsWith("<align")) return s;
             foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return "<align=left>" + s;
             return s;
         }

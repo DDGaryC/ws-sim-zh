@@ -13,6 +13,29 @@ def quoted_pairs(en, zh):
     if a and len(a) == len(b): return list(zip(a, b))
     return []
 
+# 「以任意順序執行以下 2 個效果」「選擇以下 1 個效果」：遊戲會把各效果單獨列成「1. …」讓玩家選，拆出每一段
+EN_FOLLOW = re.compile(r'following (?:\d+ |one |two |three )?effects?|in any order\.')
+ZH_FOLLOW = re.compile(r'以下\s*\d*\s*個效果')
+
+def zh_pieces(s):
+    out, depth, start = [], 0, 0
+    for i, c in enumerate(s):
+        if c == '「':
+            if depth == 0: start = i + 1
+            depth += 1
+        elif c == '」' and depth:
+            depth -= 1
+            if depth == 0: out.append(s[start:i])
+    return out
+
+def effect_pairs(en, zh):
+    m, n = EN_FOLLOW.search(en), ZH_FOLLOW.search(zh)
+    if not m or not n: return []
+    a = re.findall(r'"([^"]+)"', en[m.end():])
+    b = zh_pieces(zh[n.end():])
+    if len(a) < 2 or len(a) != len(b) or en[m.end():].count('"') != 2 * len(a): return []
+    return list(zip(a, b))
+
 def build_files():
     files = {}
     for f in glob.glob(os.path.join(D, '*_tw.json')):
@@ -24,6 +47,13 @@ def build_files():
             for a, b in quoted_pairs(en, zh):
                 a = a.strip()
                 if a not in known and a not in quoted: quoted[a] = b.strip()
+            for a, b in effect_pairs(en, zh):
+                a = a.strip()
+                if a not in known and a not in quoted: quoted[a] = b.strip()
+    # 遊戲把這些固定句接在效果文字後面（同一段文字），XUnity 整段對不到，所以在效果翻譯這裡逐行處理
+    quoted['Choose order to resolve effects:'] = '請選擇效果處理的順序：'
+    quoted['Use this effect now?'] = '現在要使用這個效果嗎？'
+    quoted['Pay the cost and use this effect?'] = '要支付費用並使用這個效果嗎？'
     files['zz_quoted'] = quoted
     return files
 

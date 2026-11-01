@@ -840,6 +840,9 @@ public class WszhLang : MonoBehaviour
             // 只在重播畫面、戰紀錄畫面做事；其他畫面（尤其對戰中）什麼都不做，避免拖慢遊戲
             string scene = SceneManager.GetActiveScene().name;
             if (scene == "DeckEditorRedo" || scene == "Duel" || scene == "ReplayDuel") JpNamePreview(scene);
+            if (Collect) CollectEnglish(scene);
+            if (scene != "Duel" && scene != "ReplayDuel") FixDeckNames();
+            if (scene == "DeckEditorRedo") MulliganTrigger();
             bool inReplay = scene == "ReplayDuel", inLogs = scene == "GameLogs";
             if (!inReplay && !inLogs && replayCtl == null) return;
             if (inReplay && Time.realtimeSinceStartup >= replayLookAt && replayCtl == null)
@@ -1047,21 +1050,173 @@ public class WszhLang : MonoBehaviour
             jpScene = scene; jpLookAt = Time.realtimeSinceStartup + 1f;
             Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("PlayerUI")).FirstOrDefault(x => x != null);
             if (t == null) return;
-            fViewing = t.GetField("viewingCard", Any); fDesc = t.GetField("cardDescriptionText", Any); fShowJp = t.GetField("showJPNames", Any);
+            fViewing = t.GetField("viewingCard", Any); fDesc = t.GetField("cardDescriptionText", Any); fShowJp = t.GetField("showJPNames", Any); fViewDeck = t.GetField("viewingDeckCard", Any);
             jpUis = FindObjectsOfType(t).Cast<Component>().ToArray();
         }
         if (fViewing == null || fDesc == null || fShowJp == null) return;
         foreach (var ui in jpUis)
         {
-            if (ui == null || !(bool)fShowJp.GetValue(ui)) continue;
+            if (ui == null) continue;
             var card = fViewing.GetValue(ui);
-            if (card == null || WszhNames.HasGameJapaneseName(card)) continue;
-            string jp = WszhNames.SupplementName(card.GetType().GetField("id").GetValue(card) as string);
             var desc = fDesc.GetValue(ui) as TMP_Text;
-            if (string.IsNullOrEmpty(jp) || desc == null) continue;
+            if (card == null || desc == null) continue;
+            // 連線對戰：對方傳來的預覽是加工過的英文，重新翻譯（見 WszhCardText.TranslateSynced）
+            if (scene != "DeckEditorRedo")
+            {
+                string shown = desc.text ?? "", body = shown, gameJp = WszhNames.JapaneseName(card);
+                if (!string.IsNullOrEmpty(gameJp) && body.EndsWith("\n" + gameJp)) body = body.Substring(0, body.Length - gameJp.Length - 1);
+                if (SyncTest && shown != syncTestShown)
+                {
+                    // 測試模式：拿這張卡「不翻譯時」組出來的預覽（和英文版主機傳來的一樣）走一次連線的翻譯流程
+                    string en = EnglishPreview(fViewDeck == null ? null : fViewDeck.GetValue(ui));
+                    if (en != null)
+                    {
+                        string zh = WszhCardText.TranslateSynced(card, en);
+                        desc.text = syncTestShown = (zh ?? "【測試：翻譯失敗】\n" + en) + shown.Substring(body.Length);
+                        body = null;
+                    }
+                }
+                if (body != null && !HasHan(body))
+                {
+                    string zh = WszhCardText.TranslateSynced(card, body);
+                    if (zh != null) desc.text = zh + shown.Substring(body.Length);
+                }
+            }
+            if (!(bool)fShowJp.GetValue(ui) || WszhNames.HasGameJapaneseName(card)) continue;
+            string jp = WszhNames.SupplementName(card.GetType().GetField("id").GetValue(card) as string);
+            if (string.IsNullOrEmpty(jp)) continue;
             string s = desc.text ?? "";
             if (!s.EndsWith(jp)) desc.text = s + "\n" + jp;
         }
+    }
+
+    static bool HasHan(string s) { foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return true; return false; }
+
+    // 0.7.9.6 的牌組清單（DeckLoadingEntry）：中文牌組名只顯示「STS ...」。
+    // 名稱欄高 26、超出就截成「...」；中文字型的行高比較高（實測 26.8），一出現中文字就超出。改成超出也照樣顯示
+    static Type deckEntryType; static System.Reflection.FieldInfo fDeckName; float deckNameAt; bool deckNameLogged;
+    void FixDeckNames()
+    {
+        if (Time.realtimeSinceStartup < deckNameAt) return;
+        deckNameAt = Time.realtimeSinceStartup + 0.5f;
+        try
+        {
+            if (deckEntryType == null)
+            {
+                deckEntryType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("DeckLoadingEntry")).FirstOrDefault(x => x != null);
+                if (deckEntryType == null) { deckNameAt += 1e9f; return; }
+                fDeckName = deckEntryType.GetField("nameText", Any);
+            }
+            if (fDeckName == null) return;
+            foreach (var e in FindObjectsOfType(deckEntryType))
+            {
+                var t = fDeckName.GetValue(e) as TMP_Text;
+                if (t == null || !HasHan(t.text ?? "") || t.overflowMode == TextOverflowModes.Overflow) continue;
+                if (!deckNameLogged)
+                {
+                    deckNameLogged = true;
+                    t.ForceMeshUpdate();
+                    Debug.Log("[WSZH] deck name: font=" + (t.font != null ? t.font.name : "?") + " size=" + t.fontSize + " auto=" + t.enableAutoSizing
+                        + " wrap=" + t.enableWordWrapping + " overflow=" + t.overflowMode + " rect=" + t.rectTransform.rect.size
+                        + " preferred=" + t.GetPreferredValues(t.text) + " truncated=" + t.isTextTruncated);
+                }
+                t.enableWordWrapping = false;
+                t.overflowMode = TextOverflowModes.Overflow;
+            }
+        }
+        catch (Exception ex) { Debug.Log("[WSZH] deck name fix failed: " + ex.Message); deckNameAt += 1e9f; }
+    }
+
+    // 起手模擬（0.7.9.6）右邊的卡片資訊：翻譯檔把「Green | Bar」翻成「綠｜判定 Bar」，判定名稱（遊戲的 TriggerIcon 列舉）在這裡換成中文。
+    // 判定有 30 多種，寫成翻譯規則要好幾百條，每段新文字都得全部比對一次，太慢
+    static readonly Dictionary<string, string> TriggerZh = new Dictionary<string, string> {
+        { "Soul", "魂" }, { "DoubleSoul", "雙魂" }, { "Book", "書" }, { "Wind", "風吹" }, { "Bag", "寶袋" }, { "Door", "木門" }, { "Gate", "城門" },
+        { "Shot", "火燒" }, { "Bar", "金磚" }, { "Standby", "開機" }, { "Focus", "橘子" }, { "Discovery", "望遠鏡" }, { "Chance", "燈泡" }, { "Choice", "箭頭" } };
+    static readonly Dictionary<string, string> TriggerCn = new Dictionary<string, string> {
+        { "Soul", "魂" }, { "DoubleSoul", "双魂" }, { "Book", "书" }, { "Wind", "风吹" }, { "Bag", "宝袋" }, { "Door", "木门" }, { "Gate", "城门" },
+        { "Shot", "火烧" }, { "Bar", "金砖" }, { "Standby", "开机" }, { "Focus", "橘子" }, { "Discovery", "望远镜" }, { "Chance", "灯泡" }, { "Choice", "箭头" } };
+    static readonly System.Text.RegularExpressions.Regex TriggerTail = new System.Text.RegularExpressions.Regex(@"(判定) (Lone)?([A-Za-z]+?)(\d*)$");
+    static Type mulliganType; static System.Reflection.FieldInfo fMullDetails; float mulliganAt;
+    void MulliganTrigger()
+    {
+        if (Time.realtimeSinceStartup < mulliganAt) return;
+        mulliganAt = Time.realtimeSinceStartup + 0.1f;
+        try
+        {
+            if (mulliganType == null)
+            {
+                mulliganType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("DeckMulliganDialog")).FirstOrDefault(x => x != null);
+                if (mulliganType == null) { mulliganAt += 1e9f; return; }
+                fMullDetails = mulliganType.GetField("previewDetails", Any);
+            }
+            if (fMullDetails == null) return;
+            var dlg = FindObjectOfType(mulliganType);
+            var t = dlg == null ? null : fMullDetails.GetValue(dlg) as TMP_Text;
+            if (t == null || string.IsNullOrEmpty(t.text)) return;
+            var m = TriggerTail.Match(t.text);
+            if (!m.Success) return;
+            bool cn = ReadLanguage() == "cn";
+            string name, key = m.Groups[3].Value;
+            if (key == "CustomIcon") name = (cn ? "自订图示 " : "自訂圖示 ") + m.Groups[4].Value;
+            else if (!(cn ? TriggerCn : TriggerZh).TryGetValue(key, out name) || m.Groups[4].Value != "") return;
+            t.text = t.text.Substring(0, m.Index) + m.Groups[1].Value + " " + name;
+        }
+        catch (Exception ex) { Debug.Log("[WSZH] mulligan trigger failed: " + ex.Message); mulliganAt += 1e9f; }
+    }
+
+    // 找漏翻：遊戲資料夾裡有 wszh_collect.txt 時，每秒掃一次畫面上的文字，英文句子記到 WSZH_英文殘留.txt
+    static readonly bool Collect = File.Exists(Path.Combine(Path.GetDirectoryName(Application.dataPath), "wszh_collect.txt"));
+    static readonly System.Text.RegularExpressions.Regex EnglishRun = new System.Text.RegularExpressions.Regex(@"[A-Za-z']{2,}(?:[ ,]+[A-Za-z']{2,}){2,}");
+    static readonly System.Text.RegularExpressions.Regex ShortLabel = new System.Text.RegularExpressions.Regex(@"^[A-Z][A-Za-z]{2,}(?: [A-Za-z]{2,})?[.!?]*$");   // 按鈕這類 1～2 個字的
+    readonly HashSet<string> collected = new HashSet<string>();
+    HashSet<string> seenBefore = new HashSet<string>(), seenNow = new HashSet<string>();
+    float collectAt;
+    void CollectEnglish(string scene)
+    {
+        if (Time.realtimeSinceStartup < collectAt) return;
+        collectAt = Time.realtimeSinceStartup + 1f;
+        try
+        {
+            var found = new List<string>();
+            var texts = FindObjectsOfType<TMP_Text>().Select(t => new KeyValuePair<Component, string>(t, t.text))
+                .Concat(FindObjectsOfType<UnityEngine.UI.Text>().Select(t => new KeyValuePair<Component, string>(t, t.text)));
+            foreach (var kv in texts)
+            {
+                if (string.IsNullOrEmpty(kv.Value) || !kv.Key.gameObject.activeInHierarchy) continue;
+                string plain = System.Text.RegularExpressions.Regex.Replace(kv.Value, "<[^>]*>", "");
+                foreach (string line in plain.Split('\n'))
+                {
+                    if (!EnglishRun.IsMatch(line) && !ShortLabel.IsMatch(line.Trim())) continue;
+                    string key = kv.Key.name + "\t" + line.Trim();
+                    seenNow.Add(key);
+                    // 連續兩次掃到才記（翻譯外掛會晚一兩個畫格才換成中文，剛出現的那一下不算）
+                    if (seenBefore.Contains(key) && collected.Add(key)) found.Add(scene + "\t" + key + "\t" + kv.Value.Replace("\n", "\\n"));
+                }
+            }
+            var swap = seenBefore; seenBefore = seenNow; seenNow = swap; seenNow.Clear();
+            if (found.Count > 0)
+                File.AppendAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), "WSZH_英文殘留.txt"), string.Join("\n", found.ToArray()) + "\n", new System.Text.UTF8Encoding(false));
+        }
+        catch (Exception ex) { Debug.Log("[WSZH] collect failed: " + ex.Message); collectAt += 30f; }
+    }
+
+    // 連線預覽的單機測試：遊戲資料夾裡有 wszh_synctest.txt 時，對戰中的預覽一律改走連線的翻譯流程
+    static readonly bool SyncTest = File.Exists(Path.Combine(Path.GetDirectoryName(Application.dataPath), "wszh_synctest.txt"));
+    static System.Reflection.FieldInfo fViewDeck;
+    static System.Reflection.MethodInfo mPreview;
+    string syncTestShown;
+    static string EnglishPreview(object deckCard)
+    {
+        if (deckCard == null) return null;
+        try
+        {
+            if (mPreview == null) mPreview = deckCard.GetType().GetMethod("GetCardPreviewText", Any, null, Type.EmptyTypes, null);
+            if (mPreview == null) return null;
+            WszhCardText.Bypass = true;
+            try { return mPreview.Invoke(deckCard, null) as string; }
+            finally { WszhCardText.Bypass = false; }
+        }
+        catch { return null; }
     }
 
     static readonly string[][] ReplayStates = {

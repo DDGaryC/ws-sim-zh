@@ -33,3 +33,103 @@ View Opponent's Deck=查看對手的牌庫
 Flip Opponent's Stock=翻開對手的能量區
 Viewing your remaining deck.=正在查看你剩下的牌庫。
 Viewing your opponent's remaining deck.=正在查看對手剩下的牌庫。
+STS 8雙魂 already exists. Are you sure you want to overwrite it?\n=STS 8雙魂 已經存在，確定要覆蓋嗎？
+Choose 1 cards from your waiting room to send=請從休息室選擇 1 張卡（支付費用）
+Look at up to 4 cards=查看最多 4 張卡
+Opponent used the act ability of "Bearing the Name Hervor" Renka.=對手發動了 "Bearing the Name Hervor" Renka. 的起動能力
+Choose a slot to place The Moment of Dawn, Wraith in.=請選擇放置 The Moment of Dawn, Wraith 的位置。
+Game complete. Inspect the final board, or use Quit / Reset to leave.=對戰結束。可以查看最後的場面，或按「結束」／「重開」離開。
+Choose a slot to place The Great Bargain Sale War, Iris in.=請選擇放置 The Great Bargain Sale War, Iris 的位置。
+Choose a slot to place Moon Shadow, Cosette in.=請選擇放置 Moon Shadow, Cosette 的位置。
+Choose a slot to place Joint Investigation in Cangwu City, Shimiao in.=請選擇放置 Joint Investigation in Cangwu City, Shimiao 的位置。
+Your card data may be out of date.\n\nLast update run: 10月 30, 2026 12:36 上午 local\nLatest repo commit: 10月 31, 2026 6:31 上午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：10月 30, 2026 12:36 上午 local\n\n最新版本：10月 31, 2026 6:31 上午 local\n\n\n\n要前往設定進行更新嗎？
+Standby: <sprite name\="mini_standby"/> Choose up to 1 character in your waiting room whose level is less than or equal to your level plus one, and place it on any position of your stage rested.=<sprite name\="mini_standby"/>【開機】最多選擇 1 張休息室中等級小於等於「你的等級 +1」的角色，以橫置狀態放置到舞台上任一位置。
+Standby: <sprite name\="mini_standby"/> Choose up to 1 level X or lower character in your waiting room to place onto your stage rested.=<sprite name\="mini_standby"/>【開機】最多選擇 1 張休息室中等級 X 以下的角色，以橫置狀態放置到舞台上。
+Choose a slot to place Spearhead of Rumors, Mistique in.=請選擇放置 Spearhead of Rumors, Mistique 的位置。
+Choose a slot to place Footprints Etched in The Snow, Fuyuka in.=請選擇放置 Footprints Etched in The Snow, Fuyuka 的位置。
+Counter Step: 15=反擊階段：15
+Counter Step: 14=反擊階段：14
+Counter Step: 13=反擊階段：13
+Counter Step: 12=反擊階段：12
+Choose a slot to place The Unrivaled Strength, Fuyuka in.=請選擇放置 The Unrivaled Strength, Fuyuka 的位置。
+Choose a slot to place Long Night Without Light, Otoha in.=請選擇放置 Long Night Without Light, Otoha 的位置。
+Choose a slot to place The Rabbit who Precedes the Waves, Shia in.=請選擇放置 The Rabbit who Precedes the Waves, Shia 的位置。
+<b>Started:</b>\nAug 12, 2026 11:29 AM=<b>開始時間：</b>\nAug 12, 2026 11:29 AM
+<b>Ended:</b>\nAug 12, 2026 11:35 AM=<b>結束時間：</b>\nAug 12, 2026 11:35 AM
+<b>Duration:</b> 0h 6m 16s=<b>對戰時長：</b> 0h 6m 16s
+<sprite name\="mini_soul"/> Triggered=<sprite name\="mini_soul"/> 判定
+<sprite name\="mini_soul"/><sprite name\="mini_soul"/> Triggered=<sprite name\="mini_soul"/><sprite name\="mini_soul"/> 判定
+<sprite name\="mini_book"/> Triggered=<sprite name\="mini_book"/> 判定
+<sprite name\="mini_bounce"/> Triggered=<sprite name\="mini_bounce"/> 判定
+<sprite name\="mini_door"/> Triggered=<sprite name\="mini_door"/> 判定
+<sprite name\="mini_bar"/> Triggered=<sprite name\="mini_bar"/> 判定
+<sprite name\="mini_shot"/> Triggered=<sprite name\="mini_shot"/> 判定
+<sprite name\="mini_gate"/> Triggered=<sprite name\="mini_gate"/> 判定
+<sprite name\="mini_choice"/> Triggered=<sprite name\="mini_choice"/> 判定
+<sprite name\="mini_standby"/> Triggered=<sprite name\="mini_standby"/> 判定
+<sprite name\="mini_bag"/> Triggered=<sprite name\="mini_bag"/> 判定
+<sprite name\="mini_focus"/> Triggered=<sprite name\="mini_focus"/> 判定
+<sprite name\="mini_discovery"/> Triggered=<sprite name\="mini_discovery"/> 判定
+<sprite name\="mini_chance"/> Triggered=<sprite name\="mini_chance"/> 判定
+<b>Started:</b>\nJan 1, 1970 8:00 AM=<b>開始時間：</b>\nJan 1, 1970 8:00 AM
+<b>Ended:</b>\nJan 1, 1970 8:00 AM=<b>結束時間：</b>\nJan 1, 1970 8:00 AM
+<b>Duration:</b> 0h 0m 0s=<b>對戰時長：</b> 0h 0m 0s
+<b>Started:</b>\nOct 31, 2026 7:20 PM=<b>開始時間：</b>\nOct 31, 2026 7:20 PM
+<b>Ended:</b>\nOct 31, 2026 7:28 PM=<b>結束時間：</b>\nOct 31, 2026 7:28 PM
+<b>Duration:</b> 0h 8m 27s=<b>對戰時長：</b> 0h 8m 27s
+Replay=重播
+<b>Started:</b>\nOct 31, 2026 7:11 PM=<b>開始時間：</b>\nOct 31, 2026 7:11 PM
+<b>Ended:</b>\nOct 31, 2026 7:20 PM=<b>結束時間：</b>\nOct 31, 2026 7:20 PM
+<b>Duration:</b> 0h 8m 51s=<b>對戰時長：</b> 0h 8m 51s
+Both players ready. Starting in 2s...=雙方都已準備，2 秒後開始…
+Both players ready. Starting in 1s...=雙方都已準備，1 秒後開始…
+Both players ready. Starting in 0s...=雙方都已準備，0 秒後開始…
+Opponent used the act ability of "To you who are yet to be born" Spica.=對手發動了 "To you who are yet to be born" Spica. 的起動能力
+Opponent must discard down to 7 cards.=對手必須把手牌丟棄到剩 7 張。
+Counter Step: 11=反擊階段：11
+Counter Step: 10=反擊階段：10
+Counter Step: 9=反擊階段：9
+Counter Step: 8=反擊階段：8
+Counter Step: 7=反擊階段：7
+Counter Step: 6=反擊階段：6
+Rematch=再來一場
+Inspect Board=查看場面
+Your card data may be out of date.\n\nLast update run: 10月 31, 2026 6:40 下午 local\nLatest repo commit: 10月 31, 2026 8:24 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：10月 31, 2026 6:40 下午 local\n\n最新版本：10月 31, 2026 8:24 下午 local\n\n\n\n要前往設定進行更新嗎？
+STS 4金磚4城門-2 already exists. Are you sure you want to overwrite it?\n=STS 4金磚4城門-2 已經存在，確定要覆蓋嗎？
+Opponent refreshed with 3 climax. <b>(View)</b>=對手洗牌重整，其中有 3 張名場面卡。 <b>（查看）</b>
+Opponent used the act ability of Sightseeing in Miyazaki, Aqua & Akane Kurokawa.=對手發動了 Sightseeing in Miyazaki, Aqua & Akane Kurokawa. 的起動能力
+You refreshed with 8 climax. <b>(View)</b>=你洗牌重整，其中有 8 張名場面卡。 <b>（查看）</b>
+Opponent refreshed with 6 climax. <b>(View)</b>=對手洗牌重整，其中有 6 張名場面卡。 <b>（查看）</b>
+You refreshed with 6 climax. <b>(View)</b>=你洗牌重整，其中有 6 張名場面卡。 <b>（查看）</b>
+A newer version of the simulator is available: 0.7.9.6\nYou are currently running 0.7.9.5.\n\nUpdate now? The game will close and restart when the update is complete.=有新版本的模擬器可以更新：0.7.9.6\n\n你目前的版本是 0.7.9.5。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
+<b>Started:</b>\nNov 1, 2026 1:59 AM=<b>開始時間：</b>\nNov 1, 2026 1:59 AM
+<b>Ended:</b>\nNov 1, 2026 2:13 AM=<b>結束時間：</b>\nNov 1, 2026 2:13 AM
+<b>Duration:</b> 0h 13m 44s=<b>對戰時長：</b> 0h 13m 44s
+50 cards | Five independent shuffled decks=50 張｜5 副各自洗好的牌庫
+1 to discard | 4 to keep=換掉 1 張｜保留 4 張
+Mulligan 1=換掉 1 張
+2 to discard | 3 to keep=換掉 2 張｜保留 3 張
+Mulligan 2=換掉 2 張
+Discarding 1...=正在換掉 1 張...
+Drawing 1 replacement...=正在抽 1 張補牌...
+Final hand | Kept 4 / Drew 1\n44 in deck | 1 in waiting room=最後手牌｜保留 4 張／補抽 1 張\n牌庫 44 張｜休息室 1 張
+3 to discard | 2 to keep=換掉 3 張｜保留 2 張
+Mulligan 3=換掉 3 張
+Discarding 3...=正在換掉 3 張...
+Drawing 3 replacements...=正在抽 3 張補牌...
+Final hand | Kept 2 / Drew 3\n42 in deck | 3 in waiting room=最後手牌｜保留 2 張／補抽 3 張\n牌庫 42 張｜休息室 3 張
+HAND 1=第 1 手
+HAND 2=第 2 手
+HAND 3=第 3 手
+HAND 4=第 4 手
+HAND 5=第 5 手
+Character | Level 3 | Cost 2\nGreen | Soul=角色｜等級 3｜費用 2\n綠｜判定 Soul
+Character | Level 0 | Cost 0\nBlue | None=角色｜等級 0｜費用 0\n藍｜判定 None
+Final hand | Kept 5 / Drew 0\n45 in deck | 0 in waiting room=最後手牌｜保留 5 張／補抽 0 張\n牌庫 45 張｜休息室 0 張
+Character | Level 2 | Cost 1\nGreen | None=角色｜等級 2｜費用 1\n綠｜判定 None
+Character | Level 2 | Cost 1\nGreen | Soul=角色｜等級 2｜費用 1\n綠｜判定 Soul
+Character | Level 3 | Cost 2\nBlue | Soul=角色｜等級 3｜費用 2\n藍｜判定 Soul
+Character | Level 1 | Cost 0\nGreen | None=角色｜等級 1｜費用 0\n綠｜判定 None
+Climax | Level 0 | Cost 0\nBlue | Gate=名場面｜等級 0｜費用 0\n藍｜判定 Gate
+Character | Level 0 | Cost 0\nGreen | None=角色｜等級 0｜費用 0\n綠｜判定 None
+Climax | Level 0 | Cost 0\nGreen | Bar=名場面｜等級 0｜費用 0\n綠｜判定 Bar
