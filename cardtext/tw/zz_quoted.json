@@ -2077,6 +2077,13 @@
 "Auto: When this card attacks, perform the trigger check twice during this attack. If you triggered twice, put the top card of your Stock to Waiting Room.": "【自】這張卡攻擊時，那次攻擊中，判定步驟時進行 2 次判定。進行了 2 次的話，將你能量區最上面的 1 張卡放置到休息室。",
 "Look at up to 2 cards from the top of your deck, choose up to 2 <Quintuplets> characters from among them, show them to your opponent, add them to hand, and send the rest to Waiting Room.": "查看你牌庫頂最多 2 張卡，從中選擇最多 2 張《Quintuplets》角色，給對手看之後加入手牌，其餘的放置到休息室。",
 "Your opponent sends all of their Stock to their deck and shuffles their deck, then puts an equal number of cards from the top of their deck into Stock.": "對手將自己能量區的所有卡放回牌庫並將牌庫洗牌，然後將自己牌庫頂相同數量的卡放置到能量區。",
+"Auto: [(1)] When this card attacks, you may pay the cost, if you do, during that attack, perform a trigger check 2 times on the trigger step.": "【自】[(1)]這張卡攻擊時，你可以支付費用，支付的話，那次攻擊中，在判定步驟進行 2 次判定。",
+"Auto: ENCORE [Put 1 <Tankery> character from your hand into the waiting room]": "【自】【再演】[將你手牌中的 1 張《Tankery》角色放置到休息室]",
+"Draw up a card.": "抽 1 張卡。",
+"Choose up to 1 of your opponent's characters, and return it to their hand.": "選擇對手最多 1 張角色，返回對手的手牌。",
+"Look at the top card of your deck, and put it either on top or bottom of your deck or into your waiting room, your opponent puts all of their stock into their waiting room, and puts the same number of cards from the top of their deck into their stock.": "查看你牌庫頂的 1 張卡，放置到牌庫頂或牌庫底或休息室，對手將自己能量區的所有卡放置到休息室，並將自己牌庫頂相同數量的卡放置到能量區。",
+"Choose up to 2 <Tankery> characters in your waiting room, and return them to your hand.": "選擇你休息室最多 2 張《Tankery》角色，返回手牌。",
+"Act: [Send this card to waiting room] Choose 1 \"Unpredictable behavior, Hanma\" in your waiting room, and put it in the stage position that this card was in.": "【起】[將這張卡放置到休息室]選擇你休息室的 1 張「Unpredictable behavior, Hanma",
 "Choose order to resolve effects:": "請選擇效果處理的順序：",
 "Use this effect now?": "現在要使用這個效果嗎？",
 "Pay the cost and use this effect?": "要支付費用並使用這個效果嗎？"

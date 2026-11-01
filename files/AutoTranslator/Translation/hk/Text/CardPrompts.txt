@@ -5566,3 +5566,47 @@ Choose one of the following effects and perform it,\n1. "Look at up to 2 cards f
 Choose one of the following effects and perform it,\n1. "Look at up to 2 cards from the top of your deck, choose up to 2 «Quintuplets» characters from among them, show them to your opponent, add them to hand, and send the rest to Waiting Room."\n2. "Your opponent sends all of their Stock to their deck and shuffles their deck, then puts an equal number of cards from the top of their deck into Stock."=請選擇以下其中一個效果並執行，\n1. 「查看你牌庫頂最多 2 張卡，從其中選擇最多 2 張《Quintuplets》角色，給對手看之後加入手牌，其餘的放置到控制室。」\n2. 「你的對手將自己費用區的所有卡放回牌庫並將牌庫洗牌，然後從牌庫頂將相同數量的卡放置到費用區。」
 Choose up to 2 <Quintuplets> characters to add to your hand=請選擇最多 2 張《Quintuplets》角色加入你的手牌
 Choose up to 2 «Quintuplets» characters to add to your hand=請選擇最多 2 張《Quintuplets》角色加入你的手牌
+Choose up to 1 <Tankery> characters=請選擇最多 1 張《Tankery》角色
+Choose up to 1 «Tankery» characters=請選擇最多 1 張《Tankery》角色
+Choose up to 2 <Tankery> characters=請選擇最多 2 張《Tankery》角色
+Choose up to 2 «Tankery» characters=請選擇最多 2 張《Tankery》角色
+Choose a <Tankery> character to put in hand.=請選擇 1 張《Tankery》角色加入手牌。
+Choose a «Tankery» character to put in hand.=請選擇 1 張《Tankery》角色加入手牌。
+Send this card to the waiting room? (Press no to leave it on the bottom.)=要將這張卡放置到控制室嗎？（按「否」則留在最下面。）
+Choose an effect \n1. Draw and discard a card \n2. Give another <AUGUST> character a soul=請選擇效果 \n1. 抽 1 張卡，然後捨棄 1 張卡 \n2. 給予另 1 張《AUGUST》角色 1 點魂
+Choose an effect \n1. Draw and discard a card \n2. Give another «AUGUST» character a soul=請選擇效果 \n1. 抽 1 張卡，然後捨棄 1 張卡 \n2. 給予另 1 張《AUGUST》角色 1 點魂
+Choose 1 of your "Joker: Amnesia?" to gain this ability.=請選擇你的 1 張「Joker: Amnesia?」獲得這個能力。
+Choose 1 of your "Harley Quinn: Amnesia?" to gain this ability.=請選擇你的 1 張「Harley Quinn: Amnesia?」獲得這個能力。
+Choose 1 of your "Batman Ninja" to give +2000 power and cannot be chosen by your opponent's effects.=請選擇你的 1 張「Batman Ninja」，給予戰力 +2000 和不能被對手的效果選擇。
+Return your waiting room to your deck, put up to 1 matching character in this card's former position, and shuffle.|Return a clock card to hand, then put the top card of your deck into your clock.=將你的控制室返回牌庫，將最多 1 張相符的角色放置到這張卡原本的位置，然後洗牌。|將 1 張傷害區的卡返回手牌，然後將你牌庫頂的 1 張卡放置到傷害區。
+Put a Sakura character from hand on stage and give it +3500 power and Costume until the end of your opponent's next turn.=從手牌將 1 張 Sakura 角色放置到舞台，並給予戰力 +3500 和 Costume，直到對手的下個回合結束為止。
+Recover up to 1 Transparent Feelings and reveal your top card for a possible +4000 power and Costume.=回收最多 1 張 Transparent Feelings，並公開你牌庫頂的 1 張卡，可能獲得戰力 +4000 和 Costume。
+Choose up to 2 of your characters to gain +4000 power and Costume.=請選擇你最多 2 張角色，獲得戰力 +4000 和 Costume。
+Choose a character in battle that cannot deal damage.=請選擇 1 張戰鬥中無法造成傷害的角色。
+Choose a level 0 or lower character to put into stock=請選擇 1 張等級 0 以下的角色放置到費用區
+Choose 1 "I'm Boko!" to put into your hand or your stock=請選擇 1 張「I'm Boko!」加入手牌或放置到費用區
+Choose 1 of the following 2 effect and perform it.\n1: Look at up to 3 cards from the top of your deck, and put them on the top of your deck in any order, your opponent puts all of their stock into their waiting room, and puts the same number of cards from the top of their deck into their stock.\n2: [<sprite name\="1cost"/> Put 1 card from your hand into your waiting room] You may pay the cost. If you do, deal 3 damage to your opponent.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂最多 3 張卡，以任意順序放回牌庫頂，對手將其費用區全部放置到控制室，並將牌庫頂相同張數的卡放置到費用區。\n2：[<sprite name\="1cost"/> 將 1 張手牌放置到控制室]你可以支付費用。支付的話，給予對手 3 點傷害。
+Choose a <Tankery> character to put into stock=請選擇 1 張《Tankery》角色放置到費用區
+Choose a «Tankery» character to put into stock=請選擇 1 張《Tankery》角色放置到費用區
+Choose up to X cards to return to your opponent's deck.=請選擇最多 X 張卡返回對手的牌庫。
+Choose 1 <Tankery> character to put into your stock.=請選擇 1 張《Tankery》角色放置到你的費用區。
+Choose 1 «Tankery» character to put into your stock.=請選擇 1 張《Tankery》角色放置到你的費用區。
+Place this card to your opponent's waiting room? (Press no to return it to the top)=要將這張卡放置到對手的控制室嗎？（按「否」則放回牌庫頂）
+Choose 1 of the following 2 effect and perform it.\n1: Draw up a card.\n2: Choose up to 1 of your opponent's characters, and return it to their hand.=請從以下 2 個效果中選擇 1 個並執行。\n1：抽 1 張卡。\n2：選擇對手最多 1 張角色，返回其手牌。
+Put 1 "Kay & M4 Sherman with 75mm gun" from your hand into waiting room=將 1 張「Kay ＆ M4 Sherman with 75mm gun」從你的手牌放置到控制室
+Choose up to 2 characters to put in hand.=請選擇最多 2 張角色加入手牌。
+Choose 1 of the following 2 effect and perform it.\n1: Look at the top card of your deck, and put it either on top or bottom of your deck or into your waiting room, your opponent puts all of their stock into their waiting room, and puts the same number of cards from the top of their deck into their stock.\n2: Choose up to 2 <Tankery> characters in your waiting room, and return them to your hand.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂的 1 張卡，放到牌庫頂、牌庫底或控制室，對手將其費用區全部放置到控制室，並將牌庫頂相同張數的卡放置到費用區。\n2：選擇你控制室中最多 2 張《Tankery》角色，返回手牌。
+Choose 1 of the following 2 effect and perform it.\n1: Look at the top card of your deck, and put it either on top or bottom of your deck or into your waiting room, your opponent puts all of their stock into their waiting room, and puts the same number of cards from the top of their deck into their stock.\n2: Choose up to 2 «Tankery» characters in your waiting room, and return them to your hand.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂的 1 張卡，放到牌庫頂、牌庫底或控制室，對手將其費用區全部放置到控制室，並將牌庫頂相同張數的卡放置到費用區。\n2：選擇你控制室中最多 2 張《Tankery》角色，返回手牌。
+Choose up to 2 <Tankery> characters to return to your hand=請選擇最多 2 張《Tankery》角色返回手牌
+Choose up to 2 «Tankery» characters to return to your hand=請選擇最多 2 張《Tankery》角色返回手牌
+Choose up to 4 <Tankery> characters=請選擇最多 4 張《Tankery》角色
+Choose up to 4 «Tankery» characters=請選擇最多 4 張《Tankery》角色
+Choose 1 of the following 2 effect and perform it.\n1: Look at up to 5 cards from the top of your deck, choose up to 2 <Tankery> character to add to your hand, and put the rest into the waiting room.\n2: Choose 1 climax with <sprite name\="mini_door"/> trigger in your waiting room, return it to your hand.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂最多 5 張卡，選擇最多 2 張《Tankery》角色加入手牌，其餘的放置到控制室。\n2：選擇你控制室中 1 張有 <sprite name\="mini_door"/> 判定圖示的名場面，返回手牌。
+Choose 1 of the following 2 effect and perform it.\n1: Look at up to 5 cards from the top of your deck, choose up to 2 «Tankery» character to add to your hand, and put the rest into the waiting room.\n2: Choose 1 climax with <sprite name\="mini_door"/> trigger in your waiting room, return it to your hand.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂最多 5 張卡，選擇最多 2 張《Tankery》角色加入手牌，其餘的放置到控制室。\n2：選擇你控制室中 1 張有 <sprite name\="mini_door"/> 判定圖示的名場面，返回手牌。
+Choose 1 of the following 2 effect and perform it.\n1: Look at up to 3 cards from the top of your deck. Choose up to 1 card from among them, put it into your hand, and put the rest into your waiting room.\n2: You may put the top card of your clock in the waiting room.=請從以下 2 個效果中選擇 1 個並執行。\n1：查看你牌庫頂最多 3 張卡，從中選擇最多 1 張加入手牌，其餘的放置到控制室。\n2：你可以將你傷害區最上方的 1 張卡放置到控制室。
+Choose a "Almost Complete, Mei Yoneme" to play on stage=請選擇 1 張「Almost Complete, Mei Yoneme」放置到舞台
+Choose 1 of your other <Music> characters to give the ability.=請選擇你其他的 1 張《Music》角色，給予這個能力。
+Choose 1 of your other «Music» characters to give the ability.=請選擇你其他的 1 張《Music》角色，給予這個能力。
+Choose 1  "A World Beginning to Take Color" or climax to add to your hand.=請選擇 1 張「A World Beginning to Take Color」或名場面加入手牌。
+Choose a level 0 or lower character to return to your opponent's hand?=請選擇 1 張等級 0 以下的角色返回對手的手牌？
+Choose 2 characters to give effects to.=請選擇 2 張角色給予效果。

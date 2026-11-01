@@ -205,3 +205,4 @@ Yuuna's Haunted Hotspring	搖曳莊的幽奈小姐|幽奈小姐|摇曳庄的幽�
 Zombie Land Saga	佐賀偶像是傳奇|殭屍樂園|佐贺偶像是传奇|僵尸乐园
 anemoi	anemoi
 sprite	sprite
+Girls und Panzer	少女戰車|少女战车

@@ -61,6 +61,16 @@ def card_effects():
                 for part in m.group(1).split(BS):
                     part = part.strip()
                     if part and re.search(r'[A-Za-z]{3}', part): lines.setdefault(part, (cur, folder))
+    # 遊戲用共用範本組出來的效果（卡片資料只寫 *GivePowerOnPlay(3000,Tankery) 這種），卡片資料裡沒有原文：
+    # 在遊戲主選單按 Ctrl+Shift+F12 會把所有卡實際的效果文字倒到 CardText_dump.tsv（卡號<Tab>系列<Tab>效果，換行寫成 \n）
+    dump = os.path.join(SIM, 'CardText_dump.tsv')
+    if os.path.exists(dump):
+        for line in open(dump, encoding='utf-8', errors='ignore'):
+            p = line.rstrip('\n').split('\t', 2)
+            if len(p) < 3: continue
+            for part in p[2].split('\\n'):
+                part = part.strip()
+                if part and re.search(r'[A-Za-z]{3}', part): lines.setdefault(part, (p[0], p[1]))
     return lines
 
 

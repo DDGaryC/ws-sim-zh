@@ -20,7 +20,7 @@ class Effect
     public bool YesNo, Choice;   // 效果裡有「是／否」的詢問、有多選一的詢問
     public string Timing = "";   // 發動時機（Auto: 後面那個字，例如 OnAttack）
     public int LookUpTo;         // 效果會從自己牌庫頂「看／翻最多幾張」（0＝沒有）
-    public bool CostStage;       // 費用要把自己場上的其他角色送走（進休息室、回想區…）
+    public bool CostStage;       // 費用要把自己場上的其他角色送走（進休息室、思出區…）
 }
 
 class CardInfo
@@ -475,8 +475,8 @@ static class Defs
         new CondKey{Key="OnStage",Label="場上的張數：",Expr="CountCards(Stage,{0})",NeedCard=true},
         new CondKey{Key="InHandStage",Label="手牌＋場上的張數：",Expr="CountCards(Hand,{0}) + CountCards(Stage,{0})",NeedCard=true},
         new CondKey{Key="InWR",Label="休息室的張數：",Expr="CountCards(WaitingRoom,{0})",NeedCard=true},
-        new CondKey{Key="InMemory",Label="回想區的張數：",Expr="CountCards(Memory,{0})",NeedCard=true},
-        new CondKey{Key="InWRMem",Label="休息室＋回想區的張數：",Expr="CountCards(WaitingRoom,{0}) + CountCards(Memory,{0})",NeedCard=true},
+        new CondKey{Key="InMemory",Label="思出區的張數：",Expr="CountCards(Memory,{0})",NeedCard=true},
+        new CondKey{Key="InWRMem",Label="休息室＋思出區的張數：",Expr="CountCards(WaitingRoom,{0}) + CountCards(Memory,{0})",NeedCard=true},
         new CondKey{Key="InDeck",Label="牌庫中的張數：",Expr="CountCards(Deck,{0})",NeedCard=true},
         new CondKey{Key="InStock",Label="能量區的張數：",Expr="CountCards(Stock,{0})",NeedCard=true},
         new CondKey{Key="OppStage",Label="對手場上的張數：",Expr="CountCards(OpponentStage,{0})",NeedCard=true},
@@ -514,7 +514,7 @@ static class Defs
     // 目標偏好可以限定區域，存成「@區域|卡名或類別」
     public static readonly List<string[]> Zones = new List<string[]> {
         new[]{"","任何地方"}, new[]{"Hand","手牌裡的"}, new[]{"Clock","傷害區的"}, new[]{"WaitingRoom","休息室的"}, new[]{"Deck","牌庫的"},
-        new[]{"Stock","能量區的"}, new[]{"CenterStage","前列的"}, new[]{"BackStage","後列的"}, new[]{"Stage","場上的"}, new[]{"Level","等級區的"}, new[]{"Memory","回想區的"} };
+        new[]{"Stock","能量區的"}, new[]{"CenterStage","前列的"}, new[]{"BackStage","後列的"}, new[]{"Stage","場上的"}, new[]{"Level","等級區的"}, new[]{"Memory","思出區的"} };
     public static void SplitZone(string k, out string zone, out string key)
     {
         zone = ""; key = k ?? "";
@@ -1372,8 +1372,8 @@ static class Defaults
             if (c.IsChar)
             {
                 // 連動：要是「這張卡自己的」自動／起動效果提到名場面才算。
-                // 卡片資料的 Combo 欄位也會列出只是「給別人能力」的相關卡（例如回想區支援），那種不算連動攻擊手
-                // 在休息室／回想區／手牌才發動的連動（例如「這張卡在休息室時，名場面打出就放進回想區」）也不算
+                // 卡片資料的 Combo 欄位也會列出只是「給別人能力」的相關卡（例如思出區支援），那種不算連動攻擊手
+                // 在休息室／思出區／手牌才發動的連動（例如「這張卡在休息室時，名場面打出就放進思出區」）也不算
                 var own = c.Effects.Where(e => (e.Cat == "Auto" || e.Cat == "Act") && e.Text != "").Select(e => e.Text)
                     .Where(t => t.IndexOf("this card is in your waiting room", StringComparison.OrdinalIgnoreCase) < 0
                              && t.IndexOf("this card is in your memory", StringComparison.OrdinalIgnoreCase) < 0

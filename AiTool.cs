@@ -411,7 +411,7 @@ class MainForm : Form
     List<Item> cardItems = new List<Item>(), groupItems = new List<Item>();
 
     TextBox txtName;
-    FlatButton btnSave, btnPreview, btnDeck, btnOpen, btnSwap;
+    FlatButton btnSave, btnPreview, btnDeck, btnOpen, btnSwap, btnTrace;
     Panel navHost; NavList nav;
     FlowLayoutPanel pageHost;
     Label toast; Timer toastTimer;
@@ -439,17 +439,19 @@ class MainForm : Form
         btnDeck = new FlatButton("開新 AI"); btnOpen = new FlatButton("開啟");
         btnPreview = new FlatButton("預覽腳本"); btnSave = new FlatButton("儲存並安裝到遊戲", 150) { Primary = true };
         btnSwap = new FlatButton("換牌組");
+        btnTrace = new FlatButton("讀取 AI 紀錄") { Ghost = true };
+        btnTrace.Click += delegate { using (var f = new TraceForm(root)) f.ShowDialog(this); };
         btnSwap.Click += delegate { ChangeDeck(); };
         btnDeck.Click += delegate { NewFromDeck(); };
         btnOpen.Click += delegate { OpenExisting(); };
         btnPreview.Click += delegate { Preview(); };
         btnSave.Click += delegate { SaveAndInstall(); };
-        head.Controls.AddRange(new Control[] { title, lblName, txtName, btnDeck, btnOpen, btnSwap, btnPreview, btnSave });
+        head.Controls.AddRange(new Control[] { title, lblName, txtName, btnDeck, btnOpen, btnSwap, btnPreview, btnSave, btnTrace });
         head.Resize += delegate
         {
             int x = head.Width - 20;
-            foreach (var b in new[] { btnSave, btnPreview, btnSwap, btnOpen, btnDeck }) { x -= b.Width; b.Location = new Point(x, 15); x -= 8; }
-            txtName.Width = Math.Max(120, Math.Min(260, btnDeck.Left - 16 - txtName.Left));
+            foreach (var b in new[] { btnSave, btnPreview, btnSwap, btnOpen, btnDeck, btnTrace }) { x -= b.Width; b.Location = new Point(x, 15); x -= 8; }
+            txtName.Width = Math.Max(120, Math.Min(260, btnTrace.Left - 16 - txtName.Left));
         };
         Controls.Add(head);
 
@@ -1338,6 +1340,7 @@ static class Program
         Application.SetCompatibleTextRenderingDefault(false);
         if (args.Length >= 4 && args[0] == "--selftest") return SelfTest(args[1], args[2], args[3]);
         if (args.Length >= 2 && args[0] == "/reinstall") return Reinstall(args[1]);
+        if (args.Length >= 3 && args[0] == "/tracedump") { TraceForm.Dump(args[1], args[2]); return 0; }   // 檢查用：把 AI 紀錄的解說輸出成文字檔
         string root = args.Length > 0 && Directory.Exists(args[0]) ? args[0] : FindRoot();
         if (root == null)
         {

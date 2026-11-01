@@ -7,6 +7,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -53,7 +54,7 @@ public static class WszhCardText
     {
         try
         {
-            if (string.IsNullOrEmpty(str) || Bypass) return str;
+            if (string.IsNullOrEmpty(str) || Bypass || (TestEnglish && allow == 0)) return str;
             string lang = CurrentLanguage();
             if (lang != loadedLang) Load(lang);
             if (map.Count == 0) return str;
@@ -117,6 +118,9 @@ public static class WszhCardText
         "Fusion", "Inheritance", "Resonate", "Memory", "Experience", "Change", "Assist", "Inspire", "Boarding", "Recollection" };
     static string syncedIn, syncedOut;
     public static bool Bypass;          // 測試用：暫時不翻譯（模擬英文版主機組出來的預覽）
+    // 單機測試連線（遊戲資料夾有 wszh_synctest.txt）：除了 Remote／TranslateSynced 裡面，一律不翻，模擬英文版主機
+    static readonly bool TestEnglish = File.Exists(Path.Combine(Path.GetDirectoryName(Application.dataPath), "wszh_synctest.txt"));
+    static int allow;
     static System.Reflection.MethodInfo enrich;
 
     public static string TranslateSynced(object card, string shown)
@@ -125,17 +129,70 @@ public static class WszhCardText
         {
             if (map.Count == 0 || card == null || string.IsNullOrEmpty(shown)) return null;
             if (shown == syncedIn) return syncedOut;
-            string s = shown.StartsWith("<align=left>") ? shown.Substring(12) : shown;
-            foreach (var p in Unenrich) s = s.Replace(p[0], p[1]);
-            foreach (var w in BoldWords) s = s.Replace("<b>" + w + "</b>", w.ToUpperInvariant());
-            s = Regex.Replace(s, "<b>(\"[^\"]*\")</b>", "$1");           // 名場面連動的卡名
-            s = Regex.Replace(s, "«([^«»\n]+)»", "<$1>");
             if (enrich == null) enrich = card.GetType().GetMethod("EnrichenText", new[] { typeof(string) });
-            string r = enrich == null ? null : enrich.Invoke(card, new object[] { s }) as string;
+            string r;
+            allow++;
+            try { r = enrich == null ? null : enrich.Invoke(card, new object[] { Unenrichen(shown) }) as string; }
+            finally { allow--; }
             syncedIn = shown; syncedOut = (r != null && r != shown && HasHan(r)) ? r : null;
             return syncedOut;
         }
         catch { return null; }
+    }
+
+    // 把 EnrichenText 的結果還原成卡片資料的寫法
+    static string Unenrichen(string shown)
+    {
+        string s = shown.StartsWith("<align=left>") ? shown.Substring(12) : shown;
+        foreach (var p in Unenrich) s = s.Replace(p[0], p[1]);
+        foreach (var w in BoldWords) s = s.Replace("<b>" + w + "</b>", w.ToUpperInvariant());
+        s = Regex.Replace(s, "<b>(\"[^\"]*\")</b>", "$1");           // 名場面連動的卡名
+        s = Regex.Replace(s, "«([^«»\n]+)»", "<$1>");
+        return s;
+    }
+
+    // ---- 連線對戰：主機傳來的提示 ----
+    // 是否詢問、選項、選卡說明、誘發效果排序、起動能力清單，都是主機那台 EnrichenText 完才用 Target_ RPC 傳來；
+    // 對方是英文版時就是英文。LangPatch 在 NetworkPlayer 收到這些 RPC 的地方插入 Remote／RemoteAll，
+    // 還原後交給一張空白卡的 EnrichenText 重做（EnrichenText 只用到卡片的 combos，空白卡沒差）
+    static object blankCard;
+    static readonly Dictionary<string, string> remoteCache = new Dictionary<string, string>();
+
+    public static string Remote(string s)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(s) || HasHan(s)) return s;
+            string hit;
+            if (remoteCache.TryGetValue(s, out hit)) return hit;
+            if (blankCard == null)
+            {
+                Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("WeissCard")).FirstOrDefault(x => x != null);
+                if (t == null) return s;
+                blankCard = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(t);
+                var fc = t.GetField("combos");
+                if (fc != null) fc.SetValue(blankCard, new List<string>());
+                enrichBlank = t.GetMethod("EnrichenText", new[] { typeof(string) });
+            }
+            string r;
+            allow++;
+            try { r = enrichBlank == null ? null : enrichBlank.Invoke(blankCard, new object[] { Unenrichen(s) }) as string; }
+            finally { allow--; }
+            if (r == null || !HasHan(r)) r = s;          // 翻不到就維持原樣（翻譯外掛還有機會整句翻）
+            if (remoteCache.Count > 200) remoteCache.Clear();
+            remoteCache[s] = r;
+            if (TestEnglish && remoteLogged++ < 20) Debug.Log("[WSZH] remote: " + s.Replace("\n", "\\n") + " => " + (r == s ? "(unchanged) " + Unenrichen(s) : r));
+            return r;
+        }
+        catch (Exception ex) { if (remoteLogged++ < 20) Debug.Log("[WSZH] remote failed: " + ex); return s; }
+    }
+    static int remoteLogged;
+    static System.Reflection.MethodInfo enrichBlank;
+
+    public static void RemoteAll(string[] a)
+    {
+        if (a == null) return;
+        for (int i = 0; i < a.Length; i++) a[i] = Remote(a[i]);
     }
 
     static bool HasHan(string s) { foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return true; return false; }
@@ -241,7 +298,7 @@ public static class WszhCardText
     {
         try
         {
-            if (map.Count == 0 || string.IsNullOrEmpty(s) || Bypass || s.StartsWith("<align")) return s;
+            if (map.Count == 0 || string.IsNullOrEmpty(s) || Bypass || (TestEnglish && allow == 0) || s.StartsWith("<align")) return s;
             foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return "<align=left>" + s;
             return s;
         }

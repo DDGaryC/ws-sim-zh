@@ -1200,6 +1200,47 @@ public class WszhLang : MonoBehaviour
         catch (Exception ex) { Debug.Log("[WSZH] collect failed: " + ex.Message); collectAt += 30f; }
     }
 
+    // ---- F8 的 AI 檢查工具（AITraceInspector，0.7.9.6）----
+    // 它用 IMGUI 畫，翻譯外掛沒開 IMGUI（每幀都要攔截，太慢），所以 LangPatch 把它裡面每個字串常數都改成過一次 Ui()。
+    // 只翻表裡有的介面文字；寫進紀錄檔的字串（Match ended. 等）和程式內部用的代號不在表裡，維持原樣
+    static readonly Dictionary<string, string> UiZh = new Dictionary<string, string> {
+        { "AI Inspector (F8)", "AI 檢查 (F8)" }, { "AI Inspector - local V7 / F8 to close", "AI 檢查工具 - 本機 V7／按 F8 關閉" },
+        { "View only - recording and gameplay continue.", "僅供檢視，紀錄和對戰會繼續進行。" },
+        { "Live: latest 600 events and 20 decision histories. Full history is in JSONL; Detailed records actual evaluations.",
+          "即時：最新 600 筆事件和 20 次決策過程。完整歷史在 JSONL 檔裡；「詳細」模式才會記錄實際的評估值。" },
+        { "Capture", "紀錄" }, { "Off", "關閉" }, { "Summary", "摘要" }, { "Detailed", "詳細" }, { "Open trace folder", "開啟紀錄資料夾" },
+        { "Cannot open trace folder: ", "無法開啟紀錄資料夾：" },
+        { "Decisions", "決策" }, { "Plans / notes", "計畫／備註" }, { "Actions", "動作" }, { "Rules", "規則" }, { "All", "全部" },
+        { "Both bots", "雙方 AI" }, { "Player 1", "玩家 1" }, { "Player 2", "玩家 2" },
+        { "< Turn", "< 回合" }, { "Turn >", "回合 >" }, { "Current", "目前" }, { "All turns", "所有回合" }, { "Turn ", "回合 " },
+        { "Freeze recent view", "凍結目前畫面" }, { "Resume live view", "恢復即時畫面" }, { "Back to recent", "回到最新" },
+        { "Newer", "較新" }, { "Older", "較舊" }, { "Page ", "頁 " }, { " matching events", " 筆符合的事件" },
+        { "Decision #", "決策 #" }, { " (live evidence truncated)", "（即時紀錄已截斷）" }, { "Copy decision + scripts", "複製決策＋腳本" },
+        { "Copied decision evidence as JSONL.", "已複製決策紀錄（JSONL）。" }, { "Copy event JSON", "複製事件 JSON" }, { "Inspect decision", "查看決策" },
+        { "INCOMPLETE: ", "不完整：" }, { "Result: ", "結果：" }, { " / decision ", " / 決策 " }, { " / plan ", " / 計畫 " },
+        { "Level/clock ", "等級/傷害 " }, { " | Stock ", "｜能量 " }, { " | Hand ", "｜手牌 " }, { " | Deck ", "｜牌庫 " }, { " | Reserved stock ", "｜保留能量 " },
+        { "Own hand at decision start:", "決策開始時自己的手牌：" }, { "Own stage at decision start:", "決策開始時自己的舞台：" },
+        { "Reserved hand expression (not reevaluated): ", "保留手牌的條件（沒有重新評估）：" },
+        { "Planned search: ", "預定搜尋：" }, { "Planned climax: ", "預定名場面：" },
+        { "Decision evidence has left the live buffer; open its trace file.", "這次決策的紀錄已經移出即時緩衝，請開啟紀錄檔查看。" },
+        { "Live-buffer excerpt, not the complete match. ", "這是即時緩衝的節錄，不是整場對戰。" },
+        { "Some decision evidence was evicted. ", "部分決策紀錄已經移出。" },
+        { "Script sources have left the live buffer. ", "腳本內容已經移出即時緩衝。" },
+        { "Embedded scripts are the loaded originals. ", "附上的腳本是載入時的原始內容。" },
+        { "Read the original JSONL for complete history, nested decisions, capture mode and truncation markers.", "完整歷史、巢狀決策、紀錄模式和截斷標記，請看原始的 JSONL 檔。" },
+        { "AI Inspector cannot find SettingsTopRow/QuitResetButtons. Open the inspector with F8.", "AI 檢查工具找不到放按鈕的位置，請按 F8 開啟。" },
+    };
+    public static string Ui(string s)
+    {
+        string zh, lang = ReadLanguage();
+        if (s == null || lang == null || lang == "en" || !UiZh.TryGetValue(s, out zh)) return s;
+        if (lang != "cn") return zh;
+        string cn;                                   // 每幀都會畫，簡體轉換結果記起來
+        if (!UiCn.TryGetValue(s, out cn)) UiCn[s] = cn = ToSimplified(zh);
+        return cn;
+    }
+    static readonly Dictionary<string, string> UiCn = new Dictionary<string, string>();
+
     // 連線預覽的單機測試：遊戲資料夾裡有 wszh_synctest.txt 時，對戰中的預覽一律改走連線的翻譯流程
     static readonly bool SyncTest = File.Exists(Path.Combine(Path.GetDirectoryName(Application.dataPath), "wszh_synctest.txt"));
     static System.Reflection.FieldInfo fViewDeck;

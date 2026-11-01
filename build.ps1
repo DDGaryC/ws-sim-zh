@@ -49,9 +49,9 @@ if (Newer $mtExe 'MusicTool.cs') {
 }
 New-Item -ItemType Directory -Force (Join-Path $Sim 'AIEditor') | Out-Null
 $aiExe = Join-Path $Sim 'AIEditor\AIEditor.exe'
-if (Newer $aiExe 'AiTool.cs', 'AiTool_Data.cs') {
+if (Newer $aiExe 'AiTool.cs', 'AiTool_Data.cs', 'AiTrace.cs') {
     & $csc /nologo /target:winexe /optimize+ /codepage:65001 "/out:$aiExe.new" `
-        /r:System.Web.Extensions.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll (Join-Path $Here 'AiTool.cs') (Join-Path $Here 'AiTool_Data.cs')
+        /r:System.Web.Extensions.dll /r:System.Windows.Forms.dll /r:System.Drawing.dll (Join-Path $Here 'AiTool.cs') (Join-Path $Here 'AiTool_Data.cs') (Join-Path $Here 'AiTrace.cs')
     if ($LASTEXITCODE -ne 0) { throw "AI 對手編輯器編譯失敗" }
     Install-Built "$aiExe.new" $aiExe
 }
