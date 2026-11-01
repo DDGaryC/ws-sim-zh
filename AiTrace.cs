@@ -249,8 +249,11 @@ class TraceForm : Form
 
         var help = new Label
         {
-            Dock = DockStyle.Top, Height = 46, Padding = new Padding(20, 6, 20, 0), ForeColor = UI.Muted, Font = UI.F(9.5f),
-            Text = "怎麼產生紀錄：和電腦 AI 對戰時按 F8 開「AI 檢查工具」，把「紀錄」切到「詳細」，打完後紀錄會存在模擬器資料夾的 AITraces。\n" +
+            Dock = DockStyle.Top, Height = 104, Padding = new Padding(20, 6, 20, 0), ForeColor = UI.Muted, Font = UI.F(9.5f),
+            Text = "怎麼產生紀錄：和電腦 AI 對戰時按 F8 開「AI 檢查工具」，把「紀錄」切到「詳細」（只要設定一次，之後每場都會從開局自動記錄，不用再按 F8）。\n" +
+                   "　・要選「詳細」：「摘要」不會記每張卡的分數和腳本條件，這裡能顯示的會少很多。\n" +
+                   "　・紀錄存在模擬器資料夾的 AITraces，一場約 30MB，不要的可以直接刪；不想記的時候回 F8 把「紀錄」切回「關閉」。\n" +
+                   "　・對戰中別按 F8 視窗的「All」「Rules」，模擬器本身會卡住（英文版也一樣）；切換紀錄設定沒問題。\n" +
                    "左邊每一行是 AI 的一次選擇或動作，點一下右邊會列出當時的狀況、每張卡的分數，以及腳本裡哪幾行條件成立。滑鼠移到卡圖上可以看大圖。"
         };
         Controls.Add(help);
