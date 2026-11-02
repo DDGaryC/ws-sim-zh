@@ -1,1 +1,5 @@
-﻿
+﻿Preparing audio (1 / 1)...=正在準備音效（1 / 1）…
+Your card data may be out of date.\n\nLast update run: 11月 2, 2026 12:38 上午 local\nLatest repo commit: 11月 2, 2026 9:04 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 2, 2026 12:38 上午 local\n\n最新版本：11月 2, 2026 9:04 下午 local\n\n\n\n要前往設定進行更新嗎？
+Default=預設
+Emote Pack=表情包
+Stage: Downloading new images (100%)\nSet: Assault Lily (34%)=階段：Downloading new images（100%）\n系列：Assault Lily (34%)

@@ -1050,7 +1050,7 @@ public class WszhLang : MonoBehaviour
             jpScene = scene; jpLookAt = Time.realtimeSinceStartup + 1f;
             Type t = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("PlayerUI")).FirstOrDefault(x => x != null);
             if (t == null) return;
-            fViewing = t.GetField("viewingCard", Any); fDesc = t.GetField("cardDescriptionText", Any); fShowJp = t.GetField("showJPNames", Any); fViewDeck = t.GetField("viewingDeckCard", Any);
+            fViewing = t.GetField("viewingCard", Any); fDesc = t.GetField("cardDescriptionText", Any); fShowJp = t.GetField("showJPNames", Any); fViewDeck = t.GetField("viewingDeckCard", Any); fCardName = t.GetField("cardNameText", Any);
             jpUis = FindObjectsOfType(t).Cast<Component>().ToArray();
         }
         if (fViewing == null || fDesc == null || fShowJp == null) return;
@@ -1059,7 +1059,7 @@ public class WszhLang : MonoBehaviour
             if (ui == null) continue;
             var card = fViewing.GetValue(ui);
             var desc = fDesc.GetValue(ui) as TMP_Text;
-            if (card == null || desc == null) continue;
+            if (card == null || desc == null || !OwnsPreview(ui, desc)) continue;
             // 連線對戰：對方傳來的預覽是加工過的英文，重新翻譯（見 WszhCardText.TranslateSynced）
             if (scene != "DeckEditorRedo")
             {
@@ -1088,6 +1088,29 @@ public class WszhLang : MonoBehaviour
             string s = desc.text ?? "";
             if (!s.EndsWith(jp)) desc.text = s + "\n" + jp;
         }
+    }
+
+    // 自己打自己（Hotseat）時兩位玩家的 PlayerUI 共用同一個預覽文字框，各自記著自己最後看的卡。
+    // 兩邊輪流補上自己那張的日文名，「結尾不是這個名字」每幀都成立，就會一直刷下去。
+    // 所以一個文字框只讓一個 PlayerUI 處理：顯示中的卡名對得上的那個，都對不上就固定第一個
+    static System.Reflection.FieldInfo fCardName;
+    bool sharedLogged;
+    bool OwnsPreview(Component ui, TMP_Text desc)
+    {
+        Component first = null, match = null;
+        int sharing = 0;
+        foreach (var u in jpUis)
+        {
+            if (u == null || fDesc.GetValue(u) as TMP_Text != desc) continue;
+            sharing++;
+            if (first == null) first = u;
+            var card = fViewing.GetValue(u);
+            var shownName = fCardName == null ? null : fCardName.GetValue(u) as TMP_Text;
+            if (match == null && card != null && shownName != null && shownName.text == card.GetType().GetField("name").GetValue(card) as string) match = u;
+        }
+        if (sharing <= 1) return true;
+        if (!sharedLogged) { sharedLogged = true; Debug.Log("[WSZH] preview text shared by " + sharing + " PlayerUI"); }
+        return ui == (match ?? first);
     }
 
     static bool HasHan(string s) { foreach (char c in s) if (c >= 0x4E00 && c <= 0x9FFF) return true; return false; }

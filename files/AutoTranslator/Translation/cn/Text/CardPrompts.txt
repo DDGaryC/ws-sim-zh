@@ -5610,3 +5610,4 @@ Choose 1 of your other «Music» characters to give the ability.=请选择你其
 Choose 1  "A World Beginning to Take Color" or climax to add to your hand.=请选择 1 张「A World Beginning to Take Color」或高潮加入手牌。
 Choose a level 0 or lower character to return to your opponent's hand?=请选择 1 张等级 0 以下的角色返回对手的手牌？
 Choose 2 characters to give effects to.=请选择 2 张角色给予效果。
+Choose 1 of your opponent's characters to get no-events and no-backups until end of turn.=请选择对手的 1 张角色，直到回合结束为止，该角色不能使用事件和【助太刀】。
