@@ -3,3 +3,42 @@ Your card data may be out of date.\n\nLast update run: 11月 2, 2026 12:38 上�
 Default=預設
 Emote Pack=表情包
 Stage: Downloading new images (100%)\nSet: Assault Lily (34%)=階段：Downloading new images（100%）\n系列：Assault Lily (34%)
+Location: Decks\\星塔=位置：Decks\\星塔
+Choose 1 cards from your waiting room to send=請從休息室選擇 1 張卡（支付費用）
+Choose a slot to place The Gentle Heart Residing in Steel, Firenze in.=請選擇放置 The Gentle Heart Residing in Steel, Firenze 的位置。
+<sprite name\="mini_bar"/> Put the top card of your deck into your stock?=<sprite name\="mini_bar"/>【寶袋】要將牌庫頂的 1 張卡放置到能量區嗎？
+<sprite name\="mini_door"/> Choose up to 1 character in your waiting room and return it to your hand.=<sprite name\="mini_door"/>【木門】最多選擇 1 張休息室的角色，加入手牌。
+Look at up to 4 cards=查看最多 4 張卡
+You refreshed with 8 climax. <b>(View)</b>=你洗牌重整，其中有 8 張名場面卡。 <b>（查看）</b>
+Penalty=重整懲罰
+Choose 0 to 1 cards.=請選擇 0 到 1 張卡。
+Opponent refreshed with 4 climax. <b>(View)</b>=對手洗牌重整，其中有 4 張名場面卡。 <b>（查看）</b>
+Opponent used the act ability of "Bearing the Name Hervor" Renka.=對手發動了 "Bearing the Name Hervor" Renka. 的起動能力
+Opponent refreshed with 3 climax. <b>(View)</b>=對手洗牌重整，其中有 3 張名場面卡。 <b>（查看）</b>
+Flip Stock=翻開能量區
+View My Deck=查看我的牌庫
+View Opponent's Deck=查看對手的牌庫
+Flip Opponent's Stock=翻開對手的能量區
+Game complete. Inspect the final board, or use Quit / Reset to leave.=對戰結束。可以查看最後的場面，或按「結束」／「重開」離開。
+Look at up to 2 cards=查看最多 2 張卡
+Opponent used the act ability of Pure White Shining Lily, Riri.=對手發動了 Pure White Shining Lily, Riri. 的起動能力
+Look at up to 5 cards=查看最多 5 張卡
+Choose up to 1 cards=最多選擇 1 張卡。
+Look at up to 3 cards=查看最多 3 張卡
+Choose 1 cards.=請選擇 1 張卡。
+Opponent refreshed with 5 climax. <b>(View)</b>=對手洗牌重整，其中有 5 張名場面卡。 <b>（查看）</b>
+You refreshed with 6 climax. <b>(View)</b>=你洗牌重整，其中有 6 張名場面卡。 <b>（查看）</b>
+Opponent refreshed with 8 climax. <b>(View)</b>=對手洗牌重整，其中有 8 張名場面卡。 <b>（查看）</b>
+Counter Step: 15=反擊階段：15
+You refreshed with 7 climax. <b>(View)</b>=你洗牌重整，其中有 7 張名場面卡。 <b>（查看）</b>
+Choose a slot to place Strongest teamwork, McQueen & Meter in.=請選擇放置 Strongest teamwork, McQueen & Meter 的位置。
+Discard 2 cards.=丟棄 2 張卡。
+Opponent refreshed with 7 climax. <b>(View)</b>=對手洗牌重整，其中有 7 張名場面卡。 <b>（查看）</b>
+Your card data may be out of date.\n\nLast update run: 11月 3, 2026 12:20 上午 local\nLatest repo commit: 11月 3, 2026 9:14 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 3, 2026 12:20 上午 local\n\n最新版本：11月 3, 2026 9:14 下午 local\n\n\n\n要前往設定進行更新嗎？
+Choose a slot to place Heart-Searing Resonance, Caramel in.=請選擇放置 Heart-Searing Resonance, Caramel 的位置。
+You refreshed with 4 climax. <b>(View)</b>=你洗牌重整，其中有 4 張名場面卡。 <b>（查看）</b>
+Markers under Heart-Searing Resonance, Caramel=Heart-Searing Resonance, Caramel 下方的標記
+Markers under Argument and Proof, Freesia=Argument and Proof, Freesia 下方的標記
+<sprite name\="mini_gate"/> Choose up to 1 climax in your waiting room and return it to your hand.=<sprite name\="mini_gate"/>【城門】最多選擇 1 張休息室的名場面卡，加入手牌。
+Choose 2 cards.=請選擇 2 張卡。
+Your card data may be out of date.\n\nLast update run: 11月 3, 2026 12:20 上午 local\nLatest repo commit: 11月 9, 2026 1:51 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 3, 2026 12:20 上午 local\n\n最新版本：11月 9, 2026 1:51 下午 local\n\n\n\n要前往設定進行更新嗎？

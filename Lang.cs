@@ -1404,10 +1404,42 @@ public class WszhLang : MonoBehaviour
         // 開發用：Ctrl+Shift+F12 匯出所有卡片的效果文字（給卡片翻譯用，見 CardText.cs）
         if (Input.GetKeyDown(KeyCode.F12) && (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)))
         {
-            string err;
-            try { err = WszhCardText.Dump(); }
-            catch (Exception ex) { err = (ex.InnerException ?? ex).Message; }
-            Debug.Log("[WSZH] card text dump " + (err == null ? "done" : "failed: " + err));
+            if (!dumping) StartCoroutine(DumpRun());
         }
+    }
+
+    bool dumping;
+    IEnumerator DumpRun()
+    {
+        dumping = true;
+        var overlay = gameObject.AddComponent<WszhDumpOverlay>();
+        WszhCardText.DumpProgress = "輸出卡片文字中…";
+        var e = WszhCardText.Dump();
+        while (true)
+        {
+            bool more;
+            try { more = e.MoveNext(); }
+            catch (Exception ex)
+            {
+                more = false;
+                WszhCardText.DumpProgress = "輸出失敗：" + ex.Message;
+                Debug.Log("[WSZH] card text dump failed: " + ex);
+            }
+            if (!more) break;
+            yield return e.Current;
+        }
+        yield return new WaitForSecondsRealtime(6f);
+        Destroy(overlay);
+        dumping = false;
+    }
+}
+
+// 輸出卡片文字時的進度（只在輸出時才掛上，平常沒有 OnGUI 的成本）
+public class WszhDumpOverlay : MonoBehaviour
+{
+    void OnGUI()
+    {
+        var style = new GUIStyle(GUI.skin.box) { fontSize = 22, alignment = TextAnchor.MiddleCenter };
+        GUI.Box(new Rect(Screen.width / 2 - 360, 20, 720, 56), WszhCardText.DumpProgress, style);
     }
 }

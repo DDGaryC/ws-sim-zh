@@ -5611,3 +5611,7 @@ Choose 1  "A World Beginning to Take Color" or climax to add to your hand.=请�
 Choose a level 0 or lower character to return to your opponent's hand?=请选择 1 张等级 0 以下的角色返回对手的手牌？
 Choose 2 characters to give effects to.=请选择 2 张角色给予效果。
 Choose 1 of your opponent's characters to get no-events and no-backups until end of turn.=请选择对手的 1 张角色，直到回合结束为止，该角色不能使用事件和【助太刀】。
+Choose an effect to activate first \n1. Look up to 2 cards from the top of your opponent's deck, choose up to 2 of them and put them back on top of their deck in any order and put the rest into their waiting room, and this gains +1000 power. \n2. Deal 1 damage to your opponent.=请选择要先发动的效果 \n1. 查看对手卡组顶最多 2 张卡，从中选择最多 2 张以任意顺序放回对手的卡组顶，其余的放置到对手的控室，并且这张卡的战力 +1000。\n2. 给予对手 1 点伤害。
+Choose a character to gain the on-reverse search effect.=请选择 1 张角色，获得倒置时的搜寻效果。
+Choose a <Revue> character from your waiting room to put into your stock?=要从你的控室选择 1 张《Revue》角色放置到能量区吗？
+Choose a «Revue» character from your waiting room to put into your stock?=要从你的控室选择 1 张《Revue》角色放置到能量区吗？

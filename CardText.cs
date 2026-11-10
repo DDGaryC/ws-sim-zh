@@ -342,49 +342,138 @@ public static class WszhCardText
     // ---- 開發用：把每張卡實際顯示的效果文字匯出（Ctrl+Shift+F12，見 Lang.cs）----
     // 卡片資料裡的共用效果簡寫（*xxx）要遊戲讀卡時才會展開，所以直接從遊戲的卡片庫拿最準。
     // 會強制讀取所有系列，輸出到模擬器資料夾的 CardText_dump.tsv：卡號<Tab>系列<Tab>效果文字（換行寫成 \n）
-    public static string Dump()
+    public static string DumpProgress;      // 畫面上顯示的進度（Lang.cs 的 WszhDumpOverlay）
+    const string DumpFolderTag = "#FOLDER\t";
+
+    // 只重讀有變動的資料夾：上次的結果存在 CardText_dump.cache，每個資料夾記著 CardData.txt 的雜湊。
+    // 比內容不比時間：模擬器更新卡片資料後，檔案時間不一定會變新。
+    // 共用範本（Resources 裡的 CommonEffects）或遊戲程式變了，所有卡的文字都可能變，就全部重讀。
+    // 每個畫格最多處理約 30ms，輸出時遊戲不會卡住
+    public static System.Collections.IEnumerator Dump()
     {
         const System.Reflection.BindingFlags Any = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+        var watch = System.Diagnostics.Stopwatch.StartNew();
         Type lib = null;
         foreach (var a in AppDomain.CurrentDomain.GetAssemblies()) { lib = a.GetType("CardLibrary"); if (lib != null) break; }
-        if (lib == null) return "找不到 CardLibrary";
-        var series = lib.GetField("allSeries", Any).GetValue(null) as System.Collections.IEnumerable;
-        var read = lib.GetMethod("ReadSeriesFolder", Any);
-        if (series == null || read == null) return "卡片庫結構和預期不同";
-        var sb = new StringBuilder();
-        int cards = 0, folders = 0;
-        foreach (var s in series)
+        var seriesObj = lib == null ? null : lib.GetField("allSeries", Any).GetValue(null) as System.Collections.IEnumerable;
+        var read = lib == null ? null : lib.GetMethod("ReadSeriesFolder", Any);
+        var readText = lib == null ? null : lib.GetMethod("TryReadCardTextFile", Any);
+        if (seriesObj == null || read == null || readText == null)
         {
-            string sname = (string)s.GetType().GetField("seriesName", Any).GetValue(s);
-            var fl = s.GetType().GetField("seriesFolders", Any).GetValue(s) as System.Collections.IEnumerable;
-            if (fl == null) continue;
-            foreach (var f in fl)
-            {
-                var ft = f.GetType();
-                if (!(bool)ft.GetField("loaded", Any).GetValue(f))
-                {
-                    try { Drain(read.Invoke(null, new object[] { f, false }) as System.Collections.IEnumerator); }
-                    catch (Exception ex) { Debug.Log("[WSZH] dump: failed to load folder in " + sname + ": " + ex.Message); continue; }
-                }
-                folders++;
-                var list = ft.GetField("cards", Any).GetValue(f) as System.Collections.IEnumerable;
-                if (list == null) continue;
-                foreach (var c in list)
-                {
-                    var ct = c.GetType();
-                    string id = ct.GetField("id", Any).GetValue(c) as string;
-                    string text = ct.GetField("text", Any).GetValue(c) as string;
-                    if (string.IsNullOrEmpty(text)) continue;
-                    sb.Append(id).Append('\t').Append(sname).Append('\t').Append(text.Replace("\r", "").Replace("\n", "\\n")).Append('\n');
-                    cards++;
-                }
-            }
+            DumpProgress = "輸出失敗：卡片庫結構和預期不同";
+            Debug.Log("[WSZH] card text dump failed: unexpected CardLibrary");
+            yield break;
         }
         string root = Path.GetDirectoryName(Application.dataPath);
         string outp = Path.Combine(root, "CardText_dump.tsv");   // 不放 AutoTranslator：那個資料夾會整個打包進中文化套件
-        File.WriteAllText(outp, sb.ToString(), new UTF8Encoding(false));
-        Debug.Log("[WSZH] card text dump: " + cards + " cards from " + folders + " folders -> " + outp);
-        return null;
+        string cachePath = Path.Combine(root, "CardText_dump.cache");
+
+        var common = Resources.Load<TextAsset>("CommonEffects");
+        string globalKey = Md5((common != null ? common.text : "") + "|" + lib.Assembly.ManifestModule.ModuleVersionId);
+        var old = new Dictionary<string, KeyValuePair<string, string>>();     // 資料夾 → (雜湊, 上次的內容)
+        try { if (File.Exists(cachePath)) old = ReadDumpCache(cachePath, globalKey); }
+        catch (Exception ex) { Debug.Log("[WSZH] dump: cache ignored: " + ex.Message); }
+
+        var folders = new List<KeyValuePair<string, object>>();
+        foreach (var s in seriesObj)
+        {
+            string sname = (string)s.GetType().GetField("seriesName", Any).GetValue(s);
+            var fl = s.GetType().GetField("seriesFolders", Any).GetValue(s) as System.Collections.IEnumerable;
+            if (fl != null) foreach (var f in fl) folders.Add(new KeyValuePair<string, object>(sname, f));
+        }
+
+        var body = new StringBuilder();      // CardText_dump.tsv
+        var cache = new StringBuilder(globalKey + "\n");
+        int cards = 0, reused = 0, reread = 0, failed = 0, done = 0;
+        var slice = System.Diagnostics.Stopwatch.StartNew();
+        foreach (var kv in folders)
+        {
+            done++;
+            string one = null, hash = null, key = null;
+            try
+            {
+                var ft = kv.Value.GetType();
+                key = (string)ft.GetField("folderName", Any).GetValue(kv.Value) + "/" + (string)ft.GetField("cardDataName", Any).GetValue(kv.Value);
+                var args = new object[] { "Cards/" + key + ".txt", null };
+                readText.Invoke(null, args);
+                string src = args[1] as string;
+                if (src == null) { var ta = Resources.Load<TextAsset>("Cards/" + key); if (ta != null) src = ta.text; }
+                hash = Md5(src ?? "");
+                KeyValuePair<string, string> prev;
+                // 聯動系列的資料夾會同時掛在兩個系列底下（輸出的系列欄不同），快取要連系列一起分
+                if (old.TryGetValue(kv.Key + "|" + key, out prev) && prev.Key == hash) { one = prev.Value; reused++; }
+                else
+                {
+                    // 已經讀進記憶體的直接用（重讀會重複加卡；卡片資料更新後遊戲會清掉卡片庫重建）
+                    if (!(bool)ft.GetField("loaded", Any).GetValue(kv.Value)) Drain(read.Invoke(null, new object[] { kv.Value, false }) as System.Collections.IEnumerator);
+                    one = FolderText(kv.Value, kv.Key, Any);
+                    reread++;
+                }
+            }
+            catch (Exception ex) { failed++; Debug.Log("[WSZH] dump: failed to load folder in " + kv.Key + ": " + (ex.InnerException ?? ex).Message); }
+            if (one != null)
+            {
+                body.Append(one);
+                cache.Append(DumpFolderTag).Append(kv.Key).Append('|').Append(key).Append('\t').Append(hash).Append('\n').Append(one);
+                foreach (char c in one) if (c == '\n') cards++;
+            }
+            if (slice.ElapsedMilliseconds > 30)
+            {
+                DumpProgress = "輸出卡片文字中… " + done + " / " + folders.Count + "（重讀 " + reread + " 個資料夾）";
+                yield return null;
+                slice = System.Diagnostics.Stopwatch.StartNew();
+            }
+        }
+        File.WriteAllText(outp, body.ToString(), new UTF8Encoding(false));
+        if (failed == 0) File.WriteAllText(cachePath, cache.ToString(), new UTF8Encoding(false));
+        else if (File.Exists(cachePath)) File.Delete(cachePath);      // 有失敗的就不留快取，下次全部重讀
+        DumpProgress = "卡片文字輸出完成：" + cards + " 張，重讀 " + reread + " 個資料夾，花了 " + (watch.ElapsedMilliseconds / 1000.0).ToString("0.0") + " 秒" + (failed > 0 ? "（" + failed + " 個資料夾失敗）" : "");
+        Debug.Log("[WSZH] card text dump: " + cards + " cards, folders reused=" + reused + " reread=" + reread + " failed=" + failed + ", " + watch.ElapsedMilliseconds + " ms -> " + outp);
+        Debug.Log("[WSZH] card text dump done");
+    }
+
+    // 一個資料夾的輸出內容：卡號<Tab>系列<Tab>效果文字（換行寫成 \n），一張一行
+    static string FolderText(object folder, string sname, System.Reflection.BindingFlags Any)
+    {
+        var sb = new StringBuilder();
+        var list = folder.GetType().GetField("cards", Any).GetValue(folder) as System.Collections.IEnumerable;
+        if (list == null) return "";
+        foreach (var c in list)
+        {
+            var ct = c.GetType();
+            string id = ct.GetField("id", Any).GetValue(c) as string;
+            string text = ct.GetField("text", Any).GetValue(c) as string;
+            if (string.IsNullOrEmpty(text)) continue;
+            sb.Append(id).Append('\t').Append(sname).Append('\t').Append(text.Replace("\r", "").Replace("\n", "\\n")).Append('\n');
+        }
+        return sb.ToString();
+    }
+
+    static Dictionary<string, KeyValuePair<string, string>> ReadDumpCache(string path, string globalKey)
+    {
+        var res = new Dictionary<string, KeyValuePair<string, string>>();
+        string curKey = null, curHash = null;
+        StringBuilder cur = null;
+        bool first = true;
+        foreach (var line in File.ReadAllLines(path, Encoding.UTF8))
+        {
+            if (first) { first = false; if (line != globalKey) return res; continue; }
+            if (line.StartsWith(DumpFolderTag))
+            {
+                if (curKey != null) res[curKey] = new KeyValuePair<string, string>(curHash, cur.ToString());
+                var p = line.Split('\t');
+                curKey = p[1]; curHash = p[2]; cur = new StringBuilder();
+            }
+            else if (cur != null) cur.Append(line).Append('\n');
+        }
+        if (curKey != null) res[curKey] = new KeyValuePair<string, string>(curHash, cur.ToString());
+        return res;
+    }
+
+    static string Md5(string s)
+    {
+        using (var m = System.Security.Cryptography.MD5.Create())
+            return BitConverter.ToString(m.ComputeHash(Encoding.UTF8.GetBytes(s))).Replace("-", "");
     }
 
     static void Drain(System.Collections.IEnumerator e)

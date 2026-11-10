@@ -2084,6 +2084,7 @@
 "Look at the top card of your deck, and put it either on top or bottom of your deck or into your waiting room, your opponent puts all of their stock into their waiting room, and puts the same number of cards from the top of their deck into their stock.": "查看你牌庫頂的 1 張卡，放置到牌庫頂或牌庫底或休息室，對手將自己能量區的所有卡放置到休息室，並將自己牌庫頂相同數量的卡放置到能量區。",
 "Choose up to 2 <Tankery> characters in your waiting room, and return them to your hand.": "選擇你休息室最多 2 張《Tankery》角色，返回手牌。",
 "Act: [Send this card to waiting room] Choose 1 \"Unpredictable behavior, Hanma\" in your waiting room, and put it in the stage position that this card was in.": "【起】[將這張卡放置到休息室]選擇你休息室的 1 張「Unpredictable behavior, Hanma",
+"Act: [<sprite name=\"rest\"/> this card] Choose 1 of your characters, it gets +1 level and +1500 power for the turn.": "【起】[將這張卡<sprite name=\"rest\"/>]選擇你的 1 張角色，那張角色這個回合中等級 +1、戰力 +1500。",
 "Choose order to resolve effects:": "請選擇效果處理的順序：",
 "Use this effect now?": "現在要使用這個效果嗎？",
 "Pay the cost and use this effect?": "要支付費用並使用這個效果嗎？"
