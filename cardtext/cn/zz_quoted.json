@@ -2085,6 +2085,8 @@
 "Choose up to 2 <Tankery> characters in your waiting room, and return them to your hand.": "选择你控室最多 2 张《Tankery》角色，返回手牌。",
 "Act: [Send this card to waiting room] Choose 1 \"Unpredictable behavior, Hanma\" in your waiting room, and put it in the stage position that this card was in.": "【起】[将这张卡放置到控室]选择你控室的 1 张「Unpredictable behavior, Hanma",
 "Act: [<sprite name=\"rest\"/> this card] Choose 1 of your characters, it gets +1 level and +1500 power for the turn.": "【起】[将这张卡<sprite name=\"rest\"/>]选择你的 1 张角色，那张角色这个回合中等级 +1、战力 +1500。",
+"Auto: When this card becomes <sprite name=\"reverse\"/>, if the level of this card's battle opponent is higher than your opponent's level, you may put that character into your opponent's stock, if you do, put 1 card from the bottom of your opponent's stock into their waiting room.": "【自】这张卡变成<sprite name=\"reverse\"/>时，如果这张卡的战斗对手的等级高于对手的等级，你可以将那张角色放置到对手的能量区。放置的话，将对手能量区最底下的 1 张卡放置到对手的控室。",
+"Cont: The character facing this card cannot side attack, and during this card's battle, you cannot receive damage by the Auto: effects of your opponent's characters.\"": "【永】这张卡正对面的角色不能侧面攻击，且这张卡战斗中，你不会受到对手角色的【自】效果造成的伤害。」",
 "Choose order to resolve effects:": "请选择效果处理的顺序：",
 "Use this effect now?": "现在要使用这个效果吗？",
 "Pay the cost and use this effect?": "要支付费用并使用这个效果吗？"

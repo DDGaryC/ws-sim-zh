@@ -42,3 +42,4 @@ Markers under Argument and Proof, Freesia=Argument and Proof, Freesia 下方的�
 <sprite name\="mini_gate"/> Choose up to 1 climax in your waiting room and return it to your hand.=<sprite name\="mini_gate"/>【城門】最多選擇 1 張休息室的名場面卡，加入手牌。
 Choose 2 cards.=請選擇 2 張卡。
 Your card data may be out of date.\n\nLast update run: 11月 3, 2026 12:20 上午 local\nLatest repo commit: 11月 9, 2026 1:51 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 3, 2026 12:20 上午 local\n\n最新版本：11月 9, 2026 1:51 下午 local\n\n\n\n要前往設定進行更新嗎？
+A newer version of the simulator is available: 0.7.9.7\nYou are currently running 0.7.9.6.\n\nUpdate now? The game will close and restart when the update is complete.=有新版本的模擬器可以更新：0.7.9.7\n\n你目前的版本是 0.7.9.6。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。

@@ -1154,10 +1154,10 @@ public class WszhLang : MonoBehaviour
     // 判定有 30 多種，寫成翻譯規則要好幾百條，每段新文字都得全部比對一次，太慢
     static readonly Dictionary<string, string> TriggerZh = new Dictionary<string, string> {
         { "Soul", "魂" }, { "DoubleSoul", "雙魂" }, { "Book", "書" }, { "Wind", "風吹" }, { "Bag", "寶袋" }, { "Door", "木門" }, { "Gate", "城門" },
-        { "Shot", "火燒" }, { "Bar", "金磚" }, { "Standby", "開機" }, { "Focus", "橘子" }, { "Discovery", "望遠鏡" }, { "Chance", "燈泡" }, { "Choice", "箭頭" } };
+        { "Shot", "火燒" }, { "Bar", "金磚" }, { "Standby", "開機" }, { "Focus", "橘子" }, { "Discovery", "望遠鏡" }, { "Chance", "燈泡" }, { "Choice", "箭頭" }, { "Recovery", "回復" } };
     static readonly Dictionary<string, string> TriggerCn = new Dictionary<string, string> {
         { "Soul", "魂" }, { "DoubleSoul", "双魂" }, { "Book", "书" }, { "Wind", "风吹" }, { "Bag", "宝袋" }, { "Door", "木门" }, { "Gate", "城门" },
-        { "Shot", "火烧" }, { "Bar", "金砖" }, { "Standby", "开机" }, { "Focus", "橘子" }, { "Discovery", "望远镜" }, { "Chance", "灯泡" }, { "Choice", "箭头" } };
+        { "Shot", "火烧" }, { "Bar", "金砖" }, { "Standby", "开机" }, { "Focus", "橘子" }, { "Discovery", "望远镜" }, { "Chance", "灯泡" }, { "Choice", "箭头" }, { "Recovery", "回复" } };
     static readonly System.Text.RegularExpressions.Regex TriggerTail = new System.Text.RegularExpressions.Regex(@"(判定) (Lone)?([A-Za-z]+?)(\d*)$");
     static Type mulliganType; static System.Reflection.FieldInfo fMullDetails; float mulliganAt;
     void MulliganTrigger()

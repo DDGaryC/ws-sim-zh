@@ -5615,3 +5615,28 @@ Choose an effect to activate first \n1. Look up to 2 cards from the top of your 
 Choose a character to gain the on-reverse search effect.=請選擇 1 張角色，獲得倒置時的搜尋效果。
 Choose a <Revue> character from your waiting room to put into your stock?=要從你的控制室選擇 1 張《Revue》角色放置到費用區嗎？
 Choose a «Revue» character from your waiting room to put into your stock?=要從你的控制室選擇 1 張《Revue》角色放置到費用區嗎？
+Choose 1 character to put into your opponent's waiting room among those cards.=請從那些卡中選擇 1 張角色，放置到對手的控制室。
+Choose 1 of the following effects, and perform it. \n1. Put the top 18 cards of your deck into waiting room, and deal 2 damage X times to your opponent. X is equal to the number of climax among those cards. \n2. Perform <b>Dream Big Without Limits!</b>.\n REPLAY <sprite name\="1game"/> <b><color\="red">Dream Big Without Limits!</color></b> Choose 1 card in your level, and put it into your waiting room. Put the top 4 cards of your deck into your clock, and deal 1 damage to your opponent 5 times.=請選擇以下效果中的 1 個並執行。\n1. 將你牌庫頂的 18 張卡放置到控制室，並給予對手 X 次 2 點傷害。X 等於那些卡中名場面的數量。\n2. 執行 <b>Dream Big Without Limits!</b>。\n REPLAY <sprite name\="1game"/> <b><color\="red">Dream Big Without Limits!</color></b> 選擇你等級區的 1 張卡，放置到控制室。將你牌庫頂的 4 張卡放置到傷害區，並給予對手 1 點傷害 5 次。
+Choose 1 of the following effects, and perform it. \n1. Draw up to 2 cards. \n2. Choose 1 <Mugendai MewType> character in your clock, and return it to your hand.=請選擇以下效果中的 1 個並執行。\n1. 最多抽 2 張卡。\n2. 選擇你傷害區的 1 張《Mugendai MewType》角色，返回手牌。
+Choose 1 of the following effects, and perform it. \n1. Draw up to 2 cards. \n2. Choose 1 «Mugendai MewType» character in your clock, and return it to your hand.=請選擇以下效果中的 1 個並執行。\n1. 最多抽 2 張卡。\n2. 選擇你傷害區的 1 張《Mugendai MewType》角色，返回手牌。
+Choose 1 character to put into your opponent's memory=請選擇 1 張角色，放置到對手的思出區
+Choose up to 1 cost 0 character in your opponent's center stage.=請選擇對手前列最多 1 張費用 0 的角色。
+Choose up to 1 cost 0 character in your opponent's back stage.=請選擇對手後列最多 1 張費用 0 的角色。
+Choose 1 of the following effects, and perform it. \n1. Choose up to 2 characters in your waiting room, choose 1 card from among them, return it to your hand, put the rest into your stock, and this card gets +1000 power until end of turn. \n2. [<sprite name\="1cost"/> Put 1 card from your hand into your waiting room] You may pay the cost. If you do, deal 3 damage to your opponent.=請選擇以下效果中的 1 個並執行。\n1. 選擇你控制室最多 2 張角色，從中選擇 1 張返回手牌，其餘的放置到費用區，並且這張卡的戰力 +1000，直到回合結束為止。\n2. [<sprite name\="1cost"/> 將你手牌 1 張卡放置到控制室]你可以支付費用。支付的話，給予對手 3 點傷害。
+Choose up to 2 characters to give +500 power and ability to.=請選擇最多 2 張角色，給予戰力 +500 和能力。
+Move this character to an open position of your back stage?=要將這張角色移動到你後列的空位嗎？
+Choose 1 of your characters to get +1000 power until end of turn.=請選擇你的 1 張角色，戰力 +1000，直到回合結束為止。
+Choose 1 of the following effects, and perform it. \n1. Choose up to 2 characters in your waiting room, and return them to your hand. \n2. Choose up to 2 characters in your opponent's stage, and return them to your opponent's hand.=請選擇以下效果中的 1 個並執行。\n1. 選擇你控制室最多 2 張角色，返回手牌。\n2. 選擇對手舞台最多 2 張角色，返回對手的手牌。
+Choose up to 2 of your opponent's characters, and return them to your opponent's hand.=請選擇對手最多 2 張角色，返回對手的手牌。
+Choose 1 of the following effects, and perform it. \n1. You may put the top card of your clock into your waiting room. \n2. Choose 1 "Advancing Through the Infinite Universe, Miyako Fuji" in your memory, put it in any position of your stage, and this card gets +2000 power until end of turn.=請選擇以下效果中的 1 個並執行。\n1. 你可以將你傷害區頂的 1 張卡放置到控制室。\n2. 選擇你思出區的 1 張「Advancing Through the Infinite Universe, Miyako Fuji」，放置到你舞台的任意位置，並且這張卡的戰力 +2000，直到回合結束為止。
+Deal 1 damage to your opponent or put the top card of your clock into your waiting room.=給予對手 1 點傷害，或將你傷害區頂的 1 張卡放置到控制室。
+Heal 1=回復 1
+Perform the action?=要執行這個動作嗎？
+Choose 1 of the following effects, and perform it. \n1. Put up to 1 card from the top of your clock into your waiting room, and this card gets +2000 power until end of turn. \n2. Your opponent reveals the top 3 cards of their deck, shuffles their deck, and puts X cards from the top of their deck into their clock. X is equal to the number of climax revealed among those cards.=請選擇以下效果中的 1 個並執行。\n1. 將你傷害區頂最多 1 張卡放置到控制室，並且這張卡的戰力 +2000，直到回合結束為止。\n2. 對手公開其牌庫頂的 3 張卡，將牌庫洗牌，然後將其牌庫頂的 X 張卡放置到傷害區。X 等於那些公開的卡中名場面的數量。
+Choose up to 2 to put into your stock, and put the rest into your memory.=請選擇最多 2 張放置到費用區，其餘的放置到思出區。
+Choose up to 1 of your other <Music> characters to get the ability.=請選擇你其他的最多 1 張《Music》角色，獲得該能力。
+Choose up to 1 of your other «Music» characters to get the ability.=請選擇你其他的最多 1 張《Music》角色，獲得該能力。
+Choose up to 2 "Maru-kun" or <Mugendai MewType> characters=請選擇最多 2 張「Maru-kun」或《Mugendai MewType》角色
+Choose up to 2 "Maru-kun" or «Mugendai MewType» characters=請選擇最多 2 張「Maru-kun」或《Mugendai MewType》角色
+Put up to 2 cards from your hand into your stock?=要將你手牌最多 2 張卡放置到費用區嗎？
+Choose a character to give the following ability: "Auto: When this card's battle opponent becomes reversed, you may put that character on the top of your opponent's deck.".=請選擇 1 張角色，給予以下能力：「【自】這張卡的戰鬥對手變成倒置時，你可以將那張角色放置到對手的牌庫頂。」

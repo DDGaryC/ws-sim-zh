@@ -101,6 +101,19 @@ ENTRIES = [
     ('r:"^Server  -  ([0-9]+:[0-9]+)$"', '系統  -  $1'),
     '// --- 戰紀錄 ---',
     ('Turn Order', '先後攻'),
+    # 2026-11-12 模擬器更新（還是 0.7.9.6 系列）：新的「Recovery」判定、大廳聊天、卡片資料不一致的報告
+    '// --- 回復判定（Recovery） ---',
+    ('r:"^(<sprite[^>]*>) ?Recovery: Choose one effect\\.$"', '$1 回復：請選擇 1 個效果。'),
+    ('Put the bottom card of your clock into your waiting room', '將你傷害區最下面的 1 張卡放置到休息室'),
+    ('Return up to 1 cost 0 or lower character from your waiting room to your hand', '選擇你休息室最多 1 張費用 0 以下的角色，返回手牌'),
+    ('Do nothing', '什麼都不做'),
+    ('r:"^(<sprite[^>]*>) ?Choose up to 1 cost 0 or lower character in your waiting room to return to your hand\\.$"', '$1 請選擇你休息室最多 1 張費用 0 以下的角色，返回手牌。'),
+    '// --- 大廳聊天、卡片資料不一致 ---',
+    ('Say hello to your opponent.\\nMessages are kept for this lobby (latest 300).', '跟對手打聲招呼吧。\\n訊息會保留到離開大廳為止（最新 300 則）。'),
+    ('r:"(?s)^You could not connect to this game because your card data does not match the host\'s\\.\\n\\nThis usually means your card content is out of date\\. You will be taken to Settings to update it\\.\\n\\nA detailed card-data mismatch report was saved locally:\\n(.+)$"',
+     '你的卡片資料和房主不同，無法加入這場對戰。\\n\\n通常是你的卡片資料不是最新的，接下來會帶你到設定頁面進行更新。\\n\\n詳細的差異報告已經存在：\\n$1'),
+    ('r:"(?s)^You could not connect to this game because your card data does not match the host\'s\\.\\n\\nThis usually means your card content is out of date\\. You will be taken to Settings to update it\\.\\n\\nThe card-data mismatch report could not be saved in either IncidentLogs directory\\. See the Unity log for details\\.$"',
+     '你的卡片資料和房主不同，無法加入這場對戰。\\n\\n通常是你的卡片資料不是最新的，接下來會帶你到設定頁面進行更新。\\n\\n（差異報告沒辦法存檔，詳細情況請看遊戲的紀錄檔）'),
 ]
 
 

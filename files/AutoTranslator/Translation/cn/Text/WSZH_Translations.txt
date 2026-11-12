@@ -1101,3 +1101,13 @@ r:"^Opponent  -  ([0-9]+:[0-9]+)$"=对手  -  $1
 r:"^Server  -  ([0-9]+:[0-9]+)$"=系统  -  $1
 // --- 戰紀錄 ---
 Turn Order=先后攻
+// --- 回復判定（Recovery） ---
+r:"^(<sprite[^>]*>) ?Recovery: Choose one effect\.$"=$1 回复：请选择 1 个效果。
+Put the bottom card of your clock into your waiting room=将你时计区最下面的 1 张卡放置到控室
+Return up to 1 cost 0 or lower character from your waiting room to your hand=选择你控室最多 1 张费用 0 以下的角色，返回手牌
+Do nothing=什么都不做
+r:"^(<sprite[^>]*>) ?Choose up to 1 cost 0 or lower character in your waiting room to return to your hand\.$"=$1 请选择你控室最多 1 张费用 0 以下的角色，返回手牌。
+// --- 大廳聊天、卡片資料不一致 ---
+Say hello to your opponent.\nMessages are kept for this lobby (latest 300).=跟对手打声招呼吧。\n讯息会保留到离开大厅为止（最新 300 则）。
+r:"(?s)^You could not connect to this game because your card data does not match the host's\.\n\nThis usually means your card content is out of date\. You will be taken to Settings to update it\.\n\nA detailed card-data mismatch report was saved locally:\n(.+)$"=你的卡片资料和房主不同，无法加入这场对战。\n\n通常是你的卡片资料不是最新的，接下来会带你到设定页面进行更新。\n\n详细的差异报告已经存在：\n$1
+r:"(?s)^You could not connect to this game because your card data does not match the host's\.\n\nThis usually means your card content is out of date\. You will be taken to Settings to update it\.\n\nThe card-data mismatch report could not be saved in either IncidentLogs directory\. See the Unity log for details\.$"=你的卡片资料和房主不同，无法加入这场对战。\n\n通常是你的卡片资料不是最新的，接下来会带你到设定页面进行更新。\n\n（差异报告没办法存档，详细情况请看游戏的纪录档）
