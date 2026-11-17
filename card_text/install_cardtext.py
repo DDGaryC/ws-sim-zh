@@ -36,6 +36,38 @@ def effect_pairs(en, zh):
     if len(a) < 2 or len(a) != len(b) or en[m.end():].count('"') != 2 * len(a): return []
     return list(zip(a, b))
 
+# 對戰提示（MultipleChoiceQuestion 等）裡「\n1. …\n2. …」的選項：遊戲會先 EnrichenText 再顯示，XUnity 整段對不到，
+# 由 CardText 逐行翻（「N. 」後面那段查表），所以把 CardPrompts 裡的選項逐行拆出來
+PROMPTS = os.path.join(os.path.dirname(D), 'files', 'AutoTranslator', 'Translation', 'tw', 'Text', 'CardPrompts.txt')
+OPT = re.compile(r'^\s*(\d{1,2})\.\s+(.+?)\s*$')
+ENRICH = re.compile(r'CxCombo|CXCOMBO|Auto:|Act:|Cont:|REPLAY|BOND/|《|\b(?:ENCORE|BRAINSTORM|ALARM|SHIFT|BACKUP|GREAT PERFORMANCE|ACCELERATE|FORCE|SUNDER|MERGE|FUSION|INHERITANCE|RESONATE|MEMORY|EXPERIENCE|CHANGE|ASSIST|INSPIRE|BOARDING|RECOLLECTION)\b')
+
+def prompt_option_pairs():
+    out = []
+    if not os.path.exists(PROMPTS): return out
+    for line in open(PROMPTS, encoding='utf-8-sig'):
+        line = line.rstrip('\r\n')
+        if line.startswith('//'): continue
+        m = re.search(r'(?<!\\)=', line)
+        if not m: continue
+        en, zh = line[:m.start()].replace('\\=', '='), line[m.end():].replace('\\=', '=')
+        if '\\n' not in en:
+            # 單行提示裡有 EnrichenText 會換掉的字（Auto: → 圖示、ENCORE → 粗體…），XUnity 整段對不到，整句放進來
+            # 引號卡名若是名場面連動對象會被加粗（<b>"X"</b>），也一樣對不到
+            if (ENRICH.search(en) or '"' in en) and '«' not in en and en.strip() != zh.strip(): out.append((en.strip(), zh.strip()))
+            continue
+        a, b = en.split('\\n'), zh.split('\\n')
+        if len(a) != len(b): continue
+        for x, y in zip(a, b):
+            x, y = x.strip(), y.strip()
+            if not x or not y or x == y: continue
+            mx, my = OPT.match(x), OPT.match(y)
+            if mx and my and mx.group(1) == my.group(1):
+                out.append((mx.group(2), my.group(2)))
+            # 整行也放（提問句「Choose an effect:」、「1: …」「1.Search …」這類非標準編號的選項）
+            out.append((x, y))
+    return out
+
 def build_files():
     files = {}
     for f in glob.glob(os.path.join(D, '*_tw.json')):
@@ -54,6 +86,8 @@ def build_files():
     quoted['Choose order to resolve effects:'] = '請選擇效果處理的順序：'
     quoted['Use this effect now?'] = '現在要使用這個效果嗎？'
     quoted['Pay the cost and use this effect?'] = '要支付費用並使用這個效果嗎？'
+    for a, b in prompt_option_pairs():
+        if a not in known and a not in quoted: quoted[a] = b
     files['zz_quoted'] = quoted
     return files
 
