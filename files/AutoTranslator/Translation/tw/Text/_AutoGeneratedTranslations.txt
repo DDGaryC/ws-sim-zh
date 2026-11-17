@@ -43,3 +43,24 @@ Markers under Argument and Proof, Freesia=Argument and Proof, Freesia 下方的�
 Choose 2 cards.=請選擇 2 張卡。
 Your card data may be out of date.\n\nLast update run: 11月 3, 2026 12:20 上午 local\nLatest repo commit: 11月 9, 2026 1:51 下午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 3, 2026 12:20 上午 local\n\n最新版本：11月 9, 2026 1:51 下午 local\n\n\n\n要前往設定進行更新嗎？
 A newer version of the simulator is available: 0.7.9.7\nYou are currently running 0.7.9.6.\n\nUpdate now? The game will close and restart when the update is complete.=有新版本的模擬器可以更新：0.7.9.7\n\n你目前的版本是 0.7.9.6。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
+Choose 0 to 2 cards.=請選擇 0 到 2 張卡。
+Choose up to 3 cards=最多選擇 3 張卡。
+<sprite name\="mini_choice"/> Choose a card with a soul trigger icon.=<sprite name\="mini_choice"/>【箭頭】請選擇一張有魂判定圖示的卡。
+<sprite name\="mini_choice"/> Put this card into your hand or your stock?=<sprite name\="mini_choice"/>【箭頭】要將這張卡加入手牌，還是放置到能量區？
+Opponent refreshed with 6 climax. <b>(View)</b>=對手洗牌重整，其中有 6 張名場面卡。 <b>（查看）</b>
+Choose 2 characters to send.=請選擇 2 張角色（支付費用）。
+You refreshed with 2 climax. <b>(View)</b>=你洗牌重整，其中有 2 張名場面卡。 <b>（查看）</b>
+BD 8箭頭 already exists. Are you sure you want to overwrite it?\n=BD 8箭頭 已經存在，確定要覆蓋嗎？
+Viewing your remaining deck.=正在查看你剩下的牌庫。
+You refreshed with 5 climax. <b>(View)</b>=你洗牌重整，其中有 5 張名場面卡。 <b>（查看）</b>
+Your card data may be out of date.\n\nLast update run: 11月 12, 2026 2:29 下午 local\nLatest repo commit: 11月 16, 2026 3:30 上午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 12, 2026 2:29 下午 local\n\n最新版本：11月 16, 2026 3:30 上午 local\n\n\n\n要前往設定進行更新嗎？
+Choose a slot to place Spearhead of Rumors, Mistique in.=請選擇放置 Spearhead of Rumors, Mistique 的位置。
+Opponent used the act ability of Happy New Year, Kana Arima.=對手發動了 Happy New Year, Kana Arima. 的起動能力
+Viewing your opponent's remaining deck.=正在查看對手剩下的牌庫。
+Counter Step: 14=反擊階段：14
+Counter Step: 13=反擊階段：13
+Your card data may be out of date.\n\nLast update run: 11月 17, 2026 12:36 上午 local\nLatest repo commit: 11月 17, 2026 10:21 上午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 17, 2026 12:36 上午 local\n\n最新版本：11月 17, 2026 10:21 上午 local\n\n\n\n要前往設定進行更新嗎？
+Opponent used the act ability of Moments of Relaxation, IRyS.=對手發動了 Moments of Relaxation, IRyS. 的起動能力
+Choose 1 characters to put under Happy Birthday, Yuno Sengoku as a marker.=請選擇 1 張角色，放置到「Happy Birthday, Yuno Sengoku」下方作為標記。
+Open Lobbies: 0=開放中的房間：0
+Markers under Like a Dream, Nanoha=Like a Dream, Nanoha 下方的標記

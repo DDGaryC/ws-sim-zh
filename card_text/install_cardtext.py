@@ -103,7 +103,8 @@ if __name__ == '__main__':
         out = os.path.join(SIM, 'AutoTranslator', 'Translation', lang, 'CardText')
         os.makedirs(out, exist_ok=True)
         for name, data in fs.items():
-            json.dump(data, open(os.path.join(out, name + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+            # 和 publish_cardtext.py 寫法一致（LF 換行），本機檔案才會和雲端 sha256 相同，遊戲的更新提醒不會誤報
+            open(os.path.join(out, name + '.json'), 'wb').write(json.dumps(data, ensure_ascii=False, indent=0).encode('utf-8'))
     hk = os.path.join(SIM, 'AutoTranslator', 'Translation', 'hk', 'CardText')
     if os.path.isdir(hk): shutil.rmtree(hk)          # 舊版另存的香港版，已改成遊戲裡轉換
     print('files', len(files), 'lines', sum(len(d) for d in files.values()), 'quoted abilities', len(files['zz_quoted']))

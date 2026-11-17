@@ -46,6 +46,44 @@ public class WszhLang : MonoBehaviour
         Debug.Log("[WSZH] language switch ready, current=" + current);
         ApplyFpsCap();
         StartCoroutine(PreloadCardText());
+        StartCoroutine(CheckCardTextLater());
+    }
+
+    // ---- 開遊戲時檢查卡片翻譯有沒有更新，有的話在主選單上方提醒（可以直接按「立即更新」） ----
+    internal static string menuScene;          // 主選單的場景名稱；提醒只在主選單顯示
+    internal static string noticeText;         // 提醒列目前的文字（null = 不顯示）
+    internal static bool noticeCanUpdate, noticeBusy;
+    internal static float noticeHideAt;
+
+    IEnumerator CheckCardTextLater()
+    {
+        menuScene = SceneManager.GetActiveScene().name;
+        yield return new WaitForSecondsRealtime(4f);
+        string lang = ReadLanguage() ?? "tw";
+        if (lang == "en") yield break;
+        int diff = -1;
+        var e = WszhCardText.CheckUpdates(lang, d => diff = d);
+        while (true)
+        {
+            object cur;
+            try { if (!e.MoveNext()) break; cur = e.Current; }
+            catch (Exception ex) { Debug.Log("[WSZH] card text check failed: " + ex.Message); yield break; }
+            yield return cur;
+        }
+        Debug.Log("[WSZH] card text check: " + (diff < 0 ? "offline" : diff + " file(s) differ"));
+        if (diff <= 0) yield break;
+        noticeText = WszhCardText.LineCount() == 0 ? "還沒下載卡片翻譯，卡片效果會顯示英文" : "卡片翻譯有更新（" + diff + " 個檔案）";
+        noticeCanUpdate = true;
+        noticeHideAt = 0;
+        gameObject.AddComponent<WszhCardTextNotice>();
+    }
+
+    internal void NoticeUpdate()
+    {
+        if (cardBusy || noticeBusy) return;
+        noticeBusy = true; noticeCanUpdate = false;
+        cardBusy = true;
+        StartCoroutine(RunCardTextUpdate());
     }
 
     // 卡片翻譯（4 萬多條）第一次用到時才載入會頓 0.3 秒左右，改成在主選單就先載好
@@ -650,8 +688,8 @@ public class WszhLang : MonoBehaviour
     }
 
     // 這個檔案、CardText.cs、JpArt.cs 裡給玩家看的中文字的繁→簡對照（用 OpenCC 產生；新增文字時要補上）
-    const string TradChars = "個側傷內動勝區問啟單圖場夾對幀庫張後從態戰戲換擇擊擬敗時暫會條構檔檢沒減灣為無狀獲畢確穩紀紅級組結經綠網線編與藍裝裡複視試語說請證譯讀變費資載輯這連進遊過選還錄長開間關階雲預題顏驗驟體黃";
-    const string SimpChars = "个侧伤内动胜区问启单图场夹对帧库张后从态战戏换择击拟败时暂会条构档检没减湾为无状获毕确稳纪红级组结经绿网线编与蓝装里复视试语说请证译读变费资载辑这连进游过选还录长开间关阶云预题颜验骤体黄";
+    const string TradChars = "個側傷內動勝區問啟單圖場夾對幀庫張後從態戰戲換擇擊擬敗時暫會條構檔檢沒減灣為無狀獲畢確穩紀紅級組結經綠網線編與藍裝裡複視試語說請證譯讀變費資載輯這連進遊過選還錄長開間關階雲預題顏驗驟體黃閉顯";
+    const string SimpChars = "个侧伤内动胜区问启单图场夹对帧库张后从态战戏换择击拟败时暂会条构档检没减湾为无状获毕确稳纪红级组结经绿网线编与蓝装里复视试语说请证译读变费资载辑这连进游过选还录长开间关阶云预题颜验骤体黄闭显";
     internal static string ToSimplified(string s)
     {
         if (string.IsNullOrEmpty(s)) return s;
@@ -662,6 +700,8 @@ public class WszhLang : MonoBehaviour
 
     // 簡體中文模式時把我們自己顯示的文字轉成簡體
     static string Zh(string s) { return ReadLanguage() == "cn" ? ToSimplified(s) : s; }
+    internal static string ZhText(string s) { return Zh(s); }
+    internal static void StartNoticeUpdate() { if (inst != null) inst.NoticeUpdate(); }
 
     void BuildCardTextUI(object os, Type osType, Canvas cv, float H)
     {
@@ -733,15 +773,25 @@ public class WszhLang : MonoBehaviour
     IEnumerator RunCardTextUpdate()
     {
         string last = null;
-        var e = WszhCardText.Download(ReadLanguage(), s => { last = s; if (cardStatus != null) SetTextOf(cardStatus, Zh(s)); });
+        var e = WszhCardText.Download(ReadLanguage(), s => { last = s; if (cardStatus != null) SetTextOf(cardStatus, Zh(s)); if (noticeText != null) noticeText = s; });
+        bool ok = true;
         while (true)
         {
             object cur;
             try { if (!e.MoveNext()) break; cur = e.Current; }
-            catch (Exception ex) { last = "更新失敗：" + ex.Message; if (cardStatus != null) SetTextOf(cardStatus, Zh(last)); break; }
+            catch (Exception ex) { ok = false; last = "更新失敗：" + ex.Message; if (cardStatus != null) SetTextOf(cardStatus, Zh(last)); break; }
             yield return cur;
         }
         cardBusy = false;
+        // 主選單的提醒列：更新完顯示結果幾秒後關掉；失敗就留著「立即更新」可以再按
+        if (noticeText != null)
+        {
+            noticeBusy = false;
+            if (!ok) noticeText = last;
+            bool done = ok && last != null && (last.StartsWith("卡片翻譯已是最新") || last.StartsWith("卡片翻譯更新完成"));
+            noticeCanUpdate = !done;
+            noticeHideAt = done ? Time.realtimeSinceStartup + 5f : 0;
+        }
     }
 
     // 新建一個文字物件，只沿用範本的字型、顏色與樣式
@@ -1435,6 +1485,37 @@ public class WszhLang : MonoBehaviour
 }
 
 // 輸出卡片文字時的進度（只在輸出時才掛上，平常沒有 OnGUI 的成本）
+// 主選單上方的「卡片翻譯有更新」提醒列（只在主選單顯示，進對戰或牌組編輯就不畫）
+public class WszhCardTextNotice : MonoBehaviour
+{
+    GUIStyle box, btn;
+    void OnGUI()
+    {
+        if (WszhLang.noticeText == null) { Destroy(this); return; }
+        if (WszhLang.noticeHideAt > 0 && Time.realtimeSinceStartup > WszhLang.noticeHideAt) { WszhLang.noticeText = null; Destroy(this); return; }
+        if (SceneManager.GetActiveScene().name != WszhLang.menuScene) return;
+        float s = Mathf.Clamp(Screen.height / 1080f, 0.7f, 2f);
+        if (box == null)
+        {
+            box = new GUIStyle(GUI.skin.box) { alignment = TextAnchor.MiddleLeft, wordWrap = false };
+            btn = new GUIStyle(GUI.skin.button);
+        }
+        box.fontSize = btn.fontSize = Mathf.RoundToInt(22 * s);
+        box.padding = new RectOffset(Mathf.RoundToInt(16 * s), 0, 0, 0);
+        float w = 860 * s, h = 56 * s, bw = 150 * s, bh = 40 * s, gap = 10 * s;
+        var r = new Rect((Screen.width - w) / 2, 12 * s, w, h);
+        GUI.Box(r, WszhLang.ZhText(WszhLang.noticeText), box);
+        float bx = r.xMax - gap - bw * 0.7f, by = r.y + (h - bh) / 2;
+        if (GUI.Button(new Rect(bx, by, bw * 0.7f, bh), WszhLang.ZhText(WszhLang.noticeBusy ? "…" : "關閉"), btn) && !WszhLang.noticeBusy)
+        { WszhLang.noticeText = null; Destroy(this); return; }
+        if (WszhLang.noticeCanUpdate)
+        {
+            bx -= gap + bw;
+            if (GUI.Button(new Rect(bx, by, bw, bh), WszhLang.ZhText("立即更新"), btn)) WszhLang.StartNoticeUpdate();
+        }
+    }
+}
+
 public class WszhDumpOverlay : MonoBehaviour
 {
     void OnGUI()

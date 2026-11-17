@@ -542,6 +542,46 @@ public static class WszhCardText
         return r;
     }
 
+    // 開遊戲時在背景檢查：雲端有幾個檔案和本機不同（含本機多出來、雲端已刪的）。result：-1 = 無法檢查
+    public static System.Collections.IEnumerator CheckUpdates(string lang, Action<int> result)
+    {
+        string sub = lang == "cn" ? "cn" : "tw";
+        string manifest = null;
+        using (var r = Get(CardTextBase + (sub == "cn" ? "manifest_cn.txt" : "manifest.txt")))
+        {
+            r.timeout = 20;
+            yield return r.SendWebRequest();
+            if (r.result == UnityEngine.Networking.UnityWebRequest.Result.Success) manifest = r.downloadHandler.text;
+        }
+        if (manifest == null) { result(-1); yield break; }
+        int diff = 0, n = 0;
+        string dir = CardTextDir(sub);
+        var keep = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var t0 = DateTime.Now;
+        foreach (var raw in manifest.Split('\n'))
+        {
+            var p = raw.Trim().Split('\t');
+            if (p.Length < 3 || p[0].StartsWith("#") || !p[2].EndsWith(".json") || p[2].IndexOfAny(new[] { '/', '\\' }) >= 0) continue;
+            n++;
+            keep.Add(p[2]);
+            string path = Path.Combine(dir, p[2]);
+            bool same = false;
+            try
+            {
+                // 先比大小（快），一樣才算 sha256
+                var fi = new FileInfo(path);
+                long size;
+                same = fi.Exists && (!long.TryParse(p[1], out size) || fi.Length == size) && Sha256(File.ReadAllBytes(path)) == p[0].ToLowerInvariant();
+            }
+            catch { }
+            if (!same) diff++;
+            if ((DateTime.Now - t0).TotalMilliseconds > 8) { yield return null; t0 = DateTime.Now; }   // 分散到多個畫格，不卡主選單
+        }
+        if (n == 0) { result(-1); yield break; }
+        try { if (Directory.Exists(dir)) foreach (var f in Directory.GetFiles(dir, "*.json")) if (!keep.Contains(Path.GetFileName(f))) diff++; } catch { }
+        result(diff);
+    }
+
     // lang：目前的語言。简体中文下載 cardtext/cn/（清單 manifest_cn.txt），其他（台灣、香港）下載 cardtext/tw/
     public static System.Collections.IEnumerator Download(string lang, Action<string> status)
     {
