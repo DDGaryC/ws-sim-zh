@@ -5640,3 +5640,13 @@ Choose up to 2 "Maru-kun" or <Mugendai MewType> characters=请选择最多 2 张
 Choose up to 2 "Maru-kun" or «Mugendai MewType» characters=请选择最多 2 张「Maru-kun」或《Mugendai MewType》角色
 Put up to 2 cards from your hand into your stock?=要将你手牌最多 2 张卡放置到能量区吗？
 Choose a character to give the following ability: "Auto: When this card's battle opponent becomes reversed, you may put that character on the top of your opponent's deck.".=请选择 1 张角色，给予以下能力：「【自】这张卡的战斗对手变成倒置时，你可以将那张角色放置到对手的卡组顶。」
+Choose a character in your opponent's stage to <sprite name\="rest"/>.=请选择对手舞台上的 1 张角色，将其 <sprite name\="rest"/>。
+Choose up to 2 of your characters to get +2000 power until end of turn=请选择你的最多 2 张角色，直到回合结束为止，战力 +2000
+Choose up to 1 card to put at the bottom of your opponent's deck=请选择最多 1 张卡，放置到对手卡组底
+Choose up to 2 cards to shuffle into your opponent's deck.=请选择最多 2 张卡，洗入对手的卡组。
+Choose how many cards you want to draw (up to 3).=请选择要抽几张卡（最多 3 张）。
+Choose a character to get +1 soul until end of turn=请选择 1 张角色，直到回合结束为止，魂 +1
+Choose up to 1 other character to get +1 level and +1000 power until end of turn.=请选择最多 1 张其他的角色，直到回合结束为止，等级 +1 且战力 +1000。
+Choose up to 1 character to get +2000 power.=请选择最多 1 张角色，给予战力 +2000。
+Choose a character to put at the top of your opponent's deck.=请选择 1 张角色，放置到对手的卡组顶。
+Choose a character to get +X soul until end of turn, where X is the level of the card milled by this effect=请选择 1 张角色，直到回合结束为止，魂 +X，X 为因此效果被放置到控室的卡的等级
