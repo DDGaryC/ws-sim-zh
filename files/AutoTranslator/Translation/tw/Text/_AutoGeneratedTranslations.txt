@@ -65,3 +65,5 @@ Choose 1 characters to put under Happy Birthday, Yuno Sengoku as a marker.=請�
 Open Lobbies: 0=開放中的房間：0
 Markers under Like a Dream, Nanoha=Like a Dream, Nanoha 下方的標記
 Your card data may be out of date.\n\nLast update run: 11月 17, 2026 12:14 下午 local\nLatest repo commit: 11月 19, 2026 7:16 上午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 17, 2026 12:14 下午 local\n\n最新版本：11月 19, 2026 7:16 上午 local\n\n\n\n要前往設定進行更新嗎？
+Counter Step: 12=反擊階段：12
+Choose a slot to place Legendary Racer, Doc Hudson in.=請選擇放置 Legendary Racer, Doc Hudson 的位置。
