@@ -86,6 +86,8 @@ def build_files():
     quoted['Choose order to resolve effects:'] = '請選擇效果處理的順序：'
     quoted['Use this effect now?'] = '現在要使用這個效果嗎？'
     quoted['Pay the cost and use this effect?'] = '要支付費用並使用這個效果嗎？'
+    # 遊戲內建的再演 3（CardLibrary.encore3，所有角色都有），再演詢問和效果說明列會顯示
+    quoted['Auto: Encore [<sprite name="3cost"/>]'] = '【自】【再演】[<sprite name="3cost"/>]'
     for a, b in prompt_option_pairs():
         if a not in known and a not in quoted: quoted[a] = b
     files['zz_quoted'] = quoted

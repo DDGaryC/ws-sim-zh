@@ -2090,6 +2090,7 @@
 "Choose order to resolve effects:": "請選擇效果處理的順序：",
 "Use this effect now?": "現在要使用這個效果嗎？",
 "Pay the cost and use this effect?": "要支付費用並使用這個效果嗎？",
+"Auto: Encore [<sprite name=\"3cost\"/>]": "【自】【再演】[<sprite name=\"3cost\"/>]",
 "Place this card to the waiting room or on the bottom of the deck?": "要將這張卡放置到休息室還是牌庫底？",
 "Place it to the waiting room": "放置到休息室",
 "1. Place it to the waiting room": "1. 放置到休息室",
@@ -4554,5 +4555,6 @@
 "2. Your opponent reveals the top 3 cards of their deck, shuffles their deck, and puts X cards from the top of their deck into their clock. X is equal to the number of climax revealed among those cards.": "2. 對手公開其牌庫頂的 3 張卡，將牌庫洗牌，然後將其牌庫頂的 X 張卡放置到傷害區。X 等於那些公開的卡中名場面的數量。",
 "Choose up to 2 \"Maru-kun\" or <Mugendai MewType> characters": "請選擇最多 2 張「Maru-kun」或《Mugendai MewType》角色",
 "Choose a character to give the following ability: \"Auto: When this card's battle opponent becomes reversed, you may put that character on the top of your opponent's deck.\".": "請選擇 1 張角色，給予以下能力：「【自】這張卡的戰鬥對手變成倒置時，你可以將那張角色放置到對手的牌庫頂。」",
-"Choose a character in your opponent's stage to <sprite name=\"rest\"/>.": "請選擇對手舞台上的 1 張角色，將其 <sprite name=\"rest\"/>。"
+"Choose a character in your opponent's stage to <sprite name=\"rest\"/>.": "請選擇對手舞台上的 1 張角色，將其 <sprite name=\"rest\"/>。",
+"Choose a \"Prideful One, Shana\" to place on stage": "請選擇 1 張「Prideful One, Shana」放置到舞台。"
 }

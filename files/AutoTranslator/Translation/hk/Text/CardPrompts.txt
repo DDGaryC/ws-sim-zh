@@ -5650,3 +5650,4 @@ Choose up to 1 other character to get +1 level and +1000 power until end of turn
 Choose up to 1 character to get +2000 power.=請選擇最多 1 張角色，給予戰力 +2000。
 Choose a character to put at the top of your opponent's deck.=請選擇 1 張角色，放置到對手的牌庫頂。
 Choose a character to get +X soul until end of turn, where X is the level of the card milled by this effect=請選擇 1 張角色，直到回合結束為止，魂 +X，X 為因此效果被放置到控制室的卡的等級
+Choose a "Prideful One, Shana" to place on stage=請選擇 1 張「Prideful One, Shana」放置到舞台。

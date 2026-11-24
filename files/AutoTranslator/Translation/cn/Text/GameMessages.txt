@@ -19,6 +19,7 @@ r:"^Send ([0-9]+) cards\.$"=选择 $1 张卡（支付费用）。
 r:"^Choose cards? to flip face-down$"=请选择要翻成背面朝上的卡
 r:"^Choose cards? to flip face-up$"=请选择要翻成正面朝上的卡
 r:"^Send (.+) to the waiting room to return (.+) to the stage rested\?$"=要将「$1」放置到控室，让「$2」以横置状态回到舞台吗？
+r:"^Exchange a (.+) card in your hand with (.+) in your clock\?$"=要将手牌中 1 张 $1 卡和时计区的「$2」交换吗？
 r:"^Opponent chose <(.+)>$"=对手选择了《$1》
 r:"^Opponent chose (.+)\.$"=对手选择了「$1」。
 r:"^Opponent must discard down to ([0-9]+) cards\.$"=对手必须把手牌丢弃到剩 $1 张。

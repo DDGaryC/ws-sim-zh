@@ -28,6 +28,7 @@ RULES = [
     (r'^Choose cards? to flip face-down$', '請選擇要翻成背面朝上的卡', '请选择要翻成背面朝上的卡'),
     (r'^Choose cards? to flip face-up$', '請選擇要翻成正面朝上的卡', '请选择要翻成正面朝上的卡'),
     (r'^Send (.+) to the waiting room to return (.+) to the stage rested\?$', '要將「$1」放置到休息室，讓「$2」以橫置狀態回到舞台嗎？', '要将「$1」放置到控室，让「$2」以横置状态回到舞台吗？'),
+    (r'^Exchange a (.+) card in your hand with (.+) in your clock\?$', '要將手牌中 1 張 $1 卡和傷害區的「$2」交換嗎？', '要将手牌中 1 张 $1 卡和时计区的「$2」交换吗？'),
     (r'^Opponent chose <(.+)>$', '對手選擇了《$1》', '对手选择了《$1》'),
     (r'^Opponent chose (.+)\.$', '對手選擇了「$1」。', '对手选择了「$1」。'),
     (r'^Opponent must discard down to %s cards\.$' % N, '對手必須把手牌丟棄到剩 $1 張。', '对手必须把手牌丢弃到剩 $1 张。'),

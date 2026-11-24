@@ -86,6 +86,13 @@ public static class WszhCardText
                 // 誘發效果排序：傷害相關的自動能力後面接「(3 Damage)」
                 var dm = Regex.Match(tr, @"^\((\d+) Damage\)$");
                 if (dm.Success) { lines[i] = "（" + dm.Groups[1].Value + (loadedLang == "cn" ? " 点伤害）" : " 點傷害）"); changed = true; continue; }
+                // 再演詢問：DeckCard 組的「Use <效果原文> on <卡名>?」（效果原文要查表翻）
+                var um = Regex.Match(tr, @"^Use (.+) on (.+)\?$");
+                if (um.Success && map.TryGetValue(um.Groups[1].Value.Trim(), out whole))
+                {
+                    lines[i] = (loadedLang == "cn" ? "要对「" : "要對「") + um.Groups[2].Value + "」使用 " + whole + (loadedLang == "cn" ? " 吗？" : " 嗎？");
+                    changed = true; continue;
+                }
                 // 對不到時，行首可能有遊戲加上的標籤（例如 <color=#000000>），拿掉再比對
                 // 一個一個拿掉行首標籤再比對（對戰時是「顏色標籤＋判定圖示＋文字」，判定圖示本身是譯文的一部分）
                 int p = 0;

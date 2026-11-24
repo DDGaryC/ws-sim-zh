@@ -311,10 +311,10 @@ Choose stage position.=請選擇想要放置的地點。
 Move=移動
 Choose new position.=請選擇想要移動的地點。
 Choose which effect to resolve first=請選擇想要優先發動的效果。
-Place this card on the bottom of the deck? (Press no to return it to the top)=
-Put this card into your hand or your stock?=
+Place this card on the bottom of the deck? (Press no to return it to the top)=要將這張卡放置到牌庫底嗎？（按「否」則放回牌庫頂）
+Put this card into your hand or your stock?=要將這張卡加入手牌，還是放置到能量區？
 Choose 1
-Choose 0 to 3 cards.=
+Choose 0 to 3 cards.=請選擇 0～3 張卡。
 
 // ===== 2026-10-05 補充翻譯 =====
 // --- 主選單 ---
