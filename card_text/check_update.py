@@ -47,6 +47,47 @@ def known_effects():
     return s
 
 
+# ---------- 共用範本（CommonEffects）：照遊戲 CommonEffect.GetTextWithReplacements 的規則組出文字 ----------
+_CE = None
+def common_effect_text(name, argstr):
+    global _CE
+    if _CE is None:
+        _CE = {}
+        cur = None
+        p = os.path.join(SIM, 'Weiss Schwarz_Data', 'StreamingAssets', 'CommonEffects_USER_REFERENCE.txt')
+        if os.path.exists(p):
+            for raw in open(p, encoding='utf-8-sig', errors='ignore'):
+                l = raw.rstrip('\r\n')
+                m = re.match(r'^Define:\s*([A-Za-z0-9_]+)\s*(?:\((.*)\))?\s*$', l)
+                if m:
+                    cur = m.group(1); _CE[cur] = ([x.strip() for x in m.group(2).split(',')] if m.group(2) else [], [])
+                elif cur and re.match(r'^\s+Text ', l):
+                    _CE[cur][1].append(l.strip()[5:])
+    if name not in _CE: return []
+    params, texts = _CE[name]
+    args, buf, i, s = [], '', 0, argstr or ''
+    while i < len(s):                       # 逗號分隔，「\,」是參數裡的逗號
+        if s[i] == '\\' and i + 1 < len(s): buf += s[i + 1]; i += 2; continue
+        if s[i] == ',': args.append(buf.strip()); buf = ''; i += 1; continue
+        buf += s[i]; i += 1
+    if s: args.append(buf.strip())
+    out = []
+    for t in texts:
+        for prm, a in zip(params, args):
+            if '|' in a:
+                parts = ['<' + x.replace('$', '').strip() + '>' for x in a.split('|')]
+                t = t.replace('$' + prm, ' '.join(parts[:-1]) + ' or ' + parts[-1])
+            else:
+                t = t.replace('$' + prm, '<' + a + '>')
+            t = t.replace(prm, a)
+        out.append(t.replace(' <Any>', '').replace(' < Any>', '').replace(' <None>', ' traitless'))
+    return out
+
+
+# 羈絆範本由遊戲裡的 CardText.Bond() 直接組中文（卡名不固定），不用逐句翻
+BOND_RX = re.compile(r'^Auto: BOND/ <b>(.+?)</b>"? ?\[(.*?)\] ?\(<i>When this card is placed on the stage from your hand, you may pay the cost\. If you do, choose 1 .+? in your waiting room, and return it to your hand</i>\)\.?$')
+
+
 def card_effects():
     lines = {}
     for f in glob.glob(os.path.join(SIM, 'CardContent', 'Cards', '*', '*', 'CardData.txt')):
@@ -57,10 +98,16 @@ def card_effects():
             if m: cur = m.group(2); continue
             # 縮排在效果區塊裡的 Text 也要（角色獲得那個能力後，預覽會顯示這段，例如「Auto: (Canace) When…」）
             m = re.match(r'^\s*Text:?\s+(.*)$', line.rstrip('\n'))
-            if m and cur:
-                for part in m.group(1).split(BS):
-                    part = part.strip()
-                    if part and re.search(r'[A-Za-z]{3}', part): lines.setdefault(part, (cur, folder))
+            texts = [m.group(1)] if m else []
+            # 縮排在效果區塊裡的共用範本（例如 GainEffect 底下的 *BondDiscard(卡名)）：角色獲得能力時，
+            # 遊戲用範本＋參數臨時組出文字，卡片本身的效果裡沒有這句（2026-11-26 艾吉斯獲得的【羈絆】就是這樣漏掉）
+            m2 = re.match(r'^\s+\*([A-Za-z0-9_]+)(?:\((.*)\))?\s*$', line.rstrip('\r\n'))
+            if m2: texts = common_effect_text(m2.group(1), m2.group(2))
+            if texts and cur:
+                for tx in texts:
+                    for part in tx.split(BS):
+                        part = part.strip()
+                        if part and re.search(r'[A-Za-z]{3}', part) and not BOND_RX.match(part): lines.setdefault(part, (cur, folder))
     # 遊戲用共用範本組出來的效果（卡片資料只寫 *GivePowerOnPlay(3000,Tankery) 這種），卡片資料裡沒有原文：
     # 在遊戲主選單按 Ctrl+Shift+F12 會把所有卡實際的效果文字倒到 CardText_dump.tsv（卡號<Tab>系列<Tab>效果，換行寫成 \n）
     dump = os.path.join(SIM, 'CardText_dump.tsv')
