@@ -115,6 +115,18 @@ def check_names():
     new = {c: v for c, v in miss.items() if c not in tried}
     print('系列中文名：沒有 %d 個' % len(ms))
     for s in ms: print('  ' + s)
+    # 牌組編輯系列選單顯示的名稱是另一份（WSZH_Translations.txt 的「英文系列名=中文」，由 add_update_20261102.py 加）
+    disp = set()
+    wt = os.path.join(os.path.dirname(D), 'files', 'AutoTranslator', 'Translation', 'tw', 'Text', 'WSZH_Translations.txt')
+    for l in open(wt, encoding='utf-8-sig'):
+        if '=' in l and not l.startswith('//'): disp.add(l.split('=', 1)[0].strip())
+    allser = set()
+    for f in glob.glob(os.path.join(NM.CARDS, '*', 'SingleSetData.txt')):
+        for line in open(f, encoding='utf-8', errors='ignore'):
+            if line.startswith('Series:'): allser.add(line[7:].strip())
+    md = sorted(s for s in allser if s not in disp and s != 'AUGUST')
+    print('系列選單顯示名稱：沒有 %d 個（加到 add_update_20261102.py 的系列名稱段）' % len(md))
+    for s in md: print('  ' + s)
     print('日文卡名：新卡沒有日文名 %d 張（之前查不到的 %d 張不再列出）' % (len(new), len(miss) - len(new)))
     by = {}
     for c, folder in new.items(): by.setdefault(folder, []).append(c)

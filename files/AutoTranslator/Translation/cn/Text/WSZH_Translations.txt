@@ -1111,3 +1111,22 @@ r:"^(<sprite[^>]*>) ?Choose up to 1 cost 0 or lower character in your waiting ro
 Say hello to your opponent.\nMessages are kept for this lobby (latest 300).=跟对手打声招呼吧。\n讯息会保留到离开大厅为止（最新 300 则）。
 r:"(?s)^You could not connect to this game because your card data does not match the host's\.\n\nThis usually means your card content is out of date\. You will be taken to Settings to update it\.\n\nA detailed card-data mismatch report was saved locally:\n(.+)$"=你的卡片资料和房主不同，无法加入这场对战。\n\n通常是你的卡片资料不是最新的，接下来会带你到设定页面进行更新。\n\n详细的差异报告已经存在：\n$1
 r:"(?s)^You could not connect to this game because your card data does not match the host's\.\n\nThis usually means your card content is out of date\. You will be taken to Settings to update it\.\n\nThe card-data mismatch report could not be saved in either IncidentLogs directory\. See the Unity log for details\.$"=你的卡片资料和房主不同，无法加入这场对战。\n\n通常是你的卡片资料不是最新的，接下来会带你到设定页面进行更新。\n\n（差异报告没办法存档，详细情况请看游戏的纪录档）
+// --- 0.8.0.0 對戰桌面主題 ---
+Duel Table Theme=对战桌面主题
+Original Green=原版绿
+Modern (Light)=现代（浅色）
+Modern (Dark)=现代（深色）
+Classic Navy=经典海军蓝
+Stone Red=红色石材
+Fantasy Forest=奇幻森林
+Cyberspace=网路空间
+Beach Episode=海滩回
+Waiting for the first player to finish their mulligan.=等待先攻玩家完成换牌。
+Waiting for the second player to finish their mulligan.=等待后攻玩家完成换牌。
+// --- 系列名稱（牌組編輯的系列選單；搜尋用的另見 card_text\series_zh.txt） ---
+Persona 30th Anniversary=女神异闻录 30 周年
+Girls und Panzer=少女战车
+Stella Sora=星塔旅人
+Rurouni Kenshin=浪客剑心
+Revue Starlight (Blau)=少女☆歌剧 Revue Starlight（Blau）
+Tales of Series (Blau)=传说系列（Blau）

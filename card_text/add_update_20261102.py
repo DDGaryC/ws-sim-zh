@@ -114,6 +114,26 @@ ENTRIES = [
      '你的卡片資料和房主不同，無法加入這場對戰。\\n\\n通常是你的卡片資料不是最新的，接下來會帶你到設定頁面進行更新。\\n\\n詳細的差異報告已經存在：\\n$1'),
     ('r:"(?s)^You could not connect to this game because your card data does not match the host\'s\\.\\n\\nThis usually means your card content is out of date\\. You will be taken to Settings to update it\\.\\n\\nThe card-data mismatch report could not be saved in either IncidentLogs directory\\. See the Unity log for details\\.$"',
      '你的卡片資料和房主不同，無法加入這場對戰。\\n\\n通常是你的卡片資料不是最新的，接下來會帶你到設定頁面進行更新。\\n\\n（差異報告沒辦法存檔，詳細情況請看遊戲的紀錄檔）'),
+    # 2026-11-26 模擬器 0.8.0.0：對戰桌面主題、照規則的換牌順序（先攻換完後攻才換）
+    '// --- 0.8.0.0 對戰桌面主題 ---',
+    ('Duel Table Theme', '對戰桌面主題'),
+    ('Original Green', '原版綠'),
+    ('Modern (Light)', '現代（淺色）'),
+    ('Modern (Dark)', '現代（深色）'),
+    ('Classic Navy', '經典海軍藍'),
+    ('Stone Red', '紅色石材'),
+    ('Fantasy Forest', '奇幻森林'),
+    ('Cyberspace', '網路空間'),
+    ('Beach Episode', '海灘回'),
+    ('Waiting for the first player to finish their mulligan.', '等待先攻玩家完成換牌。'),
+    ('Waiting for the second player to finish their mulligan.', '等待後攻玩家完成換牌。'),
+    '// --- 系列名稱（牌組編輯的系列選單；搜尋用的另見 card_text\\series_zh.txt） ---',
+    ('Persona 30th Anniversary', '女神異聞錄 30 週年'),
+    ('Girls und Panzer', '少女戰車'),
+    ('Stella Sora', '星塔旅人'),
+    ('Rurouni Kenshin', '浪客劍心'),
+    ('Revue Starlight (Blau)', '少女☆歌劇 Revue Starlight（Blau）'),
+    ('Tales of Series (Blau)', '傳說系列（Blau）'),
 ]
 
 

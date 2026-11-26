@@ -111,8 +111,8 @@ public class WszhLang : MonoBehaviour
     static string FpsLabel()
     {
         int cap = FpsCap;
-        if (ReadLanguage() == "en") return "Frame rate limit: " + (cap > 0 ? cap + " FPS" : "None");
-        return Zh("幀率上限：" + (cap > 0 ? cap + " FPS" : "不限制"));
+        if (ReadLanguage() == "en") return cap > 0 ? cap + " FPS" : "None";
+        return cap > 0 ? cap + " FPS" : Zh("不限制");
     }
 
     Graphic fpsLabel;
@@ -309,6 +309,33 @@ public class WszhLang : MonoBehaviour
         rt.position = world - centerOffset;
     }
 
+    // ---- 「中文化設定」獨立頁 ----
+    // 設定頁只放一顆「中文化設定」按鈕（模擬器的下拉選單最下面那一列的下方）；按下去打開我們自己的一頁，
+    // 放語言、幀率上限、更新卡片翻譯、日版卡圖、下載牌組卡圖。模擬器之後再加設定也不會跟它們擠在一起。
+    // 外觀沿用設定頁原本的字型與按鈕圖樣，下拉選單也是遊戲同款（TextMeshPro）。
+    GameObject page;                 // 我們的那一頁（平常隱藏）
+    Canvas pageCanvas;
+    Graphic entryLabel, pageTitle, cardTitle, closeLabel;
+
+    static string L(string zh, string en) { return ReadLanguage() == "en" ? en : Zh(zh); }
+
+    void OpenPage() { if (page != null) { page.SetActive(true); page.transform.SetAsLastSibling(); ShowCardTextInfo(); } }
+    void ClosePage() { if (page != null) page.SetActive(false); }
+
+    // 新建一段文字，放在指定的螢幕位置（width 是螢幕像素）
+    Graphic AddText(Graphic tmpl, Transform parent, string name, string text, float size, float width, Vector2 pos)
+    {
+        var go = MakeText(tmpl, parent, name);
+        var g = go.GetComponent<Graphic>();
+        var rt = (RectTransform)go.transform;
+        SetSizeOf(g, size);
+        Normalize(g, width / Mathf.Max(0.0001f, rt.lossyScale.x), size);
+        g.raycastTarget = false;
+        SetTextOf(g, text);
+        PlaceAt(rt, pos, pageCanvas);
+        return g;
+    }
+
     void Build()
     {
         Type osType = AppDomain.CurrentDomain.GetAssemblies().Select(x => x.GetType("OptionsScreen")).FirstOrDefault(t => t != null);
@@ -321,97 +348,95 @@ public class WszhLang : MonoBehaviour
         Canvas cv = on.GetComponentInParent<Canvas>();
         if (cv == null) { Debug.Log("[WSZH] language UI: canvas not found"); return; }
         cv = cv.rootCanvas;
-
-        Vector2 pOn = ScreenPos(on, cv), pOff = ScreenPos(off, cv);
-        float cx = (pOn.x + pOff.x) / 2, by = pOn.y;
-
-        // 這一區的標題：按鈕上方、同一欄、字最大的那段文字
-        // （設定頁的標題是 Unity 舊式的 Text，也可能是 TextMeshPro，兩種都找）
-        Graphic refTitle = null;
-        var all = FindObjectsOfType<Graphic>().Where(t => (t is TMP_Text || t is Text) && t.GetComponentInParent<Button>() == null).ToList();
-        foreach (var t in all)
-        {
-            Canvas tc = t.canvas; if (tc == null) continue;
-            Vector2 p = ScreenPos(t, tc.rootCanvas);
-            if (Mathf.Abs(p.x - cx) > Screen.width * 0.2f || p.y <= by || p.y > by + Screen.height * 0.3f) continue;
-            if (refTitle == null || SizeOf(t) > SizeOf(refTitle)) refTitle = t;
-        }
-        if (refTitle == null)
-        {
-            // 找不到時把畫面上的文字都記下來，方便查原因
-            var sb = new StringBuilder("[WSZH] language UI: buttons at " + cx + "," + by + " screen " + Screen.width + "x" + Screen.height + "; texts:");
-            foreach (var t in all)
-            {
-                Canvas tc = t.canvas;
-                Vector2 p = tc == null ? Vector2.zero : ScreenPos(t, tc.rootCanvas);
-                string tx = t is TMP_Text ? ((TMP_Text)t).text : ((Text)t).text;
-                sb.Append("\n  " + t.GetType().Name + " '" + (tx ?? "").Replace("\n", " ").Substring(0, Math.Min(20, (tx ?? "").Length)) + "' at " + p + " size " + SizeOf(t) + " canvas " + (tc == null ? "-" : tc.renderMode.ToString()));
-            }
-            Debug.Log(sb.ToString());
-        }
+        pageCanvas = cv;
         TMP_Text backLabel = back.GetComponentInChildren<TMP_Text>(true);
         if (backLabel == null) { Debug.Log("[WSZH] language UI: back button label not found"); return; }
-        float H = Screen.height;
-        // 找不到原本的標題時，改用「回到主界面」按鈕上的文字當範本（同樣是遊戲的字型）
-        Transform host = refTitle != null ? refTitle.transform.parent : back.transform.parent;
-        Graphic tmpl = refTitle;
-        float titleSize = refTitle != null ? SizeOf(refTitle) : backLabel.fontSize * 1.25f;
-        if (tmpl == null) tmpl = backLabel;
+        var fUpd = osType.GetField("updateCardsButton", Any);
+        var fUpdText = osType.GetField("updateStatusText", Any);
+        var upd = fUpd == null ? null : fUpd.GetValue(os) as Button;
+        var updText = fUpdText == null ? null : fUpdText.GetValue(os) as Text;
+        float W = Screen.width, H = Screen.height;
+        var backRt = (RectTransform)back.transform;
+        float backW = backRt.rect.width * backRt.lossyScale.x, backH = backRt.rect.height * backRt.lossyScale.y;
 
-        // 擺放位置：預設是左欄「讓對手看到你的自訂卡套」下方，標題／選單／幀率按鈕／提示由上往下
-        Vector2 titlePos = new Vector2(cx, by - H * 0.085f), ddPos = new Vector2(cx, by - H * 0.155f),
-                fpsPos = new Vector2(cx, by - H * 0.222f), stPos = new Vector2(cx, by - H * 0.285f);
-        Vector2 ddSize = Vector2.zero;
-        // 模擬器 0.7.9.5 起那裡多了「Emote Pack」（標籤在左、下拉選單在右）：改成跟它同樣的排法，放在它下面
-        var emote = osType.GetField("emotePackDropdown", Any) == null ? null : osType.GetField("emotePackDropdown", Any).GetValue(os) as TMP_Dropdown;
-        if (emote != null && emote.gameObject.activeInHierarchy)
+        // 入口按鈕的位置：遊戲下拉選單（表情包、0.8.0.0 起的對戰桌面主題）最下面那一個的下方；
+        // 沒有的話放在左欄「讓對手看到你的自訂卡套」按鈕下方
+        Vector2 pOn = ScreenPos(on, cv), pOff = ScreenPos(off, cv);
+        Vector2 entryPos = new Vector2((pOn.x + pOff.x) / 2, pOn.y - H * 0.12f);
+        float ddW = backW * 1.05f, ddH = backH;
+        Graphic labelTmpl = null;
+        TMP_Dropdown lowestDd = null; float lowest = float.MaxValue;
+        foreach (var fname in new[] { "emotePackDropdown", "tableThemeDropdown" })
         {
-            var ert = (RectTransform)emote.transform;
-            Vector2 ep = ScreenPos(emote, cv);
-            float rh = ert.rect.height * ert.lossyScale.y, rw = ert.rect.width * ert.lossyScale.x;
-            float labelX = ep.x - rw * 1.05f;
-            Graphic emoteLabel = null; float best = float.MaxValue;
-            foreach (var t in all)
-            {
-                Canvas tc = t.canvas; if (tc == null || t.GetComponentInParent<TMP_Dropdown>() != null) continue;
-                Vector2 p = ScreenPos(t, tc.rootCanvas);
-                if (Mathf.Abs(p.y - ep.y) > rh || p.x >= ep.x - rw * 0.5f) continue;
-                float dist = ep.x - p.x;
-                if (dist < best) { best = dist; emoteLabel = t; labelX = p.x; }
-            }
-            titlePos = new Vector2(labelX, ep.y - rh * 1.35f);
-            ddPos = new Vector2(ep.x, ep.y - rh * 1.35f);
-            fpsPos = new Vector2(ep.x, ep.y - rh * 2.6f);
-            stPos = new Vector2(labelX, ep.y - rh * 2.6f);
-            ddSize = ert.rect.size;
-            if (emoteLabel != null) { tmpl = emoteLabel; titleSize = SizeOf(emoteLabel); }
+            var fi = osType.GetField(fname, Any);
+            var d = fi == null ? null : fi.GetValue(os) as TMP_Dropdown;
+            if (d == null || !d.gameObject.activeInHierarchy) continue;
+            float y = ScreenPos(d, cv).y;
+            if (y < lowest) { lowest = y; lowestDd = d; }
         }
+        if (lowestDd != null)
+        {
+            var ert = (RectTransform)lowestDd.transform;
+            Vector2 ep = ScreenPos(lowestDd, cv);
+            ddW = ert.rect.width * ert.lossyScale.x; ddH = ert.rect.height * ert.lossyScale.y;
+            entryPos = new Vector2(ep.x, ep.y - ddH * 1.35f);
+            // 文字範本：下拉選單左邊那個標籤（「表情包」），和設定頁的字一致
+            float best = float.MaxValue;
+            foreach (var t in FindObjectsOfType<Graphic>())
+            {
+                if (!(t is TMP_Text || t is Text) || t.GetComponentInParent<Button>() != null || t.GetComponentInParent<TMP_Dropdown>() != null) continue;
+                Canvas tc = t.canvas; if (tc == null) continue;
+                Vector2 p = ScreenPos(t, tc.rootCanvas);
+                if (Mathf.Abs(p.y - ep.y) > ddH || p.x >= ep.x - ddW * 0.5f) continue;
+                if (ep.x - p.x < best) { best = ep.x - p.x; labelTmpl = t; }
+            }
+        }
+        float labelSize = labelTmpl != null ? SizeOf(labelTmpl) : backLabel.fontSize * 1.1f;
+        if (labelTmpl == null) labelTmpl = backLabel;
 
-        // 標題
-        var titleGo = MakeText(tmpl, cv.transform, "WSZH_LanguageTitle");
-        titleGo.name = "WSZH_LanguageTitle";
-        var titleRt = (RectTransform)titleGo.transform;
-        float textW = ((RectTransform)back.transform).rect.width * 2f;
-        SetSizeOf(titleGo.GetComponent<Graphic>(), titleSize);
-        Normalize(titleGo.GetComponent<Graphic>(), textW, titleSize);
-        titleGo.GetComponent<Graphic>().raycastTarget = false;
-        SetTextOf(titleGo.GetComponent<Graphic>(), "語言 / Language");
-        placed.Clear();
-        Place((RectTransform)titleGo.transform, titlePos, cv);
+        // 入口按鈕
+        var entryRt = MakeButton(back, cv, "WSZH_SettingsButton", L("中文化設定", "Chinese Patch Settings"), OpenPage, out entryLabel);
+        entryRt.sizeDelta = new Vector2(ddW / entryRt.lossyScale.x, ddH / entryRt.lossyScale.y);
+        if (entryLabel != null) SetSizeOf(entryLabel, backLabel.fontSize * 0.85f);
+        PlaceAt(entryRt, entryPos, cv);
 
-        // 下拉選單（用「回到主界面」按鈕的圖樣與字型）
-        Image backImg = back.GetComponent<Image>();
+        // ---- 那一頁：半透明黑底擋住後面的設定頁，中間一個白框 ----
+        page = new GameObject("WSZH_SettingsPage", typeof(RectTransform));
+        page.transform.SetParent(cv.transform, false);
+        var prt = (RectTransform)page.transform;
+        prt.anchorMin = Vector2.zero; prt.anchorMax = Vector2.one; prt.offsetMin = Vector2.zero; prt.offsetMax = Vector2.zero;
+        var pc = page.AddComponent<Canvas>(); pc.overrideSorting = true; pc.sortingOrder = 500;
+        page.AddComponent<GraphicRaycaster>();
+        page.AddComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
+        Transform P = page.transform;
+
+        float bw = Mathf.Min(W * 0.7f, H * 1.35f), bh = H * 0.72f, cx = W / 2, cy = H / 2;
+        var box = new GameObject("WSZH_Box", typeof(RectTransform));
+        box.transform.SetParent(P, false);
+        var brt = (RectTransform)box.transform;
+        brt.anchorMin = brt.anchorMax = brt.pivot = new Vector2(0.5f, 0.5f);
+        brt.sizeDelta = new Vector2(bw / brt.lossyScale.x, bh / brt.lossyScale.y);
+        var bimg = box.AddComponent<Image>();
+        var backImg = back.GetComponent<Image>();
+        if (backImg != null) { bimg.sprite = backImg.sprite; bimg.type = backImg.type; bimg.pixelsPerUnitMultiplier = backImg.pixelsPerUnitMultiplier; }
+        bimg.color = new Color(0.92f, 0.93f, 0.94f, 1f);
+        PlaceAt(brt, new Vector2(cx, cy), cv);
+
+        float colL = cx - bw * 0.2f, colR = cx + bw * 0.16f;
+        pageTitle = AddText(labelTmpl, P, "WSZH_PageTitle", L("中文化設定", "Chinese Patch Settings"), labelSize * 1.5f, bw, new Vector2(cx, cy + bh * 0.4f));
+
+        // 語言
+        AddText(labelTmpl, P, "WSZH_LanguageTitle", "語言 / Language", labelSize, bw * 0.4f, new Vector2(colL, cy + bh * 0.24f));
+        Image bi = back.GetComponent<Image>();
         var res = new TMP_DefaultControls.Resources();
-        if (backImg != null) { res.standard = backImg.sprite; res.background = backImg.sprite; res.inputField = backImg.sprite; }
+        if (bi != null) { res.standard = bi.sprite; res.background = bi.sprite; res.inputField = bi.sprite; }
         GameObject ddGo = TMP_DefaultControls.CreateDropdown(res);
         ddGo.name = "WSZH_LanguageDropdown";
-        ddGo.transform.SetParent(host, false);
+        ddGo.transform.SetParent(P, false);
         var dd = ddGo.GetComponent<TMP_Dropdown>();
         var ddRt = (RectTransform)ddGo.transform;
-        var backRt = (RectTransform)back.transform;
-        ddRt.sizeDelta = ddSize != Vector2.zero ? ddSize : new Vector2(backRt.rect.width * 1.05f, backRt.rect.height);
-        Place(ddRt, ddPos, cv);
-
+        ddRt.sizeDelta = new Vector2(ddW / ddRt.lossyScale.x, ddH / ddRt.lossyScale.y);
+        PlaceAt(ddRt, new Vector2(colR, cy + bh * 0.24f), cv);
         foreach (var t in ddGo.GetComponentsInChildren<TMP_Text>(true))
         {
             t.font = backLabel.font;
@@ -422,11 +447,12 @@ public class WszhLang : MonoBehaviour
             t.alignment = TextAlignmentOptions.Center;
         }
         // 選項列高度配合字的大小
+        float rowH = ddH / ddRt.lossyScale.y;
         var item = dd.template.GetComponentInChildren<Toggle>(true);
         if (item != null)
         {
             var itemRt = (RectTransform)item.transform;
-            float ih = backRt.rect.height * 0.8f;
+            float ih = rowH * 0.8f;
             itemRt.sizeDelta = new Vector2(itemRt.sizeDelta.x, ih);
             var content = (RectTransform)itemRt.parent;
             content.sizeDelta = new Vector2(content.sizeDelta.x, ih);
@@ -441,112 +467,72 @@ public class WszhLang : MonoBehaviour
             }
         }
         // 右邊的箭頭：預設是白色方塊，改成文字「▼」
-        if (dd.captionText != null)
+        Transform arrow = ddGo.transform.Find("Arrow");
+        if (arrow != null)
         {
-            Transform arrow = ddGo.transform.Find("Arrow");
-            if (arrow != null)
-            {
-                var img = arrow.GetComponent<Image>();
-                if (img != null) img.enabled = false;
-                var ag = new GameObject("WSZH_Arrow", typeof(RectTransform));
-                ag.transform.SetParent(arrow, false);
-                var at = ag.AddComponent<Text>();
-                try { at.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch { }
-                at.color = backLabel.color; at.fontSize = Mathf.RoundToInt(backLabel.fontSize * 0.55f);
-                at.alignment = TextAnchor.MiddleCenter; at.text = "▼"; at.raycastTarget = false;
-                at.horizontalOverflow = HorizontalWrapMode.Overflow; at.verticalOverflow = VerticalWrapMode.Overflow;
-                var art = (RectTransform)ag.transform;
-                art.anchorMin = Vector2.zero; art.anchorMax = Vector2.one; art.offsetMin = Vector2.zero; art.offsetMax = Vector2.zero;
-                var arrowRt = (RectTransform)arrow;
-                arrowRt.sizeDelta = new Vector2(backRt.rect.height * 0.6f, backRt.rect.height * 0.6f);
-            }
+            var img = arrow.GetComponent<Image>();
+            if (img != null) img.enabled = false;
+            var ag = new GameObject("WSZH_Arrow", typeof(RectTransform));
+            ag.transform.SetParent(arrow, false);
+            var at = ag.AddComponent<Text>();
+            try { at.font = Resources.GetBuiltinResource<Font>("Arial.ttf"); } catch { }
+            at.color = backLabel.color; at.fontSize = Mathf.RoundToInt(backLabel.fontSize * 0.55f);
+            at.alignment = TextAnchor.MiddleCenter; at.text = "▼"; at.raycastTarget = false;
+            at.horizontalOverflow = HorizontalWrapMode.Overflow; at.verticalOverflow = VerticalWrapMode.Overflow;
+            var art = (RectTransform)ag.transform;
+            art.anchorMin = Vector2.zero; art.anchorMax = Vector2.one; art.offsetMin = Vector2.zero; art.offsetMax = Vector2.zero;
+            ((RectTransform)arrow).sizeDelta = new Vector2(rowH * 0.6f, rowH * 0.6f);
         }
-
         dd.ClearOptions();
         dd.AddOptions(new List<string>(Names));
         int cur = Array.IndexOf(Codes, current);
         dd.SetValueWithoutNotify(cur < 0 ? 0 : cur);
         dd.RefreshShownValue();
         dd.onValueChanged.AddListener(OnPick);
-        built = ddGo;
-        Debug.Log("[WSZH] language UI built");
 
-        // 切換結果的提示（複製標題、字小一點，放在下拉選單下方）
-        var stGo = MakeText(tmpl, cv.transform, "WSZH_LanguageStatus");
-        stGo.name = "WSZH_LanguageStatus";
-        status = stGo.GetComponent<Graphic>();
-        SetSizeOf(status, titleSize * 0.55f);
-        Normalize(status, textW, titleSize * 0.55f);
-        status.raycastTarget = false;
-        SetTextOf(status, "");
-        Place((RectTransform)stGo.transform, stPos, cv);
-
-        // 幀率上限按鈕（語言選單下方；按一下切換 60 → 120 → 30 → 不限制）
-        var fpsRt = MakeButton(back, cv, "WSZH_FpsButton", FpsLabel(), OnFpsClick, out fpsLabel);
-        fpsRt.sizeDelta = new Vector2(ddRt.rect.width, ddRt.rect.height * 0.85f);
+        // 幀率上限（按一下切換 60 → 120 → 30 → 不限制）
+        var fpsRt = MakeButton(back, cv, "WSZH_FpsButton", FpsLabel(), OnFpsClick, out fpsLabel, P);
+        fpsRt.sizeDelta = new Vector2(ddW / fpsRt.lossyScale.x, ddH * 0.85f / fpsRt.lossyScale.y);
         if (fpsLabel != null) SetSizeOf(fpsLabel, backLabel.fontSize * 0.7f);
-        Place(fpsRt, fpsPos, cv);
-        StartCoroutine(Replace());
-        StartCoroutine(BuildCardTextLater(os, osType, cv, H));
+        PlaceAt(fpsRt, new Vector2(colR, cy + bh * 0.11f), cv);
+        AddText(labelTmpl, P, "WSZH_FpsTitle", L("幀率上限", "Frame rate limit"), labelSize * 0.8f, bw * 0.4f, new Vector2(colL, cy + bh * 0.11f));
+
+        // 切換語言的結果提示
+        status = AddText(labelTmpl, P, "WSZH_LanguageStatus", "", labelSize * 0.6f, bw, new Vector2(cx, cy + bh * 0.02f));
+
+        // 卡片翻譯與日版卡圖
+        cardTitle = AddText(labelTmpl, P, "WSZH_CardTitle", L("卡片效果翻譯與日版卡圖", "Card text translation & Japanese card art"), labelSize, bw, new Vector2(cx, cy - bh * 0.08f));
+        Button bsrc = upd ?? back;
+        cardUpd = upd; cardUpdText = updText; cardCanvas = cv;
+        cardBtnRt = MakeButton(bsrc, cv, "WSZH_CardTextButton", Zh("更新卡片翻譯"), OnCardTextUpdate, out cardBtnLabel, P);
+        jpBtnRt = MakeButton(bsrc, cv, "WSZH_JpArtButton", JpArtLabel(), OnJpArtToggle, out jpBtnLabel, P);
+        Graphic pfLabel;
+        prefetchRt = MakeButton(bsrc, cv, "WSZH_JpPrefetchButton", Zh("下載牌組卡圖"), OnPrefetch, out pfLabel, P);
+        float w = cardBtnRt.rect.width * cardBtnRt.lossyScale.x, h = cardBtnRt.rect.height * cardBtnRt.lossyScale.y;
+        PlaceAt(cardBtnRt, new Vector2(cx - w * 1.08f, cy - bh * 0.19f), cv);
+        PlaceAt(jpBtnRt, new Vector2(cx, cy - bh * 0.19f), cv);
+        PlaceAt(prefetchRt, new Vector2(cx + w * 1.08f, cy - bh * 0.19f), cv);
+        Graphic stTmpl = (Graphic)updText ?? labelTmpl;
+        float stSize = updText != null ? updText.fontSize : labelSize * 0.6f;
+        cardStatus = AddText(stTmpl, P, "WSZH_CardTextStatus", "", stSize, bw, new Vector2(cx, cy - bh * 0.3f));
+        cardStatusRt = (RectTransform)cardStatus.transform;
+
+        // 關閉
+        var closeRt = MakeButton(back, cv, "WSZH_CloseButton", L("關閉", "Close"), ClosePage, out closeLabel, P);
+        PlaceAt(closeRt, new Vector2(cx, cy - bh * 0.41f), cv);
+
+        page.SetActive(false);
+        built = entryRt.gameObject;
+        StartCoroutine(FollowCardInfo());
+        ShowCardTextInfo();
+        Debug.Log("[WSZH] settings page built: entry=" + entryPos + " screen=" + W + "x" + H + " dropdownRow=" + (lowestDd != null ? lowestDd.name : "-"));
     }
 
-    // 「Card storage…」那幾行是遊戲稍後才填的，填完版面會移動，所以等它排好再放按鈕
-    IEnumerator BuildCardTextLater(object os, Type osType, Canvas cv, float H)
-    {
-        var updText = osType.GetField("updateStatusText", Any).GetValue(os) as Text;
-        float until = Time.realtimeSinceStartup + 3f;
-        while (updText != null && string.IsNullOrEmpty(updText.text) && Time.realtimeSinceStartup < until) yield return null;
-        yield return null;
-        yield return new WaitForSecondsRealtime(0.3f);
-        if (cv == null) yield break;
-        Canvas.ForceUpdateCanvases();
-        try { BuildCardTextUI(os, osType, cv, H); }
-        catch (Exception ex) { Debug.Log("[WSZH] card text UI failed: " + ex); }
-    }
-
-    // ---- 設定頁右下：「更新卡片翻譯」按鈕（放在模擬器「更新卡片」那一區的下方） ----
+    // 卡片翻譯那一區用到的物件
     Graphic cardStatus;
     bool cardBusy;
-
     Button cardUpd; Text cardUpdText; Canvas cardCanvas;
     RectTransform cardBtnRt, cardStatusRt;
-    float cardLastBottom;
-
-    // 「Card storage…」最後一行文字的下緣（螢幕座標）。按下「更新卡片」後這段文字會變長，所以要隨時重算
-    float CardInfoBottom()
-    {
-        Vector2 pBtn = ScreenPos(cardUpd, cardCanvas);
-        var urt = (RectTransform)cardUpd.transform;
-        float bottom = pBtn.y - urt.rect.height * urt.lossyScale.y * 0.5f;
-        if (cardUpdText != null && cardUpdText.gameObject.activeInHierarchy && !string.IsNullOrEmpty(cardUpdText.text))
-        {
-            // 文字框本身可能比實際文字大很多，用文字實際的高度算出最後一行的位置
-            Camera cam = cardCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : cardCanvas.worldCamera;
-            var tr = (RectTransform)cardUpdText.transform;
-            var corners = new Vector3[4];
-            tr.GetWorldCorners(corners);
-            float top = RectTransformUtility.WorldToScreenPoint(cam, corners[1]).y;
-            bottom = Mathf.Min(bottom, top - cardUpdText.preferredHeight * tr.lossyScale.y);
-        }
-        return bottom;
-    }
-
-    void PlaceCardTextUI()
-    {
-        if (cardBtnRt == null || cardUpd == null || cardCanvas == null) return;
-        float bottom = CardInfoBottom();
-        if (Mathf.Abs(bottom - cardLastBottom) < 0.5f) return;
-        cardLastBottom = bottom;
-        float cx = ScreenPos(cardUpd, cardCanvas).x;
-        float h = cardBtnRt.rect.height * cardBtnRt.lossyScale.y;
-        float w = cardBtnRt.rect.width * cardBtnRt.lossyScale.x;
-        // 「更新卡片翻譯」和「日版卡圖」左右並排，下面是兩行狀態文字
-        // 三顆按鈕並排：更新卡片翻譯｜日版卡圖開關｜下載牌組的日版卡圖
-        PlaceAt(cardBtnRt, new Vector2(cx - w * 1.08f, bottom - h * 0.65f), cardCanvas);
-        if (jpBtnRt != null) PlaceAt(jpBtnRt, new Vector2(cx, bottom - h * 0.65f), cardCanvas);
-        if (prefetchRt != null) PlaceAt(prefetchRt, new Vector2(cx + w * 1.08f, bottom - h * 0.65f), cardCanvas);
-        if (cardStatusRt != null) PlaceAt(cardStatusRt, new Vector2(cx, bottom - h * 1.55f), cardCanvas);
-    }
 
     // 新建一顆按鈕，只沿用範本按鈕的圖樣與字型
     // （不直接複製：原按鈕上的遊戲元件會把位置與文字改回去）
@@ -592,6 +578,10 @@ public class WszhLang : MonoBehaviour
         if (cardBtnLabel != null) SetTextOf(cardBtnLabel, Zh("更新卡片翻譯"));
         if (jpBtnLabel != null) SetTextOf(jpBtnLabel, JpArtLabel());
         if (fpsLabel != null) SetTextOf(fpsLabel, FpsLabel());
+        if (entryLabel != null) SetTextOf(entryLabel, L("中文化設定", "Chinese Patch Settings"));
+        if (pageTitle != null) SetTextOf(pageTitle, L("中文化設定", "Chinese Patch Settings"));
+        if (cardTitle != null) SetTextOf(cardTitle, L("卡片效果翻譯與日版卡圖", "Card text translation & Japanese card art"));
+        if (closeLabel != null) SetTextOf(closeLabel, L("關閉", "Close"));
         updaterShown = null;
         ShowCardTextInfo();
     }
@@ -622,7 +612,6 @@ public class WszhLang : MonoBehaviour
         while (cardBtnRt != null)
         {
             TranslateUpdaterStatus();
-            PlaceCardTextUI();
             // 預先下載進行中：更新剩餘張數（每 0.5 秒）
             if (Time.frameCount % 30 == 0 && WszhJpArt.Pending != shownPending && shownPending > 0 && !cardBusy) ShowCardTextInfo();
             yield return null;
@@ -688,8 +677,8 @@ public class WszhLang : MonoBehaviour
     }
 
     // 這個檔案、CardText.cs、JpArt.cs 裡給玩家看的中文字的繁→簡對照（用 OpenCC 產生；新增文字時要補上）
-    const string TradChars = "個側傷內動勝區問啟單圖場夾對幀庫張後從態戰戲換擇擊擬敗時暫會條構檔檢沒減灣為無狀獲畢確穩紀紅級組結經綠網線編與藍裝裡複視試語說請證譯讀變費資載輯這連進遊過選還錄長開間關階雲預題顏驗驟體黃閉顯";
-    const string SimpChars = "个侧伤内动胜区问启单图场夹对帧库张后从态战戏换择击拟败时暂会条构档检没减湾为无状获毕确稳纪红级组结经绿网线编与蓝装里复视试语说请证译读变费资载辑这连进游过选还录长开间关阶云预题颜验骤体黄闭显";
+    const string TradChars = "個側傷內動勝區問啟單圖場夾對幀庫張後從態戰戲換擇擊擬敗時暫會條構檔檢沒減灣為無狀獲畢確穩紀紅級組結經綠網線編與藍裝裡複視試語說請證譯讀變費資載輯這連進遊過選還錄長開間關階雲預題顏驗驟體黃閉顯設";
+    const string SimpChars = "个侧伤内动胜区问启单图场夹对帧库张后从态战戏换择击拟败时暂会条构档检没减湾为无状获毕确稳纪红级组结经绿网线编与蓝装里复视试语说请证译读变费资载辑这连进游过选还录长开间关阶云预题颜验骤体黄闭显设";
     internal static string ToSimplified(string s)
     {
         if (string.IsNullOrEmpty(s)) return s;
@@ -702,42 +691,6 @@ public class WszhLang : MonoBehaviour
     static string Zh(string s) { return ReadLanguage() == "cn" ? ToSimplified(s) : s; }
     internal static string ZhText(string s) { return Zh(s); }
     internal static void StartNoticeUpdate() { if (inst != null) inst.NoticeUpdate(); }
-
-    void BuildCardTextUI(object os, Type osType, Canvas cv, float H)
-    {
-        var upd = osType.GetField("updateCardsButton", Any).GetValue(os) as Button;
-        var updText = osType.GetField("updateStatusText", Any).GetValue(os) as Text;
-        if (upd == null) { Debug.Log("[WSZH] card text UI: update button not found"); return; }
-
-        // 位置：「更新卡片」按鈕同一欄，Card storage 那幾行文字的下方
-        Vector2 pBtn = ScreenPos(upd, cv);
-        cardUpd = upd; cardUpdText = updText; cardCanvas = cv;
-        float bottom = CardInfoBottom();
-
-        var rt = MakeButton(upd, cv, "WSZH_CardTextButton", Zh("更新卡片翻譯"), OnCardTextUpdate, out cardBtnLabel);
-        var btn = rt.GetComponent<Button>();
-        cardBtnRt = rt;
-        jpBtnRt = MakeButton(upd, cv, "WSZH_JpArtButton", JpArtLabel(), OnJpArtToggle, out jpBtnLabel);
-        Graphic pfLabel;
-        prefetchRt = MakeButton(upd, cv, "WSZH_JpPrefetchButton", Zh("下載牌組卡圖"), OnPrefetch, out pfLabel);
-
-        // 狀態文字
-        Graphic tmpl = (Graphic)updText ?? upd.GetComponentInChildren<TMP_Text>(true);
-        var stGo = MakeText(tmpl, cv.transform, "WSZH_CardTextStatus");
-        cardStatus = stGo.GetComponent<Graphic>();
-        cardStatus.raycastTarget = false;
-        float size = updText != null ? updText.fontSize : 20f;
-        SetSizeOf(cardStatus, size);
-        Normalize(cardStatus, rt.rect.width * 3f, size);
-        cardStatusRt = (RectTransform)stGo.transform;
-        cardLastBottom = float.NaN;
-        PlaceCardTextUI();
-        StartCoroutine(FollowCardInfo());
-        ShowCardTextInfo();
-        Debug.Log("[WSZH] card text UI: orig=" + pBtn + " active=" + upd.gameObject.activeInHierarchy
-            + " bottom=" + bottom + " new=" + ScreenPos(btn, cv) + " screenH=" + Screen.height
-            + " label=" + (upd.GetComponentInChildren<TMP_Text>(true) != null ? upd.GetComponentInChildren<TMP_Text>(true).text : "?"));
-    }
 
     void ShowCardTextInfo()
     {
@@ -1449,6 +1402,7 @@ public class WszhLang : MonoBehaviour
             building = true;
             StartCoroutine(BuildLater());
         }
+        if (page != null && page.activeSelf && Input.GetKeyDown(KeyCode.Escape)) ClosePage();
         if (status != null && statusShown && Time.realtimeSinceStartup > statusUntil) { SetTextOf(status, ""); statusShown = false; }
 
         // 開發用：Ctrl+Shift+F12 匯出所有卡片的效果文字（給卡片翻譯用，見 CardText.cs）

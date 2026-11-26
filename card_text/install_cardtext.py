@@ -71,7 +71,9 @@ def prompt_option_pairs():
 def build_files():
     files = {}
     for f in glob.glob(os.path.join(D, '*_tw.json')):
-        files[os.path.basename(f)[:-len('_tw.json')]] = json.load(open(f, encoding='utf-8'))
+        d = json.load(open(f, encoding='utf-8'))
+        # 「帶有「【羈絆】」的角色」這種關鍵字外面多包一層引號，讀起來框太多：只留【】
+        files[os.path.basename(f)[:-len('_tw.json')]] = {k: re.sub(r'「(【[^】「」]{1,6}】)」', r'\1', v) for k, v in d.items()}
     known = set(k for d in files.values() for k in d)
     quoted = {}
     for d in files.values():

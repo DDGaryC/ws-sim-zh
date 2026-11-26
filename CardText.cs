@@ -50,6 +50,35 @@ public static class WszhCardText
         finally { WszhPerf.Add(0, t0); }
     }
 
+    // CommonEffects 的 Bond1／BondClock／BondDiscard／2OptionBond*：
+    // Auto: BOND/ <b>"卡名"</b>[費用] (<i>When this card is placed ... choose 1 "卡名" in your waiting room, and return it to your hand</i>)
+    // 卡名可能是「"A" or "B"」或「"A|B"」
+    static readonly Regex BondRx = new Regex("^Auto: BOND/ <b>(.+?)</b>\"? ?\\[(.*?)\\] ?\\(<i>When this card is placed on the stage from your hand, you may pay the cost\\. If you do, choose 1 .+? in your waiting room, and return it to your hand</i>\\)\\.?$");
+    static string Bond(string line)
+    {
+        var m = BondRx.Match(line);
+        if (!m.Success) return null;
+        bool cn = loadedLang == "cn", hk = loadedLang == "hk";
+        var names = new List<string>();
+        foreach (var part in Regex.Split(m.Groups[1].Value, "\" or \""))
+        {
+            string p = part;
+            if (p.StartsWith("\"")) p = p.Substring(1);
+            if (p.EndsWith("\"")) p = p.Substring(0, p.Length - 1);
+            names.AddRange(p.Split('|'));
+        }
+        string n = "「" + string.Join(cn ? "」或「" : "」或「", names.ToArray()) + "」";
+        string cost = m.Groups[2].Value.Trim(), zc;
+        if (cost.StartsWith("Put 1 card from your hand into")) zc = cn ? "将你的 1 张手牌放置到控室" : hk ? "將你的 1 張手牌放置到控制室" : "將你的 1 張手牌放置到休息室";
+        else if (cost.StartsWith("Put the top card of your deck in")) zc = cn ? "将你卡组顶的 1 张卡放置到时计区" : "將你牌庫頂的 1 張卡放置到傷害區";
+        else if (map.TryGetValue(cost, out zc)) { }
+        else zc = cost;
+        if (cn) return "【自】【羁绊】/ <b>" + n + "</b> [" + zc + "] (<i>这张卡从手牌放置到舞台时，你可以支付费用。支付的话，选择你控室的 1 张" + n + "，返回手牌</i>)";
+        return "【自】【羈絆】/ <b>" + n + "</b> [" + zc + "] (<i>這張卡從手牌放置到舞台時，你可以支付費用。支付的話，選擇你" + (hk ? "控制室" : "休息室") + "的 1 張" + n + "，返回手牌</i>)";
+    }
+
+    static readonly Regex StackRx = new Regex("^((?:<color=#[0-9A-Fa-f]{6}>)?<color=#800080><b>x\\d+</b></color> )(.+)$");
+
     static string TranslateCore(string str)
     {
         try
@@ -69,6 +98,14 @@ public static class WszhCardText
             {
                 string line = lines[i];
                 string whole;
+                // 0.8.0.0 起，相同的獲得能力會疊在一起，前面加紫色粗體「x2」：拿掉前綴，剩下的照一般的一行處理
+                var sm = StackRx.Match(line);
+                if (sm.Success)
+                {
+                    string r = TranslateCore(sm.Groups[2].Value);
+                    if (r != sm.Groups[2].Value) { lines[i] = sm.Groups[1].Value + r; changed = true; }
+                    continue;
+                }
                 // 卡片預覽的狀態說明（「* Cannot attack.」「* This card's name is also treated as "X".」…，遊戲動態產生）
                 string st = StatusLine(line);
                 if (st != null) { lines[i] = st; changed = true; continue; }
@@ -81,8 +118,16 @@ public static class WszhCardText
                 { lines[i] = "「" + whole + "」"; changed = true; continue; }
                 // 「選擇效果的處理順序」各選項：「1. 效果」（效果拆自卡片原文的引號段落，見 install_cardtext.py）
                 int dot = tr.IndexOf(". ");
-                if (dot > 0 && dot <= 2 && char.IsDigit(tr[0]) && map.TryGetValue(tr.Substring(dot + 2).Trim(), out whole))
-                { lines[i] = tr.Substring(0, dot + 2) + whole; changed = true; continue; }
+                if (dot > 0 && dot <= 2 && char.IsDigit(tr[0]))
+                {
+                    // 處理順序的選項，遊戲會把效果句尾的句點拿掉，所以也試試補上句點
+                    string opt = tr.Substring(dot + 2).Trim();
+                    if (map.TryGetValue(opt, out whole) || map.TryGetValue(opt + ".", out whole))
+                    { lines[i] = tr.Substring(0, dot + 2) + whole; changed = true; continue; }
+                }
+                // 共用範本組出來的【羈絆】（例如記憶效果讓角色獲得的羈絆，卡名是執行時才填進去的，翻譯表裡沒有）
+                string bond = Bond(tr);
+                if (bond != null) { lines[i] = bond; changed = true; continue; }
                 // 誘發效果排序：傷害相關的自動能力後面接「(3 Damage)」
                 var dm = Regex.Match(tr, @"^\((\d+) Damage\)$");
                 if (dm.Success) { lines[i] = "（" + dm.Groups[1].Value + (loadedLang == "cn" ? " 点伤害）" : " 點傷害）"); changed = true; continue; }
@@ -103,6 +148,12 @@ public static class WszhCardText
                     p = e + 1;
                     string rest = line.Substring(p), zh;
                     if (map.TryGetValue(rest, out zh) || map.TryGetValue(rest.TrimEnd(), out zh)) { lines[i] = line.Substring(0, p) + zh; changed = true; break; }
+                    // 獲得的能力會用顏色標籤包起來（行尾也有 </color>），羈絆範本要去掉兩頭再比對
+                    string inner = rest, tail = "";
+                    int ce = inner.LastIndexOf("</color>", StringComparison.Ordinal);
+                    if (ce > 0 && ce + 8 == inner.Length) { tail = "</color>"; inner = inner.Substring(0, ce); }
+                    string bz = Bond(inner.Trim());
+                    if (bz != null) { lines[i] = line.Substring(0, p) + bz + tail; changed = true; break; }
                 }
             }
             string result = changed ? string.Join("\n", lines) : str;

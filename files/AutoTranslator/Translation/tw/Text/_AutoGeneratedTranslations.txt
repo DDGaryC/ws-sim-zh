@@ -72,3 +72,7 @@ Discard down to 8 cards=請把手牌丟棄至 8 張
 Choose a slot to place Advancing Through the Infinite Universe, Miyako Fuji in.=請選擇放置 Advancing Through the Infinite Universe, Miyako Fuji 的位置。
 Discard 3 cards.=丟棄 3 張卡。
 Your card data may be out of date.\n\nLast update run: 11月 19, 2026 3:20 下午 local\nLatest repo commit: 11月 24, 2026 11:32 上午 local\n\nWould you like to go to Settings to update now?=你的卡片資料可能不是最新的。\n\n上次更新：11月 19, 2026 3:20 下午 local\n\n最新版本：11月 24, 2026 11:32 上午 local\n\n\n\n要前往設定進行更新嗎？
+A newer version of the simulator is available: 0.8.0.0\nYou are currently running 0.7.9.7.\n\nUpdate now? The game will close and restart when the update is complete.=有新版本的模擬器可以更新：0.8.0.0\n\n你目前的版本是 0.7.9.7。\n\n要現在更新嗎？更新完成後遊戲會自動關閉並重新啟動。
+Reveal up to 6 cards=公開最多 6 張卡
+Reveal up to 3 cards=公開最多 3 張卡
+P3壞東西-1 already exists. Are you sure you want to overwrite it?\n=P3壞東西-1 已經存在，確定要覆蓋嗎？
